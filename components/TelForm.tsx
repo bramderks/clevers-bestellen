@@ -55,12 +55,16 @@ export default function TelForm({ vestiging }: Props) {
   const huidigeStap = controleStap ? null : STAPPEN[stap];
 
  const huidigeProducten = controleStap
+  
   ? []
   : producten.filter(
       (p) =>
         p.telCategorie === huidigeStap!.key &&
         p.id !== "speciaalsmaken"
     );
+console.log("Stap:", huidigeStap?.key);
+console.log("Producten:", huidigeProducten);
+console.log(huidigeProducten);
 
 const ijsBestelling = advies
   .filter((a) => a.bestelGroep === "ijs")
@@ -169,12 +173,14 @@ async function opslaan() {
          )}
                </div>
 
-      {!controleStap ? (
+{!controleStap ? (
   huidigeStap?.key === "speciaalsmaken" ? (
-    <SpeciaalsmakenTeller
-      waarde={telling.speciaalsmaken ?? 0}
-      onChange={(v) => wijzig("speciaalsmaken", v)}
-    />
+<SpeciaalsmakenTeller
+  waarde={telling.speciaalsmaken ?? 0}
+  onChange={(v) => wijzig("speciaalsmaken", v)}
+  slagroom={telling.slagroom ?? 0}
+  onSlagroomChange={(v) => wijzig("slagroom", v)}
+/>
   ) : (
     <TelCategorie
       titel={huidigeStap!.titel}
@@ -193,7 +199,6 @@ async function opslaan() {
     setOpmerking={setOpmerking}
   />
 )}
-
       <div className="flex justify-between">
         <button
           onClick={vorige}

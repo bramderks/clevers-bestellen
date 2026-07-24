@@ -1,11 +1,11 @@
 import type { Product } from "@/types";
 
 import { ijs } from "./ijs";
-import { overig } from "./overig";
+import { drooggoed } from "./drooggoed";
 
 export const producten: Product[] = [
   ...ijs,
-  ...overig,
+  ...drooggoed,
 ];
 
 // Controle op dubbele product-id's (alleen tijdens development)
