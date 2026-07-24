@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./clevers.db"
+}
+
+model Bestelling {
+  id         Int                @id @default(autoincrement())
+  datum      DateTime
+  vestiging  String
+  type       String
+  regels     BestellingRegel[]
+  aangemaakt DateTime           @default(now())
+}
+
+model BestellingRegel {
+  id            Int         @id @default(autoincrement())
+  bestellingId  Int
+  bestelling    Bestelling  @relation(fields: [bestellingId], references: [id], onDelete: Cascade)
+
+  productId     String
+  productNaam   String
+
+  geteld        Int
+  buffer        Int
+  besteld       Int
+
+  bestelGroep   String
+}
