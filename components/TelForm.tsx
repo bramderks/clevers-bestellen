@@ -174,15 +174,17 @@ async function opslaan() {
           onChange={wijzig}
         />
       ) : (
-  <ControlePagina
-    ijsBestelling={ijsBestelling}
-    drooggoedBestelling={drooggoedBestelling}
-    totaalIJs={totaalIJs}
-    totaalDrooggoed={totaalDrooggoed}
-    opmerking={opmerking}
-    setOpmerking={setOpmerking}
-  />
-        <div className="flex justify-between">
+        <ControlePagina
+          ijsBestelling={ijsBestelling}
+          drooggoedBestelling={drooggoedBestelling}
+          totaalIJs={totaalIJs}
+          totaalDrooggoed={totaalDrooggoed}
+          opmerking={opmerking}
+          setOpmerking={setOpmerking}
+        />
+      )}
+
+      <div className="flex justify-between">
         <button
           onClick={vorige}
           disabled={stap === 0}
@@ -215,6 +217,4 @@ async function opslaan() {
       </div>
     </div>
   );
-}
-)}
 }
