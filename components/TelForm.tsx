@@ -8,6 +8,7 @@ import { berekenBestelling } from "@/lib/bestelEngine";
 import { genereerDrooggoedPdf, genereerIJsPdf } from "@/lib/genereerPdf";
 import { useRouter } from "next/navigation";
 import ControlePagina from "./ControlePagina";
+import SpeciaalsmakenTeller from "./SpeciaalsmakenTeller";
 
 interface Props {
   vestiging: string;
@@ -53,11 +54,13 @@ export default function TelForm({ vestiging }: Props) {
 
   const huidigeStap = controleStap ? null : STAPPEN[stap];
 
-  const huidigeProducten = controleStap
-    ? []
-    : producten.filter(
-        (p) => p.telCategorie === huidigeStap!.key
-      );
+ const huidigeProducten = controleStap
+  ? []
+  : producten.filter(
+      (p) =>
+        p.telCategorie === huidigeStap!.key &&
+        p.id !== "speciaalsmaken"
+    );
 
 const ijsBestelling = advies
   .filter((a) => a.bestelGroep === "ijs")
@@ -167,22 +170,29 @@ async function opslaan() {
                </div>
 
       {!controleStap ? (
-        <TelCategorie
-          titel={huidigeStap!.titel}
-          producten={huidigeProducten}
-          telling={telling}
-          onChange={wijzig}
-        />
-      ) : (
-        <ControlePagina
-          ijsBestelling={ijsBestelling}
-          drooggoedBestelling={drooggoedBestelling}
-          totaalIJs={totaalIJs}
-          totaalDrooggoed={totaalDrooggoed}
-          opmerking={opmerking}
-          setOpmerking={setOpmerking}
-        />
-      )}
+  huidigeStap?.key === "speciaalsmaken" ? (
+    <SpeciaalsmakenTeller
+      waarde={telling.speciaalsmaken ?? 0}
+      onChange={(v) => wijzig("speciaalsmaken", v)}
+    />
+  ) : (
+    <TelCategorie
+      titel={huidigeStap!.titel}
+      producten={huidigeProducten}
+      telling={telling}
+      onChange={wijzig}
+    />
+  )
+) : (
+  <ControlePagina
+    ijsBestelling={ijsBestelling}
+    drooggoedBestelling={drooggoedBestelling}
+    totaalIJs={totaalIJs}
+    totaalDrooggoed={totaalDrooggoed}
+    opmerking={opmerking}
+    setOpmerking={setOpmerking}
+  />
+)}
 
       <div className="flex justify-between">
         <button

@@ -358,4 +358,16 @@ export const ijs: Product[] = [
     actief: true,
     alternatieveNamen: ["yoghurt aardbei"],
   },
+  {
+  id: "speciaalsmaken",
+  naam: "Speciaalsmaken",
+  categorie: "ijs",
+  telCategorie: "speciaalsmaken",
+  bestelBij: "ijskeuken",
+  bestelGroep: "ijs",
+  buffer: 6,
+  volgorde: 999,
+  actief: true,
+  alternatieveNamen: [],
+},
 ];
