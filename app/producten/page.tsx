@@ -34,9 +34,13 @@ export default function ProductenPagina() {
                     Categorie
                   </th>
 
-                  <th className="text-left p-3">
-                    Leverancier
-                  </th>
+<th className="text-left p-3">
+  Bestel bij
+</th>
+
+<th className="text-left p-3">
+  Bestelgroep
+</th>
 
                   <th className="text-center p-3">
                     Actief
@@ -66,9 +70,9 @@ export default function ProductenPagina() {
                       {product.categorie}
                     </td>
 
-                    <td className="p-3">
-                      {product.leverancierId}
-                    </td>
+<td className="p-3">
+  {product.bestelBij}
+</td>
 
                     <td className="text-center p-3">
                       {product.actief ? "✅" : "❌"}
