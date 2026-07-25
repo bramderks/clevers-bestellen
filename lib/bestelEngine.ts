@@ -1,35 +1,56 @@
-import { BestelAdvies } from "./bestelEngine";
+import { Artikel, Product } from "../types";
 
-export interface LeverancierGroep {
-  bestelBij: string;
-  artikelen: BestelAdvies[];
+export interface BestelAdvies {
+  id: string;
+  naam: string;
+
+  categorie: Product["categorie"];
+  bestelBij: Product["bestelBij"];
+  bestelGroep: Product["bestelGroep"];
+
+  volgorde: number;
+
+  geteld: number;
+  buffer: number;
+  bestellen: number;
 }
 
-export function groepeerLeverancier(
-  bestelling: BestelAdvies[]
-): LeverancierGroep[] {
-  const groepen = new Map<string, BestelAdvies[]>();
+export function berekenBestelling(
+  artikelen: Artikel[],
+  producten: Product[]
+): BestelAdvies[] {
+  const voorraad = new Map<string, number>();
 
-  for (const artikel of bestelling) {
-    if (artikel.bestellen <= 0) continue;
+  // Getelde voorraad opslaan
+  for (const artikel of artikelen) {
+    const aantal =
+      Number.isInteger(artikel.aantal) && artikel.aantal >= 0
+        ? artikel.aantal
+        : 0;
 
-    const artikelen =
-      groepen.get(artikel.bestelBij) ?? [];
-
-    artikelen.push(artikel);
-
-    groepen.set(
-      artikel.bestelBij,
-      artikelen
-    );
+    voorraad.set(artikel.id, aantal);
   }
 
-  return Array.from(groepen.entries()).map(
-    ([bestelBij, artikelen]) => ({
-      bestelBij,
-      artikelen: artikelen.sort(
-        (a, b) => a.volgorde - b.volgorde
-      ),
-    })
-  );
+  return producten
+    .filter((product) => product.actief)
+    .sort((a, b) => a.volgorde - b.volgorde)
+    .map((product) => {
+      const geteld = voorraad.get(product.id) ?? 0;
+
+      return {
+        id: product.id,
+        naam: product.naam,
+
+        categorie: product.categorie,
+        bestelBij: product.bestelBij,
+        bestelGroep: product.bestelGroep,
+
+        volgorde: product.volgorde,
+
+        geteld,
+        buffer: product.buffer,
+
+        bestellen: Math.max(0, product.buffer - geteld),
+      };
+    });
 }

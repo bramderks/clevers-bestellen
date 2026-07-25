@@ -19,6 +19,7 @@ export function mapRegels(
 
       return {
         id: product.id,
+        naam: product.naam,
         aantal: gevonden?.aantal ?? 0,
       };
     });

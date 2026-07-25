@@ -1,5 +1,5 @@
 import { producten } from "@/data/producten";
-import type { Product } from "@/types/product";
+import type { Product } from "@/types";
 
 export type TelCategorie =
   | "hardlopers"
