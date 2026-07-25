@@ -5,6 +5,8 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    console.log("Ontvangen bestelling:", body);
+
     const bestelling = await prisma.bestelling.create({
       data: {
         datum: new Date(body.datum),
@@ -28,13 +30,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(bestelling);
-  } catch (e) {
-    console.error(e);
+    console.log("✅ BESTELLING OPGESLAGEN");
+    console.log(bestelling);
+
+    return NextResponse.json({
+      success: true,
+      bestelling,
+    });
+  } catch (error) {
+    console.error("❌ FOUT BIJ OPSLAAN");
+    console.error(error);
 
     return NextResponse.json(
       {
-        error: "Opslaan mislukt",
+        success: false,
+        error: String(error),
       },
       {
         status: 500,
