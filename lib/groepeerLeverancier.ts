@@ -1,7 +1,7 @@
 import { BestelAdvies } from "./bestelEngine";
 
 export interface LeverancierGroep {
-  leverancierId: string;
+  bestelBij: string;
   artikelen: BestelAdvies[];
 }
 
@@ -14,19 +14,19 @@ export function groepeerLeverancier(
     if (artikel.bestellen <= 0) continue;
 
     const artikelen =
-      groepen.get(artikel.leverancierId) ?? [];
+      groepen.get(artikel.bestelBij) ?? [];
 
     artikelen.push(artikel);
 
     groepen.set(
-      artikel.leverancierId,
+      artikel.bestelBij,
       artikelen
     );
   }
 
   return Array.from(groepen.entries()).map(
-    ([leverancierId, artikelen]) => ({
-      leverancierId,
+    ([bestelBij, artikelen]) => ({
+      bestelBij,
       artikelen: artikelen.sort(
         (a, b) => a.volgorde - b.volgorde
       ),
