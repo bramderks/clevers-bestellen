@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./clevers.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Bestelling {
@@ -12,21 +12,23 @@ model Bestelling {
   datum      DateTime
   vestiging  String
   type       String
-  regels     BestellingRegel[]
   aangemaakt DateTime           @default(now())
+
+  regels     BestellingRegel[]
 }
 
 model BestellingRegel {
-  id            Int         @id @default(autoincrement())
-  bestellingId  Int
-  bestelling    Bestelling  @relation(fields: [bestellingId], references: [id], onDelete: Cascade)
+  id           Int          @id @default(autoincrement())
 
-  productId     String
-  productNaam   String
+  bestellingId Int
+  bestelling   Bestelling   @relation(fields: [bestellingId], references: [id], onDelete: Cascade)
 
-  geteld        Int
-  buffer        Int
-  besteld       Int
+  productId    String
+  productNaam  String
 
-  bestelGroep   String
+  geteld       Int
+  buffer       Int
+  besteld      Int
+
+  bestelGroep  String
 }
