@@ -11,14 +11,12 @@ export default function VestigingSelector({
 }: VestigingSelectorProps) {
   return (
     <div className="mb-8">
-
-      <h2 className="text-xl font-semibold mb-4">
+      <h2 className="text-lg md:text-xl font-semibold mb-4">
         Stap 1 - Kies vestiging
       </h2>
 
-      <div className="flex gap-6">
-
-        <label className="flex items-center gap-2 cursor-pointer">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
+        <label className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 cursor-pointer hover:bg-slate-50">
           <input
             type="radio"
             name="vestiging"
@@ -27,10 +25,10 @@ export default function VestigingSelector({
             onChange={(e) => onChange(e.target.value)}
           />
 
-          Nijmegen
+          <span>Nijmegen</span>
         </label>
 
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 cursor-pointer hover:bg-slate-50">
           <input
             type="radio"
             name="vestiging"
@@ -39,11 +37,9 @@ export default function VestigingSelector({
             onChange={(e) => onChange(e.target.value)}
           />
 
-          Roermond
+          <span>Roermond</span>
         </label>
-
       </div>
-
     </div>
   );
 }

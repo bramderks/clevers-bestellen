@@ -146,90 +146,90 @@ async function opslaan() {
   }
 }
 
-  return (
-    <div className="space-y-6">
-
-      <div className="rounded-xl border bg-blue-50 p-5">
-        <div className="text-sm text-gray-600">
-          Vestiging: <strong>{vestiging}</strong>
-        </div>
-
-        {!controleStap && (
-          <>
-            <div className="mt-2 text-sm">
-              Stap <strong>{stap + 1}</strong> van{" "}
-              <strong>{STAPPEN.length}</strong>
-            </div>
-
-            <div className="mt-3 h-3 w-full rounded-full bg-gray-200">
-              <div
-                className="h-3 rounded-full bg-blue-600 transition-all"
-                style={{
-                  width: `${((stap + 1) / STAPPEN.length) * 100}%`,
-                }}
-              />
-            </div>
-          </>
-         )}
-               </div>
-
-{!controleStap ? (
-  huidigeStap?.key === "speciaalsmaken" ? (
-<SpeciaalsmakenTeller
-  waarde={telling.speciaalsmaken ?? 0}
-  onChange={(v) => wijzig("speciaalsmaken", v)}
-  slagroom={telling.slagroom ?? 0}
-  onSlagroomChange={(v) => wijzig("slagroom", v)}
-/>
-  ) : (
-    <TelCategorie
-      titel={huidigeStap!.titel}
-      producten={huidigeProducten}
-      telling={telling}
-      onChange={wijzig}
-    />
-  )
-) : (
-  <ControlePagina
-    ijsBestelling={ijsBestelling}
-    drooggoedBestelling={drooggoedBestelling}
-    totaalIJs={totaalIJs}
-    totaalDrooggoed={totaalDrooggoed}
-    opmerking={opmerking}
-    setOpmerking={setOpmerking}
-  />
-)}
-      <div className="flex justify-between">
-        <button
-          onClick={vorige}
-          disabled={stap === 0}
-          className="rounded-lg bg-gray-300 px-6 py-3 disabled:opacity-40"
-        >
-          ← Vorige
-        </button>
-
-        {!controleStap ? (
-          <button
-            onClick={volgende}
-            className={`rounded-lg px-6 py-3 text-white ${
-              stap === STAPPEN.length - 1
-                ? "bg-green-600"
-                : "bg-blue-600"
-            }`}
-          >
-            {stap === STAPPEN.length - 1
-              ? "Naar controle"
-              : "Volgende →"}
-          </button>
-        ) : (
-          <button
-            onClick={opslaan}
-            className="rounded-lg bg-emerald-700 px-6 py-3 text-white"
-          >
-            Opslaan + PDF
-          </button>
-        )}
+ return (
+  <div className="space-y-6">
+    <div className="rounded-xl border bg-blue-50 p-4 md:p-5">
+      <div className="text-sm text-gray-600 break-words">
+        Vestiging: <strong>{vestiging}</strong>
       </div>
+
+      {!controleStap && (
+        <>
+          <div className="mt-2 text-sm">
+            Stap <strong>{stap + 1}</strong> van{" "}
+            <strong>{STAPPEN.length}</strong>
+          </div>
+
+          <div className="mt-3 h-3 w-full rounded-full bg-gray-200 overflow-hidden">
+            <div
+              className="h-3 rounded-full bg-blue-600 transition-all"
+              style={{
+                width: `${((stap + 1) / STAPPEN.length) * 100}%`,
+              }}
+            />
+          </div>
+        </>
+      )}
     </div>
-  );
+
+    {!controleStap ? (
+      huidigeStap?.key === "speciaalsmaken" ? (
+        <SpeciaalsmakenTeller
+          waarde={telling.speciaalsmaken ?? 0}
+          onChange={(v) => wijzig("speciaalsmaken", v)}
+          slagroom={telling.slagroom ?? 0}
+          onSlagroomChange={(v) => wijzig("slagroom", v)}
+        />
+      ) : (
+        <TelCategorie
+          titel={huidigeStap!.titel}
+          producten={huidigeProducten}
+          telling={telling}
+          onChange={wijzig}
+        />
+      )
+    ) : (
+      <ControlePagina
+        ijsBestelling={ijsBestelling}
+        drooggoedBestelling={drooggoedBestelling}
+        totaalIJs={totaalIJs}
+        totaalDrooggoed={totaalDrooggoed}
+        opmerking={opmerking}
+        setOpmerking={setOpmerking}
+      />
+    )}
+
+    <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+      <button
+        onClick={vorige}
+        disabled={stap === 0}
+        className="w-full sm:w-auto rounded-lg bg-gray-300 px-6 py-3 disabled:opacity-40"
+      >
+        ← Vorige
+      </button>
+
+      {!controleStap ? (
+        <button
+          onClick={volgende}
+          className={`w-full sm:w-auto rounded-lg px-6 py-3 text-white ${
+            stap === STAPPEN.length - 1
+              ? "bg-green-600"
+              : "bg-blue-600"
+          }`}
+        >
+          {stap === STAPPEN.length - 1
+            ? "Naar controle"
+            : "Volgende →"}
+        </button>
+      ) : (
+        <button
+          onClick={opslaan}
+          className="w-full sm:w-auto rounded-lg bg-emerald-700 px-6 py-3 text-white"
+        >
+          Opslaan + PDF
+        </button>
+      )}
+    </div>
+  </div>
+);
 }
