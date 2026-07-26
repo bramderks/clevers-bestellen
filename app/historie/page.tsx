@@ -1,15 +1,20 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 export default async function HistoriePagina() {
-  const bestellingen = await prisma.bestelling.findMany({
-    include: {
-      regels: true,
-    },
-    orderBy: {
-      datum: "desc",
-    },
-  });
+const bestellingen = await prisma.bestelling.findMany({
+  include: {
+    regels: true,
+  },
+  orderBy: {
+    id: "desc",
+  },
+});
+
+console.log("Aantal bestellingen:", bestellingen.length);
 
   return (
     <main className="min-h-screen bg-slate-100 p-10">

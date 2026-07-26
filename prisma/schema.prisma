@@ -8,27 +8,28 @@ datasource db {
 }
 
 model Bestelling {
-  id         Int                @id @default(autoincrement())
-  datum      DateTime
-  vestiging  String
-  type       String
-  aangemaakt DateTime           @default(now())
+  id          Int                @id @default(autoincrement())
+  datum       DateTime
+  vestiging   String
+  medewerker  String?
+  type        String
+  aangemaakt  DateTime           @default(now())
 
-  regels     BestellingRegel[]
+  regels      BestellingRegel[]
 }
 
 model BestellingRegel {
-  id           Int          @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
 
-  bestellingId Int
-  bestelling   Bestelling   @relation(fields: [bestellingId], references: [id], onDelete: Cascade)
+  bestellingId  Int
+  bestelling    Bestelling   @relation(fields: [bestellingId], references: [id], onDelete: Cascade)
 
-  productId    String
-  productNaam  String
+  productId     String
+  productNaam   String
 
-  geteld       Int
-  buffer       Int
-  besteld      Int
+  geteld        Int
+  buffer        Int
+  besteld       Int
 
-  bestelGroep  String
+  bestelGroep   String
 }

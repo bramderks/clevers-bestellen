@@ -26,7 +26,8 @@ export default function TelForm({ vestiging }: Props) {
     const router = useRouter();
   const [telling, setTelling] = useState<Record<string, number>>({});
   const [stap, setStap] = useState(0);
-  const [opmerking, setOpmerking] = useState("");
+const [opmerking, setOpmerking] = useState("");
+const [medewerker, setMedewerker] = useState("");
 
   function wijzig(id: string, waarde: number) {
     setTelling((vorige) => ({
@@ -97,8 +98,17 @@ const totaalDrooggoed = drooggoedBestelling.reduce(
   }
 
 async function opslaan() {
+  console.log("🚀 Opslaan gestart");
+
+  if (!medewerker.trim()) {
+    alert("Vul de naam van de medewerker in.");
+    return;
+  }
+
+  console.log("🚀 Opslaan gestart");
+
   try {
-    const regels = advies.map((r) => ({
+      const regels = advies.map((r) => ({
       productId: r.id,
       productNaam: r.naam,
       geteld: r.geteld,
@@ -112,18 +122,23 @@ async function opslaan() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        datum: new Date().toISOString(),
-        vestiging,
-        type: "telling",
-        opmerking,
-        regels,
-      }),
+body: JSON.stringify({
+  datum: new Date().toISOString(),
+  vestiging,
+  medewerker,
+  type: "telling",
+  opmerking,
+  regels,
+}),
     });
 
-    if (!response.ok) {
-      throw new Error("Opslaan mislukt");
-    }
+const result = await response.json();
+
+console.log("API RESPONSE:", result);
+
+if (!response.ok) {
+  throw new Error(result.error ?? "Opslaan mislukt");
+}
 
     genereerIJsPdf({
       vestiging,
@@ -137,9 +152,9 @@ async function opslaan() {
       bestelling: advies,
     });
 
-    alert("✅ Bestelling succesvol opgeslagen.");
+alert("✅ Bestelling succesvol opgeslagen.");
+window.location.href = "/historie";
 
-    router.push("/historie");
   } catch (error) {
     console.error(error);
     alert("❌ Er is iets misgegaan bij het opslaan.");
@@ -152,6 +167,19 @@ async function opslaan() {
       <div className="text-sm text-gray-600 break-words">
         Vestiging: <strong>{vestiging}</strong>
       </div>
+      <div className="mt-4">
+  <label className="mb-2 block text-sm font-medium text-gray-700">
+    Naam medewerker
+  </label>
+
+  <input
+    type="text"
+    value={medewerker}
+    onChange={(e) => setMedewerker(e.target.value)}
+    placeholder="Bijvoorbeeld Bram"
+    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+  />
+</div>
 
       {!controleStap && (
         <>
