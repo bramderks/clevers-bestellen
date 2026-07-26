@@ -58,12 +58,15 @@ data: {
 
     // Mail versturen (mag mislukken zonder de bestelling terug te draaien)
     try {
+console.log("➡️ VerstuurBestelMail wordt aangeroepen");
+
 await verstuurBestelMail(
   bestelling.vestiging,
   bestelling.medewerker ?? "Onbekend",
-  bestelling.datum.toLocaleDateString("nl-NL")
+  bestelling.datum.toLocaleDateString("nl-NL"),
+  bestelling.regels
 );
-
+console.log("⬅️ VerstuurBestelMail klaar");
       console.log("📧 E-mail succesvol verzonden.");
     } catch (mailError) {
       console.error("❌ E-mail kon niet worden verzonden.");

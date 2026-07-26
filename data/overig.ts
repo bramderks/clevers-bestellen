@@ -8,7 +8,7 @@ export const overig: Product[] = [
     telCategorie: "drooggoed",
     bestelBij: "drooggoed",
     bestelGroep: "drooggoed",
-    buffer: 0,
+    buffer: 1,
     volgorde: 1,
     actief: true,
     alternatieveNamen: [
@@ -24,7 +24,7 @@ export const overig: Product[] = [
     telCategorie: "drooggoed",
     bestelBij: "drooggoed",
     bestelGroep: "drooggoed",
-    buffer: 0,
+    buffer: 1,
     volgorde: 2,
     actief: true,
     alternatieveNamen: [
@@ -41,7 +41,7 @@ export const overig: Product[] = [
     telCategorie: "drooggoed",
     bestelBij: "drooggoed",
     bestelGroep: "drooggoed",
-    buffer: 0,
+    buffer: 1,
     volgorde: 3,
     actief: true,
     alternatieveNamen: [
@@ -56,7 +56,7 @@ export const overig: Product[] = [
     telCategorie: "drooggoed",
     bestelBij: "drooggoed",
     bestelGroep: "drooggoed",
-    buffer: 0,
+    buffer: 6,
     volgorde: 4,
     actief: true,
     alternatieveNamen: [
@@ -71,7 +71,7 @@ export const overig: Product[] = [
     telCategorie: "drooggoed",
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
-    buffer: 0,
+    buffer: 1,
     volgorde: 5,
     actief: true,
     alternatieveNamen: [

@@ -152,12 +152,16 @@ if (!response.ok) {
       bestelling: advies,
     });
 
-alert("✅ Bestelling succesvol opgeslagen.");
-window.location.href = "/historie";
+alert("✅ Bestelling opgeslagen en e-mail succesvol verzonden.");
+router.push("/historie");
 
   } catch (error) {
     console.error(error);
-    alert("❌ Er is iets misgegaan bij het opslaan.");
+alert(
+  error instanceof Error
+    ? `❌ ${error.message}`
+    : "❌ Er is iets misgegaan."
+);
   }
 }
 
