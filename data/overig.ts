@@ -67,7 +67,7 @@ export const overig: Product[] = [
     bestelGroep: "drooggoed",
     buffers: {
       roermond: 6,
-      nijmegen: 6,
+      nijmegen: 4,
     },
     volgorde: 4,
     actief: true,
@@ -85,7 +85,7 @@ export const overig: Product[] = [
     bestelGroep: "ijs",
     buffers: {
       roermond: 1,
-      nijmegen: 1,
+      nijmegen: 2,
     },
     volgorde: 5,
     actief: true,

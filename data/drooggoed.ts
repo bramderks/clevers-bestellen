@@ -12,7 +12,7 @@ export const drooggoed: Product[] = [
 
       roermond: 6,
 
-      nijmegen: 6,
+      nijmegen: 4,
 
     },
     volgorde: 100,
@@ -80,7 +80,7 @@ export const drooggoed: Product[] = [
 
     roermond: 1,
 
-    nijmegen: 1,
+    nijmegen: 2,
 
   },
   volgorde: 101,
