@@ -18,15 +18,15 @@ export default function BestelTabel({
       </h3>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse text-sm md:text-base">
-          <thead>
-            <tr className="border-b">
-              <th className="py-2 text-left whitespace-nowrap">Product</th>
-              <th className="py-2 text-right whitespace-nowrap">Geteld</th>
-              <th className="py-2 text-right whitespace-nowrap">Buffer</th>
-              <th className="py-2 text-right whitespace-nowrap">Bestellen</th>
-            </tr>
-          </thead>
+<table className="w-full table-fixed border-collapse text-sm md:text-base">
+<thead>
+  <tr className="border-b">
+    <th className="w-1/2 py-2 text-left">Product</th>
+    <th className="w-1/6 py-2 text-right">Geteld</th>
+    <th className="w-1/6 py-2 text-right">Buffer</th>
+    <th className="w-1/6 py-2 text-right">Bestellen</th>
+  </tr>
+</thead>
 
           <tbody>
             {regels.map((regel) => (
@@ -34,9 +34,9 @@ export default function BestelTabel({
                 key={regel.id}
                 className="border-b"
               >
-                <td className="py-2 pr-4 break-words">
-                  {regel.naam}
-                </td>
+<td className="py-2 pr-4">
+  {regel.naam}
+</td>
 
                 <td className="py-2 text-right">
                   {regel.geteld}

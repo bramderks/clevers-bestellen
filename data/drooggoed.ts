@@ -45,4 +45,15 @@ export const drooggoed: Product[] = [
     volgorde: 104,
     actief: true,
   },
+  {
+  id: "slagroom",
+  naam: "Slagroom",
+  categorie: "drooggoed",
+  telCategorie: "speciaalsmaken",
+  bestelBij: "ijskeuken",
+  bestelGroep: "drooggoed",
+  buffer: 1,
+  volgorde: 101,
+  actief: true,
+},
 ];
