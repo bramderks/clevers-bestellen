@@ -4,9 +4,10 @@ import { useState } from "react";
 
 import VestigingSelector from "@/components/VestigingSelector";
 import TelForm from "@/components/TelForm";
+import type { Vestiging } from "@/types";
 
 export default function NieuweTelling() {
-  const [vestiging, setVestiging] = useState("");
+  const [vestiging, setVestiging] = useState<Vestiging | "">("");
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 md:py-10">
@@ -22,7 +23,7 @@ export default function NieuweTelling() {
 
           <VestigingSelector
             vestiging={vestiging}
-            onChange={setVestiging}
+            onChange={(value) => setVestiging(value as Vestiging)}
           />
 
           {vestiging && (

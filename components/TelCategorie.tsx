@@ -1,12 +1,13 @@
 "use client";
 
 import TelRij from "./TelRij";
-import { Product } from "@/types";
+import { Product, Vestiging } from "@/types";
 
 interface Props {
   titel: string;
   producten: Product[];
   telling: Record<string, number>;
+  vestiging: Vestiging;
   onChange: (id: string, waarde: number) => void;
 }
 
@@ -14,6 +15,7 @@ export default function TelCategorie({
   titel,
   producten,
   telling,
+  vestiging,
   onChange,
 }: Props) {
   if (producten.length === 0) return null;
@@ -35,7 +37,7 @@ export default function TelCategorie({
           <TelRij
             key={product.id}
             naam={product.naam}
-            buffer={product.buffer}
+            buffer={product.buffers[vestiging]}
             aantal={telling[product.id] ?? 0}
             onChange={(waarde) => onChange(product.id, waarde)}
           />

@@ -10,8 +10,10 @@ import { useRouter } from "next/navigation";
 import ControlePagina from "./ControlePagina";
 import SpeciaalsmakenTeller from "./SpeciaalsmakenTeller";
 
+import type { Vestiging } from "@/types";
+
 interface Props {
-  vestiging: string;
+  vestiging: Vestiging;
 }
 
 const STAPPEN = [
@@ -46,10 +48,10 @@ const [medewerker, setMedewerker] = useState("");
     [telling]
   );
 
-  const advies = useMemo(
-    () => berekenBestelling(artikelen, producten),
-    [artikelen]
-  );
+const advies = useMemo(
+  () => berekenBestelling(artikelen, producten, vestiging),
+  [artikelen, vestiging]
+);
 
   const controleStap = stap === STAPPEN.length;
 
@@ -213,12 +215,13 @@ alert(
           onSlagroomChange={(v) => wijzig("slagroom", v)}
         />
       ) : (
-        <TelCategorie
-          titel={huidigeStap!.titel}
-          producten={huidigeProducten}
-          telling={telling}
-          onChange={wijzig}
-        />
+<TelCategorie
+  titel={huidigeStap!.titel}
+  producten={huidigeProducten}
+  telling={telling}
+  vestiging={vestiging}
+  onChange={wijzig}
+/>
       )
     ) : (
       <ControlePagina

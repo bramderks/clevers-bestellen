@@ -13,6 +13,10 @@ export type BestelGroep =
   | "ijs"
   | "drooggoed";
 
+export type Vestiging =
+  | "roermond"
+  | "nijmegen";
+
 export interface Product {
   id: string;
   naam: string;
@@ -29,8 +33,8 @@ export interface Product {
   // Op welke bestelling komt het product
   bestelGroep: BestelGroep;
 
-  // Gewenste buffervoorraad
-  buffer: number;
+  // Buffervoorraad per vestiging
+  buffers: Record<Vestiging, number>;
 
   // Sorteervolgorde
   volgorde: number;

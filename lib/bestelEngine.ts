@@ -1,4 +1,4 @@
-import { Artikel, Product } from "../types";
+import { Artikel, Product, Vestiging } from "../types";
 
 export interface BestelAdvies {
   id: string;
@@ -17,7 +17,8 @@ export interface BestelAdvies {
 
 export function berekenBestelling(
   artikelen: Artikel[],
-  producten: Product[]
+  producten: Product[],
+  vestiging: Vestiging
 ): BestelAdvies[] {
   const voorraad = new Map<string, number>();
 
@@ -36,6 +37,7 @@ export function berekenBestelling(
     .sort((a, b) => a.volgorde - b.volgorde)
     .map((product) => {
       const geteld = voorraad.get(product.id) ?? 0;
+      const buffer = product.buffers[vestiging];
 
       return {
         id: product.id,
@@ -48,9 +50,9 @@ export function berekenBestelling(
         volgorde: product.volgorde,
 
         geteld,
-        buffer: product.buffer,
+        buffer,
 
-        bestellen: Math.max(0, product.buffer - geteld),
+        bestellen: Math.max(0, buffer - geteld),
       };
     });
 }
