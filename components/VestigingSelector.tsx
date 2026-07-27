@@ -20,24 +20,24 @@ export default function VestigingSelector({
           <input
             type="radio"
             name="vestiging"
-            value="Nijmegen"
-            checked={vestiging === "Nijmegen"}
+            value="nijmegen"
+            checked={vestiging === "nijmegen"}
             onChange={(e) => onChange(e.target.value)}
           />
 
-          <span>Nijmegen</span>
+          <span>nijmegen</span>
         </label>
 
         <label className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 cursor-pointer hover:bg-slate-50">
           <input
             type="radio"
             name="vestiging"
-            value="Roermond"
-            checked={vestiging === "Roermond"}
+            value="roermond"
+            checked={vestiging === "roermond"}
             onChange={(e) => onChange(e.target.value)}
           />
 
-          <span>Roermond</span>
+          <span>roermond</span>
         </label>
       </div>
     </div>

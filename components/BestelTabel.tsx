@@ -38,9 +38,9 @@ export default function BestelTabel({
   {regel.naam}
 </td>
 
-                <td className="py-2 text-right">
-                  {regel.geteld}
-                </td>
+<td className="py-2 text-right">
+  {regel.geteld}
+</td>
 
                 <td className="py-2 text-right">
                   {regel.buffer}

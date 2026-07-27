@@ -35,11 +35,13 @@ export function berekenBestelling(
   return producten
     .filter((product) => product.actief)
     .sort((a, b) => a.volgorde - b.volgorde)
-    .map((product) => {
-      const geteld = voorraad.get(product.id) ?? 0;
-      const buffer = product.buffers[vestiging];
+.map((product) => {
+  const geteld = voorraad.get(product.id) ?? 0;
 
-      return {
+  const buffer = product.buffers[vestiging];
+
+
+  return {
         id: product.id,
         naam: product.naam,
 

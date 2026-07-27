@@ -20,6 +20,7 @@ export default function TelCategorie({
 }: Props) {
   if (producten.length === 0) return null;
 
+
   return (
     <section className="bg-white rounded-xl shadow p-4 md:p-6">
       <h2 className="text-xl md:text-2xl font-bold mb-5">
@@ -37,7 +38,7 @@ export default function TelCategorie({
           <TelRij
             key={product.id}
             naam={product.naam}
-            buffer={product.buffers[vestiging]}
+buffer={product.buffers[vestiging]}
             aantal={telling[product.id] ?? 0}
             onChange={(waarde) => onChange(product.id, waarde)}
           />
