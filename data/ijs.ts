@@ -13,7 +13,7 @@ export const ijs: Product[] = [
 
       roermond: 7,
 
-      nijmegen: 7,
+      nijmegen: 5,
 
     },
     volgorde: 1,
@@ -31,7 +31,7 @@ export const ijs: Product[] = [
 
       roermond: 6,
 
-      nijmegen: 6,
+      nijmegen: 4,
 
     },
     volgorde: 2,
@@ -49,7 +49,7 @@ export const ijs: Product[] = [
 
       roermond: 4,
 
-      nijmegen: 4,
+      nijmegen: 3,
 
     },
     volgorde: 3,
@@ -67,7 +67,7 @@ export const ijs: Product[] = [
 
       roermond: 5,
 
-      nijmegen: 5,
+      nijmegen: 3,
 
     },
     volgorde: 4,
@@ -85,7 +85,7 @@ export const ijs: Product[] = [
 
       roermond: 4,
 
-      nijmegen: 4,
+      nijmegen: 3,
 
     },
     volgorde: 5,
@@ -103,7 +103,7 @@ export const ijs: Product[] = [
 
       roermond: 4,
 
-      nijmegen: 4,
+      nijmegen: 2,
 
     },
     volgorde: 6,
@@ -121,7 +121,7 @@ export const ijs: Product[] = [
 
       roermond: 4,
 
-      nijmegen: 4,
+      nijmegen: 2,
 
     },
     volgorde: 7,
@@ -163,7 +163,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 1,
 
     },
     volgorde: 9,
@@ -181,7 +181,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 2,
 
     },
     volgorde: 10,
@@ -199,7 +199,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 2,
 
     },
     volgorde: 11,
@@ -217,7 +217,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 1,
 
     },
     volgorde: 12,
@@ -235,7 +235,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 2,
 
     },
     volgorde: 13,
@@ -253,7 +253,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 2,
 
     },
     volgorde: 14,
@@ -271,7 +271,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 2,
 
     },
     volgorde: 15,
@@ -307,7 +307,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 1,
 
     },
     volgorde: 17,
@@ -325,7 +325,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 1,
 
     },
     volgorde: 18,
@@ -343,7 +343,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 1,
 
     },
     volgorde: 19,
@@ -361,7 +361,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 1,
 
     },
     volgorde: 20,
@@ -379,7 +379,7 @@ export const ijs: Product[] = [
 
       roermond: 3,
 
-      nijmegen: 3,
+      nijmegen: 2,
 
     },
     volgorde: 21,
@@ -435,7 +435,7 @@ export const ijs: Product[] = [
 
       roermond: 2,
 
-      nijmegen: 2,
+      nijmegen: 1,
 
     },
     volgorde: 24,
@@ -453,7 +453,7 @@ export const ijs: Product[] = [
 
       roermond: 1,
 
-      nijmegen: 1,
+      nijmegen: 0,
 
     },
     volgorde: 25,
@@ -471,7 +471,7 @@ export const ijs: Product[] = [
 
       roermond: 1,
 
-      nijmegen: 1,
+      nijmegen: 2,
 
     },
     volgorde: 26,
@@ -507,7 +507,7 @@ export const ijs: Product[] = [
 
       roermond: 1,
 
-      nijmegen: 1,
+      nijmegen: 0,
 
     },
     volgorde: 28,
@@ -525,7 +525,7 @@ export const ijs: Product[] = [
 
       roermond: 1,
 
-      nijmegen: 1,
+      nijmegen: 0,
 
     },
     volgorde: 29,
@@ -541,9 +541,9 @@ export const ijs: Product[] = [
   bestelGroep: "ijs",
   buffers: {
 
-    roermond: 6,
+    roermond: 12,
 
-    nijmegen: 6,
+    nijmegen: 12,
 
   },
   volgorde: 999,
