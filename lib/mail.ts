@@ -1,4 +1,4 @@
-console.log("MAIL.TS IS GELADEN");
+
 
 import { Resend } from "resend";
 import { maakBestelPdf } from "./serverPdf";
@@ -24,7 +24,7 @@ export async function verstuurBestelMail(
 
   resend = new Resend(process.env.RESEND_API_KEY);
 
-  console.log("📦 Regels ontvangen:", regels.length);
+
 
   // PDF genereren (nog niet meesturen)
   const pdf = await maakBestelPdf(
@@ -34,7 +34,6 @@ export async function verstuurBestelMail(
     regels
   );
 
-  console.log("📄 PDF aangemaakt:", pdf.length, "bytes");
 
   const html = `
   <!DOCTYPE html>
@@ -189,14 +188,11 @@ const { data, error } = await resend.emails.send({
   ],
 });
 
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
 
   if (error) {
     throw new Error(JSON.stringify(error));
   }
 
-  console.log("📧 Mail succesvol verzonden:", data?.id);
 
   return data;
 }

@@ -27,7 +27,7 @@ if (!body.medewerker?.trim()) {
     }
   );
 }
-    console.log("📥 Ontvangen bestelling:", body);
+
 
     const bestelling = await prisma.bestelling.create({
 data: {
@@ -51,14 +51,14 @@ data: {
       },
     });
 
-    console.log("✅ Bestelling opgeslagen:", bestelling.id);
+
 
     // Historie opnieuw laten opbouwen
     revalidatePath("/historie");
 
     // Mail versturen (mag mislukken zonder de bestelling terug te draaien)
     try {
-console.log("➡️ VerstuurBestelMail wordt aangeroepen");
+
 
 await verstuurBestelMail(
   bestelling.vestiging,
@@ -66,8 +66,7 @@ await verstuurBestelMail(
   bestelling.datum.toLocaleDateString("nl-NL"),
   bestelling.regels
 );
-console.log("⬅️ VerstuurBestelMail klaar");
-      console.log("📧 E-mail succesvol verzonden.");
+
     } catch (mailError) {
       console.error("❌ E-mail kon niet worden verzonden.");
       console.error(mailError);
