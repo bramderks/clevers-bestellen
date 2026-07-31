@@ -12,7 +12,7 @@ export default function Home() {
           Kies een functie
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
           <Link
             href="/tellen"
             className="bg-white rounded-2xl shadow-xl p-6 md:p-10 hover:shadow-2xl transition"
@@ -27,6 +27,19 @@ export default function Home() {
           </Link>
 
           <Link
+            href="/weektaken"
+            className="bg-white rounded-2xl shadow-xl p-6 md:p-10 hover:shadow-2xl transition"
+          >
+            <h2 className="text-2xl md:text-3xl font-bold mb-3">
+              ✅ Weektaken
+            </h2>
+
+            <p className="text-gray-500 text-sm md:text-base">
+              Wekelijkse schoonmaak- en controletaken per vestiging.
+            </p>
+          </Link>
+
+          <Link
             href="/historie"
             className="bg-white rounded-2xl shadow-xl p-6 md:p-10 hover:shadow-2xl transition"
           >
@@ -36,32 +49,6 @@ export default function Home() {
 
             <p className="text-gray-500 text-sm md:text-base">
               Bekijk alle eerdere bestellingen.
-            </p>
-          </Link>
-
-          <Link
-            href="/ocr"
-            className="bg-white rounded-2xl shadow-xl p-6 md:p-10 hover:shadow-2xl transition"
-          >
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              📷 OCR import
-            </h2>
-
-            <p className="text-gray-500 text-sm md:text-base">
-              Lees een oud papieren formulier in.
-            </p>
-          </Link>
-
-          <Link
-            href="/instellingen"
-            className="bg-white rounded-2xl shadow-xl p-6 md:p-10 hover:shadow-2xl transition"
-          >
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              ⚙️ Instellingen
-            </h2>
-
-            <p className="text-gray-500 text-sm md:text-base">
-              Producten, buffers en vestigingen beheren.
             </p>
           </Link>
         </div>

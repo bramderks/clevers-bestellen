@@ -21,15 +21,16 @@ export async function initialiseerWeektaken(
       : [];
 
   for (const categorie of bron) {
-    for (const taak of categorie.taken) {
-      await prisma.weekTaak.create({
-        data: {
-          weekId: week.id,
-          categorie: categorie.categorie,
-          taak,
-        },
-      });
-    }
+for (const taak of categorie.taken) {
+  await prisma.weekTaak.create({
+    data: {
+      weekId: week.id,
+      taakId: taak.id,
+      categorie: categorie.categorie,
+      taak: taak.taak,
+    },
+  });
+}
   }
 
   return week;
