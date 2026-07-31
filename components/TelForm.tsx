@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import TelCategorie from "./TelCategorie";
 import { producten } from "@/data/producten";
 import { berekenBestelling } from "@/lib/bestelEngine";
-import { genereerDrooggoedPdf, genereerIJsPdf } from "@/lib/genereerPdf";
+import { genereerBestelPdf } from "@/lib/genereerPdf";
 import { useRouter } from "next/navigation";
 import ControlePagina from "./ControlePagina";
 import SpeciaalsmakenTeller from "./SpeciaalsmakenTeller";
@@ -65,9 +65,7 @@ const advies = useMemo(
         p.telCategorie === huidigeStap!.key &&
         p.id !== "speciaalsmaken"
     );
-console.log("Stap:", huidigeStap?.key);
-console.log("Producten:", huidigeProducten);
-console.log(huidigeProducten);
+
 
 const ijsBestelling = advies
   .filter((a) => a.bestelGroep === "ijs")
@@ -100,17 +98,13 @@ const totaalDrooggoed = drooggoedBestelling.reduce(
   }
 
 async function opslaan() {
-  console.log("🚀 Opslaan gestart");
-
   if (!medewerker.trim()) {
     alert("Vul de naam van de medewerker in.");
     return;
   }
 
-  console.log("🚀 Opslaan gestart");
-
   try {
-      const regels = advies.map((r) => ({
+    const regels = advies.map((r) => ({
       productId: r.id,
       productNaam: r.naam,
       geteld: r.geteld,
@@ -124,69 +118,61 @@ async function opslaan() {
       headers: {
         "Content-Type": "application/json",
       },
-body: JSON.stringify({
-  datum: new Date().toISOString(),
-  vestiging,
-  medewerker,
-  type: "telling",
-  opmerking,
-  regels,
-}),
+      body: JSON.stringify({
+        datum: new Date().toISOString(),
+        vestiging,
+        medewerker,
+        type: "telling",
+        opmerking,
+        regels,
+      }),
     });
 
-const result = await response.json();
+    const result = await response.json();
 
-console.log("API RESPONSE:", result);
+    if (!response.ok) {
+      throw new Error(result.error ?? "Opslaan mislukt");
+    }
 
-if (!response.ok) {
-  throw new Error(result.error ?? "Opslaan mislukt");
-}
-
-    genereerIJsPdf({
+    genereerBestelPdf({
       vestiging,
       datum: new Date().toISOString(),
       bestelling: advies,
     });
 
-    genereerDrooggoedPdf({
-      vestiging,
-      datum: new Date().toISOString(),
-      bestelling: advies,
-    });
+    alert("✅ Bestelling opgeslagen en e-mail succesvol verzonden.");
 
-alert("✅ Bestelling opgeslagen en e-mail succesvol verzonden.");
-router.push("/historie");
-
+    router.push("/historie");
   } catch (error) {
     console.error(error);
-alert(
-  error instanceof Error
-    ? `❌ ${error.message}`
-    : "❌ Er is iets misgegaan."
-);
+
+    alert(
+      error instanceof Error
+        ? `❌ ${error.message}`
+        : "❌ Er is iets misgegaan."
+    );
   }
 }
-
- return (
+return (
   <div className="space-y-6">
     <div className="rounded-xl border bg-blue-50 p-4 md:p-5">
       <div className="text-sm text-gray-600 break-words">
         Vestiging: <strong>{vestiging}</strong>
       </div>
+
       <div className="mt-4">
-  <label className="mb-2 block text-sm font-medium text-gray-700">
-    Naam medewerker
-  </label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          Naam medewerker
+        </label>
 
-  <input
-    type="text"
-    value={medewerker}
-    onChange={(e) => setMedewerker(e.target.value)}
-    placeholder="Bijvoorbeeld Bram"
-    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
-  />
-</div>
-
+        <input
+          type="text"
+          value={medewerker}
+          onChange={(e) => setMedewerker(e.target.value)}
+          placeholder="Bijvoorbeeld Bram"
+          className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none"
+        />
+      </div>
       {!controleStap && (
         <>
           <div className="mt-2 text-sm">

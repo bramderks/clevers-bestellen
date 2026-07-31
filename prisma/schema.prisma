@@ -33,3 +33,29 @@ model BestellingRegel {
 
   bestelGroep   String
 }
+model Week {
+  id         String      @id @default(cuid())
+  vestiging  String
+  jaar       Int
+  week       Int
+  aangemaakt DateTime    @default(now())
+
+  taken       WeekTaak[]
+
+  @@unique([vestiging, jaar, week])
+}
+
+model WeekTaak {
+  id          String    @id @default(cuid())
+  weekId      String
+
+  categorie   String
+  taak        String
+
+  voltooid    Boolean   @default(false)
+
+  naam        String?
+  voltooidOp  DateTime?
+
+  week Week @relation(fields: [weekId], references: [id], onDelete: Cascade)
+}
