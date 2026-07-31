@@ -14,8 +14,6 @@ const bestellingen = await prisma.bestelling.findMany({
   },
 });
 
-console.log("Aantal bestellingen:", bestellingen.length);
-
   return (
     <main className="min-h-screen bg-slate-100 p-10">
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-8">

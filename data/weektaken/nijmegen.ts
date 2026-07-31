@@ -1,87 +1,229 @@
+export type Taak = {
+  id: string;
+  taak: string;
+};
+
 export type TaakCategorie = {
   categorie: string;
-  taken: string[];
+  taken: Taak[];
 };
 
 export const weektakenNijmegen: TaakCategorie[] = [
   {
     categorie: "Buitenplaats onderhouden",
     taken: [
-      "Onkruid weghalen en vegen, ijsvlekken wegschrobben",
-      "Webben langs deurposten en ramen buitenzijde verwijderen",
-      "Parkeerplaatsen nalopen afval Clevers",
+      {
+        id: "buiten_001",
+        taak: "Onkruid weghalen en vegen, ijsvlekken wegschrobben",
+      },
+      {
+        id: "buiten_002",
+        taak: "Webben langs deurposten en ramen buitenzijde verwijderen",
+      },
+      {
+        id: "buiten_003",
+        taak: "Parkeerplaatsen nalopen op afval van Clevers",
+      },
     ],
   },
+
   {
     categorie: "Vaatstraat werkzaamheden",
     taken: [
-      "Bodemplaat en voorraadtanks afnemen-poten vaatstraat",
-      "Wanden vaatstraat afnemen",
-      "Bovenplanken afnemen vaatstraat- voorraad sorteren",
-      "Bestekbakken reinigen in vaatwasser",
-      "Onder de bodemplaat stofzuigen en dweilen",
-      "Witte kastje verplaatsen onder de bodem reinigen en kastje afnemen.",
+      {
+        id: "vaat_001",
+        taak: "Bodemplaat en voorraadtanks afnemen",
+      },
+      {
+        id: "vaat_002",
+        taak: "Poten van de vaatstraat reinigen",
+      },
+      {
+        id: "vaat_003",
+        taak: "Wanden van de vaatstraat afnemen",
+      },
+      {
+        id: "vaat_004",
+        taak: "Bovenplanken afnemen",
+      },
+      {
+        id: "vaat_005",
+        taak: "Voorraad sorteren",
+      },
+      {
+        id: "vaat_006",
+        taak: "Bestekbakken reinigen in de vaatwasser",
+      },
+      {
+        id: "vaat_007",
+        taak: "Onder de bodemplaat stofzuigen en dweilen",
+      },
+      {
+        id: "vaat_008",
+        taak: "Wit kastje verplaatsen en daaronder reinigen",
+      },
+      {
+        id: "vaat_009",
+        taak: "Wit kastje afnemen",
+      },
     ],
   },
+
   {
     categorie: "Vitrine werkzaamheden",
     taken: [
-      "Grote beurt vitrine, bodemplaten eruit en daaronder schoonmaken.",
-      "Ijzeren houdertjes met smaakkaartjes afnemen",
+      {
+        id: "vitrine_001",
+        taak: "Grote beurt vitrine, bodemplaten verwijderen en reinigen",
+      },
+      {
+        id: "vitrine_002",
+        taak: "IJzeren houders met smaakkaartjes afnemen",
+      },
     ],
   },
+
   {
-    categorie: "Slagroom groot onderhoud",
+    categorie: "Slagroom & Toppings",
     taken: [
-      "Wieltje wekelijkse reinigbeurt",
-      "Chocodip reinigen en aanvullen",
+      {
+        id: "slagroom_001",
+        taak: "Slagroomwieltje reinigen (wekelijkse reiniging)",
+      },
+      {
+        id: "slagroom_002",
+        taak: "Chocodip reinigen en aanvullen",
+      },
     ],
   },
+
   {
-    categorie: "Zitgedeelte binnen",
+    categorie: "Gastgedeelte",
     taken: [
-      "Ramen zemen binnenzijde",
-      "Onder de kussens banken schoonmaken",
-      "Zwarte tafelpoten afnemen",
-      "Voetjes van stoelen met stofzuiger en natte doek afnemen",
-      "Webben raggen plafond en lampen",
-      "Kinderstoelen schoonmaken incl poten",
-      "Bovenste planken afnemen, boven de toonbank",
+      {
+        id: "gast_001",
+        taak: "Ramen binnenzijde zemen",
+      },
+      {
+        id: "gast_002",
+        taak: "Onder de kussens van de banken schoonmaken",
+      },
+      {
+        id: "gast_003",
+        taak: "Zwarte tafelpoten afnemen",
+      },
+      {
+        id: "gast_004",
+        taak: "Voetjes van stoelen reinigen",
+      },
+      {
+        id: "gast_005",
+        taak: "Webben verwijderen van plafond en lampen",
+      },
+      {
+        id: "gast_006",
+        taak: "Kinderstoelen reinigen inclusief poten",
+      },
+      {
+        id: "gast_007",
+        taak: "Bovenste planken boven de toonbank afnemen",
+      },
     ],
   },
+
   {
-    categorie: "Toilet",
+    categorie: "Toiletten",
     taken: [
-      "Wanden afnemen",
-      "Aanvullen handdoekjes en toiletrol",
+      {
+        id: "toilet_001",
+        taak: "Wanden afnemen",
+      },
+      {
+        id: "toilet_002",
+        taak: "Handdoekjes aanvullen",
+      },
+      {
+        id: "toilet_003",
+        taak: "Toiletpapier aanvullen",
+      },
     ],
   },
+
   {
-    categorie: "Buffet gedeelte",
+    categorie: "Buffet",
     taken: [
-      "Airco filter reinigen door middel van koud afspoelen onder kraan",
-      "Airco randen afnemen vochtige doek",
-      "Glazen planken afstoffen en coupe glazen nakijken",
-      "Binnen kastjes uitsoppen",
-      "Lepels nakijken en polleren indien nodig",
-      "Bestekbakken en lades uitsoppen",
-      "Ruimte lege frisdrank kratjes schoonmaken",
+      {
+        id: "buffet_001",
+        taak: "Aircofilter reinigen",
+      },
+      {
+        id: "buffet_002",
+        taak: "Airco randen afnemen",
+      },
+      {
+        id: "buffet_003",
+        taak: "Glazen planken afstoffen",
+      },
+      {
+        id: "buffet_004",
+        taak: "Coupeglazen controleren",
+      },
+      {
+        id: "buffet_005",
+        taak: "Binnenzijde kastjes reinigen",
+      },
+      {
+        id: "buffet_006",
+        taak: "Lepels controleren en poleren indien nodig",
+      },
+      {
+        id: "buffet_007",
+        taak: "Bestekbakken reinigen",
+      },
+      {
+        id: "buffet_008",
+        taak: "Lades reinigen",
+      },
+      {
+        id: "buffet_009",
+        taak: "Ruimte met lege frisdrankkratten reinigen",
+      },
     ],
   },
+
   {
-    categorie: "HACCP taken",
+    categorie: "HACCP",
     taken: [
-      "Deksels ontstickeren met wasbenzine",
-      "HACCP taken afronden in de De Witt app",
+      {
+        id: "haccp_001",
+        taak: "Deksels ontstickeren met wasbenzine",
+      },
+      {
+        id: "haccp_002",
+        taak: "HACCP-taken afronden in de De Witt-app",
+      },
     ],
   },
+
   {
-    categorie: "Voorraadhok en kantoor",
+    categorie: "Voorraad & Kantoor",
     taken: [
-      "Producten groeperen en sorteren (soort bij soort)",
-      "Schone was netjes opgevouwen in bak",
-      "Doekje over het bureau",
-      "Stofzuigen",
+      {
+        id: "voorraad_001",
+        taak: "Producten groeperen en sorteren",
+      },
+      {
+        id: "voorraad_002",
+        taak: "Schone was netjes opgevouwen in de bak leggen",
+      },
+      {
+        id: "voorraad_003",
+        taak: "Bureau afnemen",
+      },
+      {
+        id: "voorraad_004",
+        taak: "Stofzuigen",
+      },
     ],
   },
 ];
