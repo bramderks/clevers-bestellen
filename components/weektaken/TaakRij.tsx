@@ -11,14 +11,20 @@ type Props = {
     naam: string | null;
     voltooidOp: string | null;
   };
+
+  onVoltooid?: (id: string, naam: string, datum: string) => void;
 };
 
-export default function TaakRij({ taak }: Props) {
+export default function TaakRij({
+  taak,
+  onVoltooid,
+}: Props) {
   const [voltooid, setVoltooid] = useState(taak.voltooid);
   const [naam, setNaam] = useState(taak.naam ?? "");
   const [datum, setDatum] = useState(taak.voltooidOp);
   const [modalOpen, setModalOpen] = useState(false);
-  const [opslaan, setOpslaan] = useState(false);
+const [opslaan, setOpslaan] = useState(false);
+const [gelukt, setGelukt] = useState(false);
 
   async function opslaanTaak() {
     if (!naam.trim()) {
@@ -43,18 +49,29 @@ export default function TaakRij({ taak }: Props) {
 
     localStorage.setItem("weektakenNaam", naam);
 
-    setVoltooid(true);
-    setDatum(data.voltooidOp);
+setVoltooid(true);
+setDatum(data.voltooidOp);
 
-    setModalOpen(false);
-    setOpslaan(false);
+onVoltooid?.(
+  taak.id,
+  naam,
+  data.voltooidOp
+);
+
+setGelukt(true);
+
+setTimeout(() => {
+  setGelukt(false);
+  setModalOpen(false);
+  setOpslaan(false);
+}, 700);
   }
 
   return (
     <>
       {/* Desktop */}
       <div
-        className={`hidden md:grid grid-cols-[80px_1fr_220px_180px] items-center gap-4 border-b px-4 py-3 ${
+        className={`hidden md:grid grid-cols-[80px_1fr_220px_180px] items-center gap-4 border-b px-4 py-3 transition ${
           voltooid ? "bg-green-50" : "bg-white"
         }`}
       >
@@ -84,7 +101,7 @@ export default function TaakRij({ taak }: Props) {
 
       {/* Mobiel */}
       <div
-        className={`md:hidden mb-3 rounded-xl border p-4 shadow-sm ${
+        className={`mb-3 rounded-xl border p-4 shadow-sm md:hidden transition ${
           voltooid
             ? "border-green-300 bg-green-50"
             : "border-gray-200 bg-white"
@@ -122,8 +139,14 @@ export default function TaakRij({ taak }: Props) {
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+<div
+  className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+  onClick={() => setModalOpen(false)}
+>
+<div
+  className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+  onClick={(e) => e.stopPropagation()}
+>
             <h2 className="mb-2 text-2xl font-bold">
               Taak afronden
             </h2>
@@ -137,24 +160,66 @@ export default function TaakRij({ taak }: Props) {
               type="text"
               value={naam}
               onChange={(e) => setNaam(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  opslaanTaak();
+                }
+
+                if (e.key === "Escape") {
+                  setModalOpen(false);
+                }
+              }}
               placeholder="Naam medewerker"
-              className="mb-6 w-full rounded-lg border px-4 py-3 text-lg"
+              className="mb-6 w-full rounded-xl border-2 border-blue-200 px-4 py-4 text-lg outline-none transition focus:border-blue-600"
             />
 
-            <div className="flex justify-end gap-3">
+{gelukt && (
+  <div className="mb-5 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-center font-semibold text-green-700">
+    ✅ Taak succesvol opgeslagen
+  </div>
+)}
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
+                type="button"
                 onClick={() => setModalOpen(false)}
-                className="rounded-lg border px-5 py-3"
+                className="rounded-xl border px-6 py-3 font-semibold transition hover:bg-gray-100"
               >
                 Annuleren
               </button>
 
               <button
+                type="button"
                 disabled={opslaan}
                 onClick={opslaanTaak}
-                className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white"
+                className="rounded-xl bg-green-600 px-6 py-3 font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {opslaan ? "Opslaan..." : "Opslaan"}
+<>
+  {opslaan && (
+    <svg
+      className="mr-2 inline h-5 w-5 animate-spin"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+  )}
+
+  {opslaan ? "Opslaan..." : "Opslaan"}
+</>
               </button>
             </div>
           </div>

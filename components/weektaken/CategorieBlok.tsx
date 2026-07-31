@@ -1,41 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TaakRij from "./TaakRij";
 
 type Props = {
   categorie: string;
   taken: any[];
+  onUpdate?: (taken: any[]) => void;
 };
 
 export default function CategorieBlok({
   categorie,
   taken,
+  onUpdate,
 }: Props) {
-const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(true);
 
-useState(() => {
-  const handler = (event: Event) => {
-    const custom =
-      event as CustomEvent<boolean>;
+  const [takenState, setTakenState] =
+    useState(taken);
 
-    setOpen(custom.detail);
-  };
+  useEffect(() => {
+    setTakenState(taken);
+  }, [taken]);
 
-  window.addEventListener(
-    "weektaken-open",
-    handler
-  );
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const custom =
+        event as CustomEvent<boolean>;
 
-  return () =>
-    window.removeEventListener(
+      setOpen(custom.detail);
+    };
+
+    window.addEventListener(
       "weektaken-open",
       handler
     );
-});
 
-  const totaal = taken.length;
-  const gereed = taken.filter(
+    return () => {
+      window.removeEventListener(
+        "weektaken-open",
+        handler
+      );
+    };
+  }, []);
+
+  const totaal = takenState.length;
+
+  const gereed = takenState.filter(
     (t) => t.voltooid
   ).length;
 
@@ -44,24 +55,42 @@ useState(() => {
       ? 0
       : Math.round((gereed / totaal) * 100);
 
+  useEffect(() => {
+    if (totaal > 0 && gereed === totaal) {
+      setOpen(false);
+    }
+  }, [gereed, totaal]);
+
   return (
-    <section className="mb-10 rounded-xl border bg-white shadow-sm overflow-hidden">
+    <section className="mb-10 overflow-hidden rounded-xl border bg-white shadow-sm">
       <button
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between bg-blue-700 px-6 py-4 text-left text-white"
       >
-        <div>
-          <div className="text-xl font-bold">
-            {categorie}
+        <div className="flex w-full items-center justify-between gap-4">
+          <div>
+            <div className="text-xl font-bold">
+              {categorie}
+            </div>
+
+            <div className="mt-1 text-sm text-blue-100">
+              {gereed} van {totaal} voltooid
+            </div>
           </div>
 
-          <div className="mt-1 text-sm text-blue-100">
-            {gereed} van {totaal} voltooid
-          </div>
+          {gereed === totaal ? (
+            <div className="rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
+              ✅ Gereed
+            </div>
+          ) : (
+            <div className="rounded-full bg-orange-500 px-4 py-1 text-sm font-bold text-white">
+              {totaal - gereed} open
+            </div>
+          )}
         </div>
 
         <div
-          className={`text-2xl transition-transform duration-200 ${
+          className={`ml-4 text-2xl transition-transform duration-200 ${
             open ? "rotate-180" : ""
           }`}
         >
@@ -69,20 +98,20 @@ useState(() => {
         </div>
       </button>
 
-<div className="px-6 pb-4 pt-3 bg-blue-700">
-  <div className="h-2 overflow-hidden rounded-full bg-blue-300">
-    <div
-      className="h-full rounded-full bg-green-400 transition-all duration-500"
-      style={{
-        width: `${percentage}%`,
-      }}
-    />
-  </div>
+      <div className="bg-blue-700 px-6 pb-4 pt-3">
+        <div className="h-2 overflow-hidden rounded-full bg-blue-300">
+          <div
+            className="h-full rounded-full bg-green-400 transition-all duration-500"
+            style={{
+              width: `${percentage}%`,
+            }}
+          />
+        </div>
 
-  <div className="mt-2 text-sm text-white">
-    {gereed} / {totaal} taken voltooid ({percentage}%)
-  </div>
-</div>
+        <div className="mt-2 text-sm text-white">
+          {gereed} / {totaal} taken voltooid ({percentage}%)
+        </div>
+      </div>
 
       {open && (
         <>
@@ -94,12 +123,44 @@ useState(() => {
           </div>
 
           <div className="divide-y">
-            {taken.map((taak) => (
-              <TaakRij
-                key={taak.id}
-                taak={taak}
-              />
-            ))}
+            {[...takenState]
+              .sort((a, b) => {
+                if (a.voltooid === b.voltooid) {
+                  return 0;
+                }
+
+                return a.voltooid ? 1 : -1;
+              })
+              .map((taak) => (
+                <TaakRij
+                  key={taak.id}
+                  taak={taak}
+                  onVoltooid={(
+                    id,
+                    naam,
+                    datum
+                  ) => {
+                    setTakenState((vorige) => {
+                      const nieuw =
+                        vorige.map((t) =>
+                          t.id === id
+                            ? {
+                                ...t,
+                                voltooid: true,
+                                naam,
+                                voltooidOp:
+                                  datum,
+                              }
+                            : t
+                        );
+
+                      onUpdate?.(nieuw);
+
+                      return nieuw;
+                    });
+                  }}
+                />
+              ))}
           </div>
         </>
       )}

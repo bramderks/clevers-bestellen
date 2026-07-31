@@ -86,10 +86,25 @@ const groepen: {
     },
     {}
   )
-).map(([categorie, taken]) => ({
-  categorie,
-  taken: taken as any[],
-}));
+)
+  .map(([categorie, taken]) => ({
+    categorie,
+    taken: taken as any[],
+  }))
+  .sort((a, b) => {
+    const openA = a.taken.filter(
+      (t) => !t.voltooid
+    ).length;
+
+    const openB = b.taken.filter(
+      (t) => !t.voltooid
+    ).length;
+
+    if (openA === 0 && openB > 0) return 1;
+    if (openB === 0 && openA > 0) return -1;
+
+    return 0;
+  });
 
   const totaal = data.taken.length;
 
@@ -133,6 +148,47 @@ const groepen: {
           {gereed} van {totaal} taken voltooid (
           {percentage}%)
         </p>
+        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+  <div className="rounded-2xl border bg-white p-5 shadow-sm">
+    <div className="text-3xl font-bold text-blue-700">
+      {totaal}
+    </div>
+
+    <div className="mt-1 text-sm text-gray-500">
+      📋 Totaal
+    </div>
+  </div>
+
+  <div className="rounded-2xl border bg-green-50 p-5 shadow-sm">
+    <div className="text-3xl font-bold text-green-700">
+      {gereed}
+    </div>
+
+    <div className="mt-1 text-sm text-gray-500">
+      ✅ Gereed
+    </div>
+  </div>
+
+  <div className="rounded-2xl border bg-orange-50 p-5 shadow-sm">
+    <div className="text-3xl font-bold text-orange-600">
+      {totaal - gereed}
+    </div>
+
+    <div className="mt-1 text-sm text-gray-500">
+      ⏳ Open
+    </div>
+  </div>
+
+  <div className="rounded-2xl border bg-blue-50 p-5 shadow-sm">
+    <div className="text-3xl font-bold text-blue-700">
+      {percentage}%
+    </div>
+
+    <div className="mt-1 text-sm text-gray-500">
+      📈 Voortgang
+    </div>
+  </div>
+</div>
       </div>
 
       <WeektakenClient
