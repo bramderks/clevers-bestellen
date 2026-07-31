@@ -1,5 +1,5 @@
-import TaakRij from "@/components/weektaken/TaakRij";
 import { headers } from "next/headers";
+import WeektakenClient from "@/components/weektaken/WeektakenClient";
 
 async function haalTakenOp(vestiging: string) {
   const h = await headers();
@@ -70,26 +70,42 @@ export default async function WeektakenPagina({
 
   const data = await haalTakenOp(vestiging);
 
-  const groepen = data.taken.reduce(
-    (acc: any, taak: any) => {
-      if (!acc[taak.categorie]) acc[taak.categorie] = [];
+const groepen: {
+  categorie: string;
+  taken: any[];
+}[] = Object.entries(
+  data.taken.reduce(
+    (acc: Record<string, any[]>, taak: any) => {
+      if (!acc[taak.categorie]) {
+        acc[taak.categorie] = [];
+      }
+
       acc[taak.categorie].push(taak);
+
       return acc;
     },
     {}
-  );
+  )
+).map(([categorie, taken]) => ({
+  categorie,
+  taken: taken as any[],
+}));
 
   const totaal = data.taken.length;
+
   const gereed = data.taken.filter(
     (t: any) => t.voltooid
   ).length;
+
   const percentage =
-    Math.round((gereed / totaal) * 100) || 0;
+    totaal === 0
+      ? 0
+      : Math.round((gereed / totaal) * 100);
 
   return (
-    <main className="mx-auto max-w-7xl p-8">
+    <main className="mx-auto max-w-7xl p-6 md:p-8">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold">
+        <h1 className="text-3xl font-bold md:text-4xl">
           Weektaken
         </h1>
 
@@ -119,34 +135,9 @@ export default async function WeektakenPagina({
         </p>
       </div>
 
-      {Object.entries(groepen).map(
-        ([categorie, taken]: any) => (
-          <section
-            key={categorie}
-            className="mb-10 rounded-xl border bg-white shadow-sm"
-          >
-            <div className="rounded-t-xl bg-blue-700 px-6 py-4 text-xl font-bold text-white">
-              {categorie}
-            </div>
-
-            <div className="grid grid-cols-[80px_1fr_220px_180px] border-b bg-gray-100 px-4 py-3 font-semibold">
-              <div>Gereed</div>
-              <div>Taak</div>
-              <div>Naam medewerker</div>
-              <div>Afgerond op</div>
-            </div>
-
-            <div className="divide-y">
-              {taken.map((taak: any) => (
-                <TaakRij
-                  key={taak.id}
-                  taak={taak}
-                />
-              ))}
-            </div>
-          </section>
-        )
-      )}
+      <WeektakenClient
+        categorieen={groepen}
+      />
     </main>
   );
 }
