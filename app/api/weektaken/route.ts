@@ -5,13 +5,33 @@ import { initialiseerWeektaken } from "@/lib/initialiseerWeektaken";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
-  const vestiging = searchParams.get("vestiging") ?? "Nijmegen";
+  const weekId = searchParams.get("weekId");
 
-  const week = await initialiseerWeektaken(vestiging);
+  if (!weekId) {
+    return NextResponse.json(
+      { error: "weekId ontbreekt." },
+      { status: 400 }
+    );
+  }
+
+  await initialiseerWeektaken(weekId);
+
+  const week = await prisma.week.findUnique({
+    where: {
+      id: weekId,
+    },
+  });
+
+  if (!week) {
+    return NextResponse.json(
+      { error: "Week niet gevonden." },
+      { status: 404 }
+    );
+  }
 
   const taken = await prisma.weekTaak.findMany({
     where: {
-      weekId: week.id,
+      weekId,
     },
     orderBy: [
       { categorie: "asc" },

@@ -1,37 +1,38 @@
 import { prisma } from "@/lib/prisma";
-import { haalOfMaakWeek } from "./haalOfMaakWeek";
 import { weektakenNijmegen } from "@/data/weektaken/nijmegen";
 
 export async function initialiseerWeektaken(
-  vestiging: string
+  weekId: string
 ) {
-  const week = await haalOfMaakWeek(vestiging);
-
-  const aantal = await prisma.weekTaak.count({
+  const week = await prisma.week.findUnique({
     where: {
-      weekId: week.id,
+      id: weekId,
     },
   });
 
-  if (aantal > 0) return week;
+  if (!week) return;
 
-  const bron =
-    vestiging === "Nijmegen"
-      ? weektakenNijmegen
-      : [];
-
-  for (const categorie of bron) {
-for (const taak of categorie.taken) {
-  await prisma.weekTaak.create({
-    data: {
-      weekId: week.id,
-      taakId: taak.id,
-      categorie: categorie.categorie,
-      taak: taak.taak,
+  const bestaat = await prisma.weekTaak.count({
+    where: {
+      weekId,
     },
   });
-}
+
+  if (bestaat > 0) return;
+
+  // Later uitbreiden met Roermond
+  const taken = weektakenNijmegen;
+
+  for (const categorie of taken) {
+    for (const taak of categorie.taken) {
+      await prisma.weekTaak.create({
+        data: {
+          weekId,
+          categorie: categorie.categorie,
+          taak: taak.taak,
+          voltooid: false,
+        },
+      });
+    }
   }
-
-  return week;
 }
