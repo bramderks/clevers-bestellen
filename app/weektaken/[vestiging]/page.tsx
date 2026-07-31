@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import WeektakenClient from "@/components/weektaken/WeektakenClient";
+import WeekAfsluitenButton from "@/components/weektaken/WeekAfsluitenButton";
 
 async function haalTakenOp(vestiging: string) {
   const h = await headers();
@@ -25,34 +26,53 @@ async function haalTakenOp(vestiging: string) {
   return res.json();
 }
 
-function weekPeriode(jaar: number, week: number) {
+function weekPeriode(
+  jaar: number,
+  week: number
+) {
   const jan4 = new Date(jaar, 0, 4);
 
   const maandagWeek1 = new Date(jan4);
   maandagWeek1.setDate(
-    jan4.getDate() - ((jan4.getDay() + 6) % 7)
+    jan4.getDate() -
+      ((jan4.getDay() + 6) % 7)
   );
 
-  const maandag = new Date(maandagWeek1);
+  const maandag = new Date(
+    maandagWeek1
+  );
+
   maandag.setDate(
-    maandagWeek1.getDate() + (week - 1) * 7
+    maandagWeek1.getDate() +
+      (week - 1) * 7
   );
 
   const zondag = new Date(maandag);
-  zondag.setDate(maandag.getDate() + 6);
 
-  const start = maandag.toLocaleDateString("nl-NL", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  zondag.setDate(
+    maandag.getDate() + 6
+  );
 
-  const einde = zondag.toLocaleDateString("nl-NL", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const start =
+    maandag.toLocaleDateString(
+      "nl-NL",
+      {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      }
+    );
+
+  const einde =
+    zondag.toLocaleDateString(
+      "nl-NL",
+      {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }
+    );
 
   return `${start} t/m ${einde}`;
 }
@@ -66,66 +86,108 @@ type Props = {
 export default async function WeektakenPagina({
   params,
 }: Props) {
-  const { vestiging } = await params;
+  const { vestiging } =
+    await params;
 
-  const data = await haalTakenOp(vestiging);
+  const data =
+    await haalTakenOp(vestiging);
 
-const groepen: {
-  categorie: string;
-  taken: any[];
-}[] = Object.entries(
-  data.taken.reduce(
-    (acc: Record<string, any[]>, taak: any) => {
-      if (!acc[taak.categorie]) {
-        acc[taak.categorie] = [];
-      }
+  const weekId = data.week.id;
 
-      acc[taak.categorie].push(taak);
+  const weekAfgesloten =
+    data.week.afgesloten;
 
-      return acc;
-    },
-    {}
+  const groepen: {
+    categorie: string;
+    taken: any[];
+  }[] = Object.entries(
+    data.taken.reduce(
+      (
+        acc: Record<string, any[]>,
+        taak: any
+      ) => {
+        if (
+          !acc[taak.categorie]
+        ) {
+          acc[taak.categorie] = [];
+        }
+
+        acc[
+          taak.categorie
+        ].push(taak);
+
+        return acc;
+      },
+      {}
+    )
   )
-)
-  .map(([categorie, taken]) => ({
-    categorie,
-    taken: taken as any[],
-  }))
-  .sort((a, b) => {
-    const openA = a.taken.filter(
-      (t) => !t.voltooid
+    .map(
+      ([categorie, taken]) => ({
+        categorie,
+        taken: taken as any[],
+      })
+    )
+    .sort((a, b) => {
+      const openA =
+        a.taken.filter(
+          (t) => !t.voltooid
+        ).length;
+
+      const openB =
+        b.taken.filter(
+          (t) => !t.voltooid
+        ).length;
+
+      if (
+        openA === 0 &&
+        openB > 0
+      )
+        return 1;
+
+      if (
+        openB === 0 &&
+        openA > 0
+      )
+        return -1;
+
+      return 0;
+    });
+
+  const totaal =
+    data.taken.length;
+
+  const gereed =
+    data.taken.filter(
+      (t: any) => t.voltooid
     ).length;
-
-    const openB = b.taken.filter(
-      (t) => !t.voltooid
-    ).length;
-
-    if (openA === 0 && openB > 0) return 1;
-    if (openB === 0 && openA > 0) return -1;
-
-    return 0;
-  });
-
-  const totaal = data.taken.length;
-
-  const gereed = data.taken.filter(
-    (t: any) => t.voltooid
-  ).length;
 
   const percentage =
     totaal === 0
       ? 0
-      : Math.round((gereed / totaal) * 100);
+      : Math.round(
+          (gereed / totaal) *
+            100
+        );
 
   return (
     <main className="mx-auto max-w-7xl p-6 md:p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold md:text-4xl">
-          Weektaken
-        </h1>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <h1 className="text-3xl font-bold md:text-4xl">
+            Weektaken
+          </h1>
 
-        <p className="mt-2 text-gray-600">
-          Week {data.week.week} • {vestiging}
+          <WeekAfsluitenButton
+            weekId={weekId}
+            afgesloten={
+              weekAfgesloten
+            }
+          />
+        </div>
+
+        <p className="mt-4 text-gray-600">
+          Week {data.week.week} •{" "}
+          {vestiging}
         </p>
 
         <p className="text-sm text-gray-500">
@@ -145,53 +207,58 @@ const groepen: {
         </div>
 
         <p className="mt-2 text-sm font-medium">
-          {gereed} van {totaal} taken voltooid (
-          {percentage}%)
+          {gereed} van {totaal} taken
+          voltooid ({percentage}%)
         </p>
+
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-  <div className="rounded-2xl border bg-white p-5 shadow-sm">
-    <div className="text-3xl font-bold text-blue-700">
-      {totaal}
-    </div>
+          <div className="rounded-2xl border bg-white p-5 shadow-sm">
+            <div className="text-3xl font-bold text-blue-700">
+              {totaal}
+            </div>
 
-    <div className="mt-1 text-sm text-gray-500">
-      📋 Totaal
-    </div>
-  </div>
+            <div className="mt-1 text-sm text-gray-500">
+              📋 Totaal
+            </div>
+          </div>
 
-  <div className="rounded-2xl border bg-green-50 p-5 shadow-sm">
-    <div className="text-3xl font-bold text-green-700">
-      {gereed}
-    </div>
+          <div className="rounded-2xl border bg-green-50 p-5 shadow-sm">
+            <div className="text-3xl font-bold text-green-700">
+              {gereed}
+            </div>
 
-    <div className="mt-1 text-sm text-gray-500">
-      ✅ Gereed
-    </div>
-  </div>
+            <div className="mt-1 text-sm text-gray-500">
+              ✅ Gereed
+            </div>
+          </div>
 
-  <div className="rounded-2xl border bg-orange-50 p-5 shadow-sm">
-    <div className="text-3xl font-bold text-orange-600">
-      {totaal - gereed}
-    </div>
+          <div className="rounded-2xl border bg-orange-50 p-5 shadow-sm">
+            <div className="text-3xl font-bold text-orange-600">
+              {totaal -
+                gereed}
+            </div>
 
-    <div className="mt-1 text-sm text-gray-500">
-      ⏳ Open
-    </div>
-  </div>
+            <div className="mt-1 text-sm text-gray-500">
+              ⏳ Open
+            </div>
+          </div>
 
-  <div className="rounded-2xl border bg-blue-50 p-5 shadow-sm">
-    <div className="text-3xl font-bold text-blue-700">
-      {percentage}%
-    </div>
+          <div className="rounded-2xl border bg-blue-50 p-5 shadow-sm">
+            <div className="text-3xl font-bold text-blue-700">
+              {percentage}%
+            </div>
 
-    <div className="mt-1 text-sm text-gray-500">
-      📈 Voortgang
-    </div>
-  </div>
-</div>
+            <div className="mt-1 text-sm text-gray-500">
+              📈 Voortgang
+            </div>
+          </div>
+        </div>
       </div>
 
       <WeektakenClient
+        afgesloten={
+          weekAfgesloten
+        }
         categorieen={groepen}
       />
     </main>

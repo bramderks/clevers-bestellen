@@ -7,24 +7,37 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const vestiging =
-    searchParams.get("vestiging") ?? "Nijmegen";
+    searchParams.get("vestiging") ??
+    "Nijmegen";
 
-  const week = await haalOfMaakWeek(vestiging);
+  const week =
+    await haalOfMaakWeek(vestiging);
 
-  await initialiseerWeektaken(week.id);
+  if (!week.afgesloten) {
+    await initialiseerWeektaken(
+      week.id
+    );
+  }
 
-  const taken = await prisma.weekTaak.findMany({
-    where: {
-      weekId: week.id,
-    },
-    orderBy: [
-      { categorie: "asc" },
-      { taak: "asc" },
-    ],
-  });
+  const taken =
+    await prisma.weekTaak.findMany({
+      where: {
+        weekId: week.id,
+      },
+      orderBy: [
+        {
+          categorie: "asc",
+        },
+        {
+          taak: "asc",
+        },
+      ],
+    });
 
   return NextResponse.json({
     week,
     taken,
+    afgesloten:
+      week.afgesloten,
   });
 }

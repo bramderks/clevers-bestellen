@@ -1,54 +1,168 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-export default function Home() {
+export default async function Home() {
+  const [
+    bestellingen,
+    weken,
+    openTaken,
+  ] = await Promise.all([
+    prisma.bestelling.count(),
+
+    prisma.week.count(),
+
+    prisma.weekTaak.count({
+      where: {
+        voltooid: false,
+      },
+    }),
+  ]);
+
   return (
-    <main className="min-h-screen bg-slate-100 flex items-center justify-center px-4 py-8 md:p-10">
-      <div className="w-full max-w-5xl">
-        <h1 className="text-3xl md:text-5xl font-bold text-center mb-3">
-          Clevers Bestelsysteem
-        </h1>
+    <main className="min-h-screen bg-slate-100 px-4 py-8 md:p-10">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-10">
+          <h1 className="text-5xl font-bold">
+            Clevers Bestelsysteem
+          </h1>
 
-        <p className="text-center text-gray-500 mb-8 md:mb-12 text-sm md:text-base">
-          Kies een functie
-        </p>
+          <p className="mt-3 text-lg text-gray-500">
+            Dashboard
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
+        <div className="mb-10 grid gap-4 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="text-4xl font-bold text-blue-700">
+              {bestellingen}
+            </div>
+
+            <div className="mt-2 text-gray-500">
+              📦 Bestellingen
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="text-4xl font-bold text-green-700">
+              {weken}
+            </div>
+
+            <div className="mt-2 text-gray-500">
+              ✅ Weken
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="text-4xl font-bold text-orange-600">
+              {openTaken}
+            </div>
+
+            <div className="mt-2 text-gray-500">
+              ⏳ Open taken
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           <Link
             href="/tellen"
-            className="bg-white rounded-2xl shadow-xl p-6 md:p-10 hover:shadow-2xl transition"
+            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              🍦 Nieuwe telling
+            <div className="mb-5 text-5xl">
+              🍦
+            </div>
+
+            <h2 className="text-2xl font-bold">
+              Nieuwe telling
             </h2>
 
-            <p className="text-gray-500 text-sm md:text-base">
-              Doorloop de voorraadtelling en genereer direct de bestelling.
+            <p className="mt-3 text-gray-500">
+              Voorraad tellen en direct een bestelling genereren.
             </p>
           </Link>
 
           <Link
             href="/weektaken"
-            className="bg-white rounded-2xl shadow-xl p-6 md:p-10 hover:shadow-2xl transition"
+            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              ✅ Weektaken
+            <div className="mb-5 text-5xl">
+              ✅
+            </div>
+
+            <h2 className="text-2xl font-bold">
+              Weektaken
             </h2>
 
-            <p className="text-gray-500 text-sm md:text-base">
-              Wekelijkse schoonmaak- en controletaken per vestiging.
+            <p className="mt-3 text-gray-500">
+              Schoonmaak-, controle- en onderhoudstaken.
             </p>
           </Link>
 
           <Link
             href="/historie"
-            className="bg-white rounded-2xl shadow-xl p-6 md:p-10 hover:shadow-2xl transition"
+            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              📚 Historie
+            <div className="mb-5 text-5xl">
+              📚
+            </div>
+
+            <h2 className="text-2xl font-bold">
+              Historie
             </h2>
 
-            <p className="text-gray-500 text-sm md:text-base">
-              Bekijk alle eerdere bestellingen.
+            <p className="mt-3 text-gray-500">
+              Bekijk alle eerdere bestellingen en weektaken.
+            </p>
+          </Link>
+
+          <Link
+            href="/producten"
+            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div className="mb-5 text-5xl">
+              🛒
+            </div>
+
+            <h2 className="text-2xl font-bold">
+              Producten
+            </h2>
+
+            <p className="mt-3 text-gray-500">
+              Beheer alle producten en buffers.
+            </p>
+          </Link>
+
+          <Link
+            href="/historie/weektaken"
+            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div className="mb-5 text-5xl">
+              📋
+            </div>
+
+            <h2 className="text-2xl font-bold">
+              Weektaken historie
+            </h2>
+
+            <p className="mt-3 text-gray-500">
+              Overzicht van alle uitgevoerde weektaken.
+            </p>
+          </Link>
+
+          <Link
+            href="/historie"
+            className="rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
+          >
+            <div className="mb-5 text-5xl">
+              📊
+            </div>
+
+            <h2 className="text-2xl font-bold">
+              Dashboard
+            </h2>
+
+            <p className="mt-3 text-blue-100">
+              Analyseer bestellingen, weektaken en prestaties.
             </p>
           </Link>
         </div>

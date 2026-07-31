@@ -6,12 +6,14 @@ import TaakRij from "./TaakRij";
 type Props = {
   categorie: string;
   taken: any[];
+  afgesloten: boolean;
   onUpdate?: (taken: any[]) => void;
 };
 
 export default function CategorieBlok({
   categorie,
   taken,
+  afgesloten,
   onUpdate,
 }: Props) {
   const [open, setOpen] = useState(true);
@@ -60,6 +62,19 @@ export default function CategorieBlok({
       setOpen(false);
     }
   }, [gereed, totaal]);
+
+  const gesorteerdeTaken = [
+    ...takenState,
+  ].sort((a, b) => {
+    if (a.voltooid === b.voltooid) {
+      return a.taak.localeCompare(
+        b.taak,
+        "nl"
+      );
+    }
+
+    return a.voltooid ? 1 : -1;
+  });
 
   return (
     <section className="mb-10 overflow-hidden rounded-xl border bg-white shadow-sm">
@@ -123,44 +138,47 @@ export default function CategorieBlok({
           </div>
 
           <div className="divide-y">
-            {[...takenState]
-              .sort((a, b) => {
-                if (a.voltooid === b.voltooid) {
-                  return 0;
-                }
-
-                return a.voltooid ? 1 : -1;
-              })
-              .map((taak) => (
+            {gesorteerdeTaken.map(
+              (taak) => (
                 <TaakRij
                   key={taak.id}
                   taak={taak}
+                  afgesloten={
+                    afgesloten
+                  }
                   onVoltooid={(
                     id,
                     naam,
                     datum
                   ) => {
-                    setTakenState((vorige) => {
-                      const nieuw =
-                        vorige.map((t) =>
-                          t.id === id
-                            ? {
-                                ...t,
-                                voltooid: true,
-                                naam,
-                                voltooidOp:
-                                  datum,
-                              }
-                            : t
+                    setTakenState(
+                      (vorige) => {
+                        const nieuw =
+                          vorige.map(
+                            (t) =>
+                              t.id ===
+                              id
+                                ? {
+                                    ...t,
+                                    voltooid: true,
+                                    naam,
+                                    voltooidOp:
+                                      datum,
+                                  }
+                                : t
+                          );
+
+                        onUpdate?.(
+                          nieuw
                         );
 
-                      onUpdate?.(nieuw);
-
-                      return nieuw;
-                    });
+                        return nieuw;
+                      }
+                    );
                   }}
                 />
-              ))}
+              )
+            )}
           </div>
         </>
       )}

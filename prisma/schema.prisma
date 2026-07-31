@@ -8,12 +8,12 @@ datasource db {
 }
 
 model Bestelling {
-  id          Int      @id @default(autoincrement())
-  datum       DateTime
-  vestiging   String
-  medewerker  String?
-  type        String
-  aangemaakt  DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  datum      DateTime
+  vestiging  String
+  medewerker String?
+  type       String
+  aangemaakt DateTime @default(now())
 
   regels BestellingRegel[]
 }
@@ -22,35 +22,54 @@ model BestellingRegel {
   id Int @id @default(autoincrement())
 
   bestellingId Int
-  bestelling   Bestelling @relation(fields: [bestellingId], references: [id], onDelete: Cascade)
+  bestelling Bestelling
+    @relation(
+      fields: [bestellingId],
+      references: [id],
+      onDelete: Cascade
+    )
 
   productId   String
   productNaam String
 
-  geteld      Int
-  buffer      Int
-  besteld     Int
+  geteld  Int
+  buffer  Int
+  besteld Int
 
   bestelGroep String
 }
 
 model Week {
-  id         String   @id @default(cuid())
-  vestiging  String
-  jaar       Int
-  week       Int
+  id String @id @default(cuid())
+
+  vestiging String
+  jaar      Int
+  week      Int
+
+  afgesloten   Boolean   @default(false)
+  afgeslotenOp DateTime?
+
   aangemaakt DateTime @default(now())
+  bijgewerkt DateTime @updatedAt
 
   taken WeekTaak[]
 
   @@unique([vestiging, jaar, week])
+  @@index([vestiging])
+  @@index([jaar, week])
+  @@index([afgesloten])
 }
 
 model WeekTaak {
   id String @id @default(cuid())
 
   weekId String
-  week   Week @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  week Week
+    @relation(
+      fields: [weekId],
+      references: [id],
+      onDelete: Cascade
+    )
 
   categorie String
   taak      String
@@ -58,4 +77,11 @@ model WeekTaak {
   voltooid   Boolean   @default(false)
   naam       String?
   voltooidOp DateTime?
+
+  aangemaakt DateTime @default(now())
+  bijgewerkt DateTime @updatedAt
+
+  @@index([weekId])
+  @@index([categorie])
+  @@index([voltooid])
 }
