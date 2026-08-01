@@ -30,6 +30,7 @@ export default function TelForm({ vestiging }: Props) {
   const [stap, setStap] = useState(0);
 const [opmerking, setOpmerking] = useState("");
 const [medewerker, setMedewerker] = useState("");
+const [opslaanBezig, setOpslaanBezig] = useState(false);
 
   function wijzig(id: string, waarde: number) {
     setTelling((vorige) => ({
@@ -98,10 +99,14 @@ const totaalDrooggoed = drooggoedBestelling.reduce(
   }
 
 async function opslaan() {
+  if (opslaanBezig) return;
+
   if (!medewerker.trim()) {
     alert("Vul de naam van de medewerker in.");
     return;
   }
+
+  setOpslaanBezig(true);
 
   try {
     const regels = advies.map((r) => ({
@@ -151,6 +156,8 @@ async function opslaan() {
         ? `❌ ${error.message}`
         : "❌ Er is iets misgegaan."
     );
+  } finally {
+    setOpslaanBezig(false);
   }
 }
 return (
@@ -243,12 +250,13 @@ return (
             : "Volgende →"}
         </button>
       ) : (
-        <button
-          onClick={opslaan}
-          className="w-full sm:w-auto rounded-lg bg-emerald-700 px-6 py-3 text-white"
-        >
-          Opslaan + PDF
-        </button>
+<button
+  onClick={opslaan}
+  disabled={opslaanBezig}
+  className="w-full sm:w-auto rounded-lg bg-emerald-700 px-6 py-3 text-white disabled:opacity-50"
+>
+  {opslaanBezig ? "Opslaan..." : "Opslaan + PDF"}
+</button>
       )}
     </div>
   </div>
