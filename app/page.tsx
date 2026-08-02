@@ -6,6 +6,7 @@ export default async function Home() {
     bestellingen,
     weken,
     openTaken,
+    medewerkers,
   ] = await Promise.all([
     prisma.bestelling.count(),
 
@@ -14,6 +15,12 @@ export default async function Home() {
     prisma.weekTaak.count({
       where: {
         voltooid: false,
+      },
+    }),
+
+    prisma.medewerker.count({
+      where: {
+        actief: true,
       },
     }),
   ]);
@@ -31,7 +38,7 @@ export default async function Home() {
           </p>
         </div>
 
-        <div className="mb-10 grid gap-4 md:grid-cols-3">
+        <div className="mb-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-2xl bg-white p-6 shadow-sm">
             <div className="text-4xl font-bold text-blue-700">
               {bestellingen}
@@ -59,6 +66,16 @@ export default async function Home() {
 
             <div className="mt-2 text-gray-500">
               ⏳ Open taken
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-white p-6 shadow-sm">
+            <div className="text-4xl font-bold text-purple-700">
+              {medewerkers}
+            </div>
+
+            <div className="mt-2 text-gray-500">
+              👥 Medewerkers
             </div>
           </div>
         </div>
@@ -124,11 +141,28 @@ export default async function Home() {
             </div>
 
             <h2 className="text-2xl font-bold">
-              Producten
+              Productbeheer
             </h2>
 
             <p className="mt-3 text-gray-500">
               Beheer alle producten en buffers.
+            </p>
+          </Link>
+
+          <Link
+            href="/medewerkers"
+            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+          >
+            <div className="mb-5 text-5xl">
+              👥
+            </div>
+
+            <h2 className="text-2xl font-bold">
+              Medewerkers
+            </h2>
+
+            <p className="mt-3 text-gray-500">
+              Beheer medewerkers, beschikbaarheid en roosters.
             </p>
           </Link>
 

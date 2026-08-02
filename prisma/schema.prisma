@@ -78,19 +78,33 @@ model WeekTaak {
 model Medewerker {
   id String @id @default(cuid())
 
-  voornaam String
+  voornaam  String
   achternaam String
 
   naam String
 
-  email String?
-  telefoon String?
+  email     String?
+  telefoon  String?
 
   vestiging String
 
   actief Boolean @default(true)
 
-  kleur String? @default("#2563eb")
+  kleur String @default("#2563eb")
+
+  functie String?                // Medewerker, Floormanager, Bedrijfsleider
+
+  uurloon Decimal? @db.Decimal(6,2)
+
+  contractUren Int?
+
+  datumInDienst DateTime?
+
+  geboortedatum DateTime?
+
+  pushToken String?
+
+  opmerkingen String?
 
   aangemaakt DateTime @default(now())
 
@@ -100,6 +114,7 @@ model Medewerker {
 
   @@index([vestiging])
   @@index([actief])
+  @@index([functie])
 }
 
 model Beschikbaarheid {
@@ -113,7 +128,7 @@ model Beschikbaarheid {
   beschikbaar Boolean @default(true)
 
   vanaf String?
-  tot String?
+  tot   String?
 
   @@index([medewerkerId])
 }
@@ -127,7 +142,7 @@ model Dienst {
   datum DateTime
 
   begintijd String
-  eindtijd String
+  eindtijd   String
 
   vestiging String
 
