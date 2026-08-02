@@ -133,23 +133,6 @@ export default async function Home() {
           </Link>
 
           <Link
-            href="/historie/weektaken"
-            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="mb-5 text-5xl">
-              📋
-            </div>
-
-            <h2 className="text-2xl font-bold">
-              Weektaken historie
-            </h2>
-
-            <p className="mt-3 text-gray-500">
-              Overzicht van alle uitgevoerde weektaken.
-            </p>
-          </Link>
-
-          <Link
             href="/historie"
             className="rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
           >

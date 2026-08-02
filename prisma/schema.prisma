@@ -45,7 +45,6 @@ model Week {
   afgeslotenOp DateTime?
 
   aangemaakt DateTime @default(now())
-  bijgewerkt DateTime @updatedAt
 
   taken WeekTaak[]
 
@@ -69,7 +68,6 @@ model WeekTaak {
   voltooidOp DateTime?
 
   aangemaakt DateTime @default(now())
-  bijgewerkt DateTime @updatedAt
 
   @@index([weekId])
   @@index([categorie])

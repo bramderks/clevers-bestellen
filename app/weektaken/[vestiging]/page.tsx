@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import WeektakenClient from "@/components/weektaken/WeektakenClient";
 import WeekAfsluitenButton from "@/components/weektaken/WeekAfsluitenButton";
+import TopBar from "@/components/TopBar";
 
 async function haalTakenOp(vestiging: string) {
   const h = await headers();
@@ -171,6 +172,7 @@ export default async function WeektakenPagina({
 
   return (
     <main className="mx-auto max-w-7xl p-6 md:p-8">
+      <TopBar title={`Weektaken ${vestiging}`} />
       <div className="mb-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold md:text-4xl">

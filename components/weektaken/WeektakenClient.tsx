@@ -35,25 +35,6 @@ export default function WeektakenClient({
     );
   }, [allesOpen]);
 
-  const totaal = categorieData.reduce(
-    (acc, groep) => acc + groep.taken.length,
-    0
-  );
-
-  const gereed = categorieData.reduce(
-    (acc, groep) =>
-      acc +
-      groep.taken.filter(
-        (t) => t.voltooid
-      ).length,
-    0
-  );
-
-  const percentage =
-    totaal === 0
-      ? 0
-      : Math.round((gereed / totaal) * 100);
-
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center gap-3">
@@ -76,57 +57,6 @@ export default function WeektakenClient({
             🔒 Week afgesloten
           </div>
         )}
-      </div>
-
-      <div className="mb-8 h-4 overflow-hidden rounded-full bg-gray-200">
-        <div
-          className="h-full bg-green-500 transition-all duration-500"
-          style={{
-            width: `${percentage}%`,
-          }}
-        />
-      </div>
-
-      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-          <div className="text-3xl font-bold text-blue-700">
-            {totaal}
-          </div>
-
-          <div className="mt-1 text-sm text-gray-500">
-            📋 Totaal
-          </div>
-        </div>
-
-        <div className="rounded-2xl border bg-green-50 p-5 shadow-sm">
-          <div className="text-3xl font-bold text-green-700">
-            {gereed}
-          </div>
-
-          <div className="mt-1 text-sm text-gray-500">
-            ✅ Gereed
-          </div>
-        </div>
-
-        <div className="rounded-2xl border bg-orange-50 p-5 shadow-sm">
-          <div className="text-3xl font-bold text-orange-600">
-            {totaal - gereed}
-          </div>
-
-          <div className="mt-1 text-sm text-gray-500">
-            ⏳ Open
-          </div>
-        </div>
-
-        <div className="rounded-2xl border bg-blue-50 p-5 shadow-sm">
-          <div className="text-3xl font-bold text-blue-700">
-            {percentage}%
-          </div>
-
-          <div className="mt-1 text-sm text-gray-500">
-            📈 Voortgang
-          </div>
-        </div>
       </div>
 
       {categorieData.map((groep) => (

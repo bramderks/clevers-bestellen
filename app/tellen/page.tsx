@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 
-import VestigingSelector from "@/components/VestigingSelector";
+import TopBar from "@/components/TopBar";
 import TelForm from "@/components/TelForm";
+import VestigingSelector from "@/components/VestigingSelector";
 import type { Vestiging } from "@/types";
 
 export default function NieuweTelling() {
@@ -11,13 +12,15 @@ export default function NieuweTelling() {
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 md:py-10">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-5 md:p-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+      <div className="mx-auto max-w-6xl">
+        <TopBar title="Nieuwe telling" />
+
+        <div className="rounded-2xl bg-white p-5 shadow-xl md:p-8">
+          <h1 className="mb-2 text-3xl font-bold md:text-4xl">
             Nieuwe telling
           </h1>
 
-          <p className="text-gray-500 mb-6 md:mb-8 text-sm md:text-base">
+          <p className="mb-6 text-sm text-gray-500 md:mb-8 md:text-base">
             Selecteer eerst de vestiging.
           </p>
 
