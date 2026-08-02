@@ -47,7 +47,9 @@ export default function TaakRij({
     useState(false);
 
   async function opslaanTaak() {
-    if (afgesloten) return;
+    if (afgesloten || voltooid) {
+      return;
+    }
 
     if (!naam.trim()) {
       alert("Vul je naam in.");
@@ -56,56 +58,59 @@ export default function TaakRij({
 
     setOpslaan(true);
 
-    const res = await fetch(
-      `/api/weektaken/${taak.id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          naam,
-          voltooid: true,
-        }),
-      }
-    );
+    try {
+      const res = await fetch(
+        `/api/weektaken/${taak.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            naam: naam.trim(),
+            voltooid: true,
+          }),
+        }
+      );
 
-    if (!res.ok) {
+      if (!res.ok) {
+        throw new Error();
+      }
+
+      const data = await res.json();
+
+      setVoltooid(true);
+      setDatum(data.voltooidOp);
+
+      onVoltooid?.(
+        taak.id,
+        naam.trim(),
+        data.voltooidOp
+      );
+
+      setGelukt(true);
+
+      setTimeout(() => {
+        setGelukt(false);
+        setModalOpen(false);
+      }, 700);
+    } catch {
       alert(
         "Opslaan is mislukt."
       );
+    } finally {
       setOpslaan(false);
-      return;
     }
-
-    const data = await res.json();
-
-    setVoltooid(true);
-    setDatum(data.voltooidOp);
-
-    onVoltooid?.(
-      taak.id,
-      naam,
-      data.voltooidOp
-    );
-
-    setGelukt(true);
-
-    setTimeout(() => {
-      setGelukt(false);
-      setModalOpen(false);
-      setOpslaan(false);
-    }, 700);
   }
 
   return (
     <>
       <div
-        className={`hidden md:grid grid-cols-[80px_1fr_220px_180px] items-center gap-4 border-b px-4 py-3 transition ${
+        className={`hidden items-center gap-4 border-b px-4 py-3 transition md:grid md:grid-cols-[80px_1fr_220px_180px] ${
           voltooid
             ? "bg-green-50"
-            : "bg-white hover:bg-gray-50"
+            : "bg-white hover:bg-slate-50"
         }`}
       >
         <div className="text-center">
@@ -115,15 +120,9 @@ export default function TaakRij({
             disabled={
               voltooid || afgesloten
             }
-            onChange={() => {
-              if (
-                voltooid ||
-                afgesloten
-              )
-                return;
-
-              setModalOpen(true);
-            }}
+            onChange={() =>
+              setModalOpen(true)
+            }
             className="h-6 w-6 cursor-pointer"
           />
         </div>
@@ -132,13 +131,17 @@ export default function TaakRij({
           {taak.taak}
         </div>
 
-        <div>{naam || "-"}</div>
+        <div>
+          {naam || "-"}
+        </div>
 
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-slate-500">
           {datum
             ? new Date(
                 datum
-              ).toLocaleString("nl-NL")
+              ).toLocaleString(
+                "nl-NL"
+              )
             : "-"}
         </div>
       </div>
@@ -147,7 +150,7 @@ export default function TaakRij({
         className={`mb-3 rounded-xl border p-4 shadow-sm transition md:hidden ${
           voltooid
             ? "border-green-300 bg-green-50"
-            : "border-gray-200 bg-white"
+            : "border-slate-200 bg-white"
         }`}
       >
         <div className="flex items-start gap-4">
@@ -157,15 +160,9 @@ export default function TaakRij({
             disabled={
               voltooid || afgesloten
             }
-            onChange={() => {
-              if (
-                voltooid ||
-                afgesloten
-              )
-                return;
-
-              setModalOpen(true);
-            }}
+            onChange={() =>
+              setModalOpen(true)
+            }
             className="mt-1 h-8 w-8 flex-shrink-0"
           />
 
@@ -174,11 +171,11 @@ export default function TaakRij({
               {taak.taak}
             </div>
 
-            <div className="mt-3 text-sm text-gray-600">
+            <div className="mt-3 text-sm text-slate-600">
               👤 {naam || "-"}
             </div>
 
-            <div className="mt-1 text-sm text-gray-500">
+            <div className="mt-1 text-sm text-slate-500">
               📅{" "}
               {datum
                 ? new Date(
@@ -192,77 +189,83 @@ export default function TaakRij({
         </div>
       </div>
 
-      {modalOpen && !afgesloten && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-            <h2 className="mb-2 text-2xl font-bold">
-              Taak afronden
-            </h2>
+      {modalOpen &&
+        !afgesloten && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+              <h2 className="mb-2 text-2xl font-bold">
+                Taak afronden
+              </h2>
 
-            <p className="mb-5 text-gray-700">
-              {taak.taak}
-            </p>
+              <p className="mb-5 text-slate-600">
+                {taak.taak}
+              </p>
 
-            {gelukt && (
-              <div className="mb-5 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-center font-semibold text-green-700">
-                ✅ Taak succesvol opgeslagen
-              </div>
-            )}
+              {gelukt && (
+                <div className="mb-5 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-center font-semibold text-green-700">
+                  ✅ Taak succesvol opgeslagen
+                </div>
+              )}
 
-            <input
-              autoFocus
-              type="text"
-              value={naam}
-              onChange={(e) =>
-                setNaam(
-                  e.target.value
-                )
-              }
-              onKeyDown={(e) => {
-                if (
-                  e.key === "Enter"
-                ) {
-                  opslaanTaak();
-                }
-
-                if (
-                  e.key ===
-                  "Escape"
-                ) {
-                  setModalOpen(false);
-                }
-              }}
-              placeholder="Naam medewerker"
-              className="mb-6 w-full rounded-xl border-2 border-blue-200 px-4 py-4 text-lg outline-none transition focus:border-blue-600"
-            />
-
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-              <button
-                onClick={() =>
-                  setModalOpen(
-                    false
+              <input
+                autoFocus
+                type="text"
+                value={naam}
+                onChange={(e) =>
+                  setNaam(
+                    e.target.value
                   )
                 }
-                className="rounded-xl border px-6 py-3 font-semibold transition hover:bg-gray-100"
-              >
-                Annuleren
-              </button>
+                onKeyDown={(e) => {
+                  if (
+                    e.key ===
+                    "Enter"
+                  ) {
+                    opslaanTaak();
+                  }
 
-              <button
-                disabled={opslaan}
-                onClick={
-                  opslaanTaak
-                }
-                className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {opslaan
-                  ? "Opslaan..."
-                  : "Opslaan"}
-              </button>
+                  if (
+                    e.key ===
+                    "Escape"
+                  ) {
+                    setModalOpen(
+                      false
+                    );
+                  }
+                }}
+                placeholder="Naam medewerker"
+                className="mb-6 w-full rounded-xl border-2 border-blue-200 px-4 py-4 text-lg transition focus:border-blue-600 focus:outline-none"
+              />
+
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setModalOpen(
+                      false
+                    )
+                  }
+                  className="rounded-xl border px-6 py-3 font-semibold transition hover:bg-slate-100"
+                >
+                  Annuleren
+                </button>
+
+                <button
+                  type="button"
+                  disabled={opslaan}
+                  onClick={
+                    opslaanTaak
+                  }
+                  className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
+                >
+                  {opslaan
+                    ? "Opslaan..."
+                    : "Opslaan"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </>
   );
 }

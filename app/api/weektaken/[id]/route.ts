@@ -11,57 +11,99 @@ export async function PATCH(
   req: NextRequest,
   { params }: Params
 ) {
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  const { naam, voltooid } =
-    await req.json();
+    const {
+      naam,
+      voltooid,
+    } = await req.json();
 
-  const bestaandeTaak =
-    await prisma.weekTaak.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        week: true,
-      },
+    if (!naam?.trim()) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Naam ontbreekt.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const bestaandeTaak =
+      await prisma.weekTaak.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          week: true,
+        },
+      });
+
+    if (!bestaandeTaak) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Taak niet gevonden.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    if (
+      bestaandeTaak.week.afgesloten
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Deze week is afgesloten en kan niet meer gewijzigd worden.",
+        },
+        {
+          status: 403,
+        }
+      );
+    }
+
+    const taak =
+      await prisma.weekTaak.update({
+        where: {
+          id,
+        },
+        data: {
+          naam: naam.trim(),
+          voltooid:
+            Boolean(voltooid),
+          voltooidOp: voltooid
+            ? new Date()
+            : null,
+        },
+      });
+
+    return NextResponse.json({
+      success: true,
+      ...taak,
     });
-
-  if (!bestaandeTaak) {
-    return NextResponse.json(
-      {
-        error: "Taak niet gevonden.",
-      },
-      {
-        status: 404,
-      }
+  } catch (error) {
+    console.error(
+      "❌ Fout bij opslaan weektaak:"
     );
-  }
+    console.error(error);
 
-  if (bestaandeTaak.week.afgesloten) {
     return NextResponse.json(
       {
+        success: false,
         error:
-          "Deze week is afgesloten en kan niet meer gewijzigd worden.",
+          error instanceof Error
+            ? error.message
+            : "Onbekende fout",
       },
       {
-        status: 403,
+        status: 500,
       }
     );
   }
-
-  const taak =
-    await prisma.weekTaak.update({
-      where: {
-        id,
-      },
-      data: {
-        naam,
-        voltooid,
-        voltooidOp: voltooid
-          ? new Date()
-          : null,
-      },
-    });
-
-  return NextResponse.json(taak);
 }

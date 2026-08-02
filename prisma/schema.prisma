@@ -13,6 +13,7 @@ model Bestelling {
   vestiging  String
   medewerker String?
   type       String
+  opmerking  String?
   aangemaakt DateTime @default(now())
 
   regels BestellingRegel[]
@@ -58,7 +59,7 @@ model WeekTaak {
   id String @id @default(cuid())
 
   weekId String
-  week   Week   @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  week   Week @relation(fields: [weekId], references: [id], onDelete: Cascade)
 
   categorie String
   taak      String
@@ -72,4 +73,95 @@ model WeekTaak {
   @@index([weekId])
   @@index([categorie])
   @@index([voltooid])
+}
+
+model Medewerker {
+  id String @id @default(cuid())
+
+  voornaam String
+  achternaam String
+
+  naam String
+
+  email String?
+  telefoon String?
+
+  vestiging String
+
+  actief Boolean @default(true)
+
+  kleur String? @default("#2563eb")
+
+  aangemaakt DateTime @default(now())
+
+  beschikbaarheden Beschikbaarheid[]
+  diensten Dienst[]
+  uren UurRegistratie[]
+
+  @@index([vestiging])
+  @@index([actief])
+}
+
+model Beschikbaarheid {
+  id String @id @default(cuid())
+
+  medewerkerId String
+  medewerker Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+
+  weekdag Int
+
+  beschikbaar Boolean @default(true)
+
+  vanaf String?
+  tot String?
+
+  @@index([medewerkerId])
+}
+
+model Dienst {
+  id String @id @default(cuid())
+
+  medewerkerId String
+  medewerker Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+
+  datum DateTime
+
+  begintijd String
+  eindtijd String
+
+  vestiging String
+
+  functie String?
+
+  aangemaakt DateTime @default(now())
+
+  urenregistratie UurRegistratie?
+
+  @@index([datum])
+  @@index([vestiging])
+  @@index([medewerkerId])
+}
+
+model UurRegistratie {
+  id String @id @default(cuid())
+
+  dienstId String @unique
+  dienst Dienst @relation(fields: [dienstId], references: [id], onDelete: Cascade)
+
+  medewerkerId String
+  medewerker Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+
+  geplandeStart String
+  geplandeEinde String
+
+  gewerkteStart String?
+  gewerkteEinde String?
+
+  pauze Int @default(0)
+
+  opmerking String?
+
+  goedgekeurd Boolean @default(false)
+
+  @@index([medewerkerId])
 }

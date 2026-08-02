@@ -1,5 +1,3 @@
-
-
 import { Resend } from "resend";
 import { maakBestelPdf } from "./serverPdf";
 
@@ -24,9 +22,6 @@ export async function verstuurBestelMail(
 
   resend = new Resend(process.env.RESEND_API_KEY);
 
-
-
-  // PDF genereren (nog niet meesturen)
   const pdf = await maakBestelPdf(
     vestiging,
     medewerker,
@@ -34,165 +29,203 @@ export async function verstuurBestelMail(
     regels
   );
 
+  const totaal = regels.reduce(
+    (totaal, regel) => totaal + regel.besteld,
+    0
+  );
+
+  const bestelRegels = regels.filter(
+    (regel) => regel.besteld > 0
+  ).length;
 
   const html = `
-  <!DOCTYPE html>
-  <html lang="nl">
-    <head>
-      <meta charset="UTF-8" />
-      <style>
-        body{
-          margin:0;
-          padding:24px;
-          background:#f4f4f4;
-          font-family:Arial,Helvetica,sans-serif;
-          color:#333;
-        }
+<!DOCTYPE html>
+<html lang="nl">
 
-        .container{
-          max-width:700px;
-          margin:0 auto;
-          background:#fff;
-          border-radius:10px;
-          overflow:hidden;
-          border:1px solid #e5e5e5;
-        }
+<head>
+<meta charset="UTF-8" />
 
-        .header{
-          background:#009640;
-          color:#fff;
-          padding:24px;
-        }
+<style>
 
-        .content{
-          padding:24px;
-        }
+body{
+  margin:0;
+  padding:24px;
+  background:#f4f4f4;
+  font-family:Arial,Helvetica,sans-serif;
+  color:#333;
+}
 
-        table{
-          width:100%;
-          border-collapse:collapse;
-          margin-top:20px;
-        }
+.container{
+  max-width:700px;
+  margin:0 auto;
+  background:#fff;
+  border:1px solid #e5e5e5;
+  border-radius:10px;
+  overflow:hidden;
+}
 
-        th{
-          background:#009640;
-          color:white;
-          padding:10px;
-        }
+.header{
+  background:#009640;
+  color:#fff;
+  padding:24px;
+}
 
-        td{
-          padding:8px;
-          border-bottom:1px solid #ddd;
-        }
+.content{
+  padding:24px;
+}
 
-        .footer{
-          padding:18px;
-          text-align:center;
-          font-size:13px;
-          color:#777;
-          background:#fafafa;
-        }
-      </style>
-    </head>
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+}
 
-    <body>
+th{
+  background:#009640;
+  color:#fff;
+  padding:10px;
+}
 
-      <div class="container">
+td{
+  padding:8px;
+  border-bottom:1px solid #e5e5e5;
+}
 
-        <div class="header">
-          <h1>🍦 Clevers Bestelapp</h1>
-          <p>Nieuwe bestelling ontvangen</p>
-        </div>
+.samenvatting{
+  margin-top:24px;
+  background:#f7f7f7;
+  border-radius:8px;
+  padding:16px;
+}
 
-        <div class="content">
+.footer{
+  background:#fafafa;
+  color:#777;
+  text-align:center;
+  font-size:13px;
+  padding:18px;
+}
 
-          <table>
-            <tr>
-              <td><strong>Vestiging</strong></td>
-              <td>${vestiging}</td>
-            </tr>
+</style>
 
-            <tr>
-              <td><strong>Datum</strong></td>
-              <td>${datum}</td>
-            </tr>
+</head>
 
-            <tr>
-              <td><strong>Medewerker</strong></td>
-              <td>${medewerker}</td>
-            </tr>
-          </table>
+<body>
 
-          <h2>Bestelling</h2>
+<div class="container">
 
-          <table>
+<div class="header">
+<h1>🍦 Clevers Bestelapp</h1>
+<p>Nieuwe bestelling ontvangen</p>
+</div>
 
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Geteld</th>
-                <th>Buffer</th>
-                <th>Bestellen</th>
-              </tr>
-            </thead>
+<div class="content">
 
-            <tbody>
+<table>
 
-              ${regels
-                .map(
-                  (regel) => `
-                  <tr>
-                    <td>${regel.productNaam}</td>
-                    <td align="center">${regel.geteld}</td>
-                    <td align="center">${regel.buffer}</td>
-                    <td align="center"><strong>${regel.besteld}</strong></td>
-                  </tr>
-                `
-                )
-                .join("")}
+<tr>
+<td><strong>Vestiging</strong></td>
+<td>${vestiging}</td>
+</tr>
 
-            </tbody>
+<tr>
+<td><strong>Datum</strong></td>
+<td>${datum}</td>
+</tr>
 
-          </table>
+<tr>
+<td><strong>Medewerker</strong></td>
+<td>${medewerker}</td>
+</tr>
 
-          <p style="margin-top:20px;font-weight:bold;">
-            Totaal te bestellen:
-            ${regels.reduce((t, r) => t + r.besteld, 0)} bakken
-          </p>
+</table>
 
-        </div>
+<h2>Bestelling</h2>
 
-        <div class="footer">
-          Deze e-mail is automatisch verzonden vanuit de Clevers Bestelapp.
-        </div>
+<table>
 
-      </div>
+<thead>
 
-    </body>
+<tr>
+<th>Product</th>
+<th>Geteld</th>
+<th>Buffer</th>
+<th>Bestellen</th>
+</tr>
 
-  </html>
-  `;
+</thead>
 
-const { data, error } = await resend.emails.send({
-  from: "Bestelapp <onboarding@resend.dev>",
-  replyTo: "bram.derks@outlook.com",
-  to: ["bram.derks@outlook.com"],
-  subject: `🍦 Nieuwe bestelling - ${vestiging}`,
-  html,
+<tbody>
 
-  attachments: [
-    {
-      filename: `Bestelling_${vestiging}_${datum.replace(/\//g, "-")}.pdf`,
-      content: Buffer.from(pdf).toString("base64"),
-    },
-  ],
-});
+${regels
+  .map(
+    (regel) => `
+<tr>
+<td>${regel.productNaam}</td>
+<td align="center">${regel.geteld}</td>
+<td align="center">${regel.buffer}</td>
+<td align="center"><strong>${regel.besteld}</strong></td>
+</tr>`
+  )
+  .join("")}
 
+</tbody>
+
+</table>
+
+<div class="samenvatting">
+
+<p><strong>Totaal te bestellen:</strong> ${totaal}</p>
+
+<p><strong>Aantal bestelregels:</strong> ${bestelRegels}</p>
+
+</div>
+
+</div>
+
+<div class="footer">
+Deze e-mail is automatisch verzonden vanuit de Clevers Bestelapp.
+</div>
+
+</div>
+
+</body>
+
+</html>
+`;
+
+  const { data, error } =
+    await resend.emails.send({
+      from:
+        "Bestelapp <onboarding@resend.dev>",
+      replyTo:
+        "bram.derks@outlook.com",
+      to: [
+        "bram.derks@outlook.com",
+      ],
+      subject: `🍦 Nieuwe bestelling - ${vestiging}`,
+      html,
+
+      attachments: [
+        {
+          filename: `Bestelling_${vestiging}_${datum.replace(
+            /\//g,
+            "-"
+          )}.pdf`,
+          content:
+            Buffer.from(pdf).toString(
+              "base64"
+            ),
+        },
+      ],
+    });
 
   if (error) {
-    throw new Error(JSON.stringify(error));
+    console.error(error);
+    throw new Error(
+      "E-mail verzenden mislukt."
+    );
   }
-
 
   return data;
 }

@@ -16,18 +16,30 @@ export default function SpeciaalsmakenTeller({
   onSlagroomChange,
 }: Props) {
   return (
-    <section className="bg-white rounded-xl shadow p-4 md:p-6">
-      <h2 className="text-xl md:text-2xl font-bold mb-5">
-        Speciaalsmaken
-      </h2>
+    <section className="rounded-xl bg-white p-4 shadow md:p-6">
+      <div className="mb-6 flex flex-col gap-2">
+        <h2 className="text-2xl font-bold">
+          ⭐ Speciaalsmaken
+        </h2>
 
-      <div className="grid grid-cols-[1fr_70px_90px] md:grid-cols-[1fr_90px_140px] font-semibold border-b pb-2 mb-2 text-sm md:text-base">
-        <div>Product</div>
-        <div className="text-center">Buffer</div>
-        <div className="text-center">Geteld</div>
+        <p className="text-sm text-gray-500">
+          Tel het totaal aantal bakken speciaalsmaken en de aanwezige slagroom.
+        </p>
       </div>
 
-      <div className="space-y-1">
+      <div className="mb-3 grid grid-cols-[1fr_70px_90px] border-b pb-2 text-sm font-semibold md:grid-cols-[1fr_90px_140px] md:text-base">
+        <div>Product</div>
+
+        <div className="text-center">
+          Buffer
+        </div>
+
+        <div className="text-center">
+          Geteld
+        </div>
+      </div>
+
+      <div className="space-y-2">
         <TelRij
           naam="Speciaalsmaken"
           buffer={6}
@@ -41,6 +53,11 @@ export default function SpeciaalsmakenTeller({
           aantal={slagroom}
           onChange={onSlagroomChange}
         />
+      </div>
+
+      <div className="mt-6 rounded-xl bg-blue-50 p-4 text-sm text-blue-900">
+        <strong>Let op:</strong> tel alleen de daadwerkelijk aanwezige voorraad.
+        Aangebroken bakken worden volgens de vaste telafspraken verwerkt.
       </div>
     </section>
   );

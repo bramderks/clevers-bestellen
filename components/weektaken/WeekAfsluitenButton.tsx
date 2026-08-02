@@ -15,40 +15,46 @@ export default function WeekAfsluitenButton({
     useState(false);
 
   async function afsluiten() {
-    if (afgesloten) return;
+    if (afgesloten || laden) {
+      return;
+    }
 
     const akkoord = confirm(
       "Weet je zeker dat je deze week definitief wilt afsluiten?\n\nHierna kunnen geen taken meer worden gewijzigd."
     );
 
-    if (!akkoord) return;
-
-    setLaden(true);
-
-    const res = await fetch(
-      "/api/weektaken/afsluiten",
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          weekId,
-        }),
-      }
-    );
-
-    setLaden(false);
-
-    if (!res.ok) {
-      alert(
-        "Het afsluiten van de week is mislukt."
-      );
+    if (!akkoord) {
       return;
     }
 
-    location.reload();
+    setLaden(true);
+
+    try {
+      const res = await fetch(
+        "/api/weektaken/afsluiten",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            weekId,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error();
+      }
+
+      location.reload();
+    } catch {
+      alert(
+        "Het afsluiten van de week is mislukt."
+      );
+      setLaden(false);
+    }
   }
 
   if (afgesloten) {
@@ -61,9 +67,10 @@ export default function WeekAfsluitenButton({
 
   return (
     <button
+      type="button"
       onClick={afsluiten}
       disabled={laden}
-      className="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+      className="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
     >
       {laden
         ? "Week afsluiten..."

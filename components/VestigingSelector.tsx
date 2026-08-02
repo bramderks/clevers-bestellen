@@ -11,33 +11,71 @@ export default function VestigingSelector({
 }: VestigingSelectorProps) {
   return (
     <div className="mb-8">
-      <h2 className="text-lg md:text-xl font-semibold mb-4">
+      <h2 className="mb-4 text-lg font-semibold md:text-xl">
         Stap 1 - Kies vestiging
       </h2>
 
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
-        <label className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 cursor-pointer hover:bg-slate-50">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label
+          className={`cursor-pointer rounded-xl border-2 p-5 transition ${
+            vestiging === "nijmegen"
+              ? "border-blue-600 bg-blue-50"
+              : "border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50"
+          }`}
+        >
           <input
             type="radio"
             name="vestiging"
             value="nijmegen"
             checked={vestiging === "nijmegen"}
             onChange={(e) => onChange(e.target.value)}
+            className="sr-only"
           />
 
-          <span>nijmegen</span>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">🍦</span>
+
+            <div>
+              <div className="text-lg font-bold">
+                Nijmegen
+              </div>
+
+              <div className="text-sm text-slate-500">
+                Clevers Nijmegen
+              </div>
+            </div>
+          </div>
         </label>
 
-        <label className="flex items-center gap-2 rounded-lg border bg-white px-4 py-3 cursor-pointer hover:bg-slate-50">
+        <label
+          className={`cursor-pointer rounded-xl border-2 p-5 transition ${
+            vestiging === "roermond"
+              ? "border-blue-600 bg-blue-50"
+              : "border-slate-200 bg-white hover:border-blue-300 hover:bg-slate-50"
+          }`}
+        >
           <input
             type="radio"
             name="vestiging"
             value="roermond"
             checked={vestiging === "roermond"}
             onChange={(e) => onChange(e.target.value)}
+            className="sr-only"
           />
 
-          <span>roermond</span>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">🍦</span>
+
+            <div>
+              <div className="text-lg font-bold">
+                Roermond
+              </div>
+
+              <div className="text-sm text-slate-500">
+                Clevers Roermond
+              </div>
+            </div>
+          </div>
         </label>
       </div>
     </div>

@@ -18,29 +18,62 @@ export default function TelCategorie({
   vestiging,
   onChange,
 }: Props) {
-  if (producten.length === 0) return null;
+  if (producten.length === 0) {
+    return null;
+  }
 
+  const totaalGeteld = producten.reduce(
+    (totaal, product) =>
+      totaal + (telling[product.id] ?? 0),
+    0
+  );
 
   return (
-    <section className="bg-white rounded-xl shadow p-4 md:p-6">
-      <h2 className="text-xl md:text-2xl font-bold mb-5">
-        {titel}
-      </h2>
+    <section className="rounded-xl bg-white p-4 shadow md:p-6">
+      <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">
+            {titel}
+          </h2>
 
-      <div className="grid grid-cols-[1fr_70px_90px] md:grid-cols-[1fr_90px_140px] font-semibold border-b pb-2 mb-2 text-sm md:text-base">
-        <div>Product</div>
-        <div className="text-center">Buffer</div>
-        <div className="text-center">Geteld</div>
+          <p className="mt-1 text-sm text-gray-500">
+            {producten.length} producten
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-blue-50 px-5 py-3 text-center">
+          <div className="text-sm text-gray-500">
+            Totaal geteld
+          </div>
+
+          <div className="text-3xl font-bold text-blue-700">
+            {totaalGeteld}
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-1">
+      <div className="mb-3 grid grid-cols-[1fr_70px_90px] border-b pb-2 text-sm font-semibold md:grid-cols-[1fr_90px_190px] md:text-base">
+        <div>Product</div>
+
+        <div className="text-center">
+          Buffer
+        </div>
+
+        <div className="text-center">
+          Geteld
+        </div>
+      </div>
+
+      <div className="space-y-2">
         {producten.map((product) => (
           <TelRij
             key={product.id}
             naam={product.naam}
-buffer={product.buffers[vestiging]}
+            buffer={product.buffers[vestiging]}
             aantal={telling[product.id] ?? 0}
-            onChange={(waarde) => onChange(product.id, waarde)}
+            onChange={(waarde) =>
+              onChange(product.id, waarde)
+            }
           />
         ))}
       </div>

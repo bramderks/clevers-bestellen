@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
+
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
@@ -11,8 +13,8 @@ export async function PATCH(
     if (!weekId) {
       return NextResponse.json(
         {
-          error:
-            "WeekId ontbreekt.",
+          success: false,
+          error: "WeekId ontbreekt.",
         },
         {
           status: 400,
@@ -30,8 +32,8 @@ export async function PATCH(
     if (!week) {
       return NextResponse.json(
         {
-          error:
-            "Week niet gevonden.",
+          success: false,
+          error: "Week niet gevonden.",
         },
         {
           status: 404,
@@ -40,13 +42,11 @@ export async function PATCH(
     }
 
     if (week.afgesloten) {
-      return NextResponse.json(
-        {
-          success: true,
-          message:
-            "Week was al afgesloten.",
-        }
-      );
+      return NextResponse.json({
+        success: true,
+        message:
+          "Week was al afgesloten.",
+      });
     }
 
     const openTaken =
@@ -60,6 +60,7 @@ export async function PATCH(
     if (openTaken > 0) {
       return NextResponse.json(
         {
+          success: false,
           error:
             "Niet alle taken zijn voltooid.",
         },
@@ -81,17 +82,28 @@ export async function PATCH(
         },
       });
 
+    revalidatePath("/weektaken");
+    revalidatePath("/historie/weektaken");
+    revalidatePath("/historie");
+    revalidatePath("/");
+
     return NextResponse.json({
       success: true,
       week: resultaat,
     });
   } catch (error) {
+    console.error(
+      "❌ Fout bij afsluiten week:"
+    );
     console.error(error);
 
     return NextResponse.json(
       {
+        success: false,
         error:
-          "Er is een fout opgetreden.",
+          error instanceof Error
+            ? error.message
+            : "Er is een fout opgetreden.",
       },
       {
         status: 500,

@@ -6,7 +6,6 @@ interface Props {
   drooggoedBestelling: BestelAdvies[];
   totaalIJs: number;
   totaalDrooggoed: number;
-
   opmerking: string;
   setOpmerking: (waarde: string) => void;
 }
@@ -17,12 +16,10 @@ export default function ControlePagina({
   opmerking,
   setOpmerking,
 }: Props) {
-  // IJs alfabetisch
   const gesorteerd = [...ijsBestelling].sort((a, b) =>
     a.naam.localeCompare(b.naam, "nl")
   );
 
-  // Blokken maken
   const speciaalsmaken = gesorteerd.filter(
     (r) => r.id === "speciaalsmaken"
   );
@@ -39,38 +36,88 @@ export default function ControlePagina({
     .filter((r) => r.id !== "slagroom")
     .sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
 
+  const totaalIJsBestelling = ijs.reduce(
+    (t, r) => t + r.bestellen,
+    0
+  );
+
+  const totaalSpeciaalsmaken = speciaalsmaken.reduce(
+    (t, r) => t + r.bestellen,
+    0
+  );
+
+  const totaalSlagroom = slagroom.reduce(
+    (t, r) => t + r.bestellen,
+    0
+  );
+
+  const totaalDrooggoedBestelling = drooggoed.reduce(
+    (t, r) => t + r.bestellen,
+    0
+  );
+
+  const totaalBestelling =
+    totaalIJsBestelling +
+    totaalSpeciaalsmaken +
+    totaalSlagroom +
+    totaalDrooggoedBestelling;
+
   return (
     <div className="rounded-xl border bg-white p-4 md:p-6">
-      <h2 className="mb-6 text-xl md:text-2xl font-bold">
-        Controle bestelling
-      </h2>
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-xl font-bold md:text-2xl">
+            Controle bestelling
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Controleer de bestelling voordat deze wordt opgeslagen.
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-blue-50 px-5 py-3 text-center">
+          <div className="text-sm text-gray-500">
+            Totaal te bestellen
+          </div>
+
+          <div className="text-3xl font-bold text-blue-700">
+            {totaalBestelling}
+          </div>
+        </div>
+      </div>
+
+      {totaalBestelling === 0 && (
+        <div className="mb-6 rounded-xl border border-orange-200 bg-orange-50 p-4 text-orange-700">
+          ⚠️ Er worden geen producten besteld.
+        </div>
+      )}
 
       <BestelTabel
         titel="🍦 IJs"
         regels={ijs}
-        totaal={ijs.reduce((t, r) => t + r.bestellen, 0)}
+        totaal={totaalIJsBestelling}
       />
 
       <BestelTabel
         titel="⭐ Speciaalsmaken"
         regels={speciaalsmaken}
-        totaal={speciaalsmaken.reduce((t, r) => t + r.bestellen, 0)}
+        totaal={totaalSpeciaalsmaken}
       />
 
       <BestelTabel
         titel="🥛 Slagroom"
         regels={slagroom}
-        totaal={slagroom.reduce((t, r) => t + r.bestellen, 0)}
+        totaal={totaalSlagroom}
       />
 
       <BestelTabel
         titel="📦 Drooggoed"
         regels={drooggoed}
-        totaal={drooggoed.reduce((t, r) => t + r.bestellen, 0)}
+        totaal={totaalDrooggoedBestelling}
       />
 
       <div className="mt-8">
-        <label className="mb-2 block font-medium text-sm md:text-base">
+        <label className="mb-2 block text-sm font-medium md:text-base">
           Opmerking
         </label>
 
@@ -78,7 +125,7 @@ export default function ControlePagina({
           value={opmerking}
           onChange={(e) => setOpmerking(e.target.value)}
           rows={4}
-          className="w-full rounded-lg border p-3 text-sm md:text-base resize-y"
+          className="w-full resize-y rounded-lg border p-3 text-sm md:text-base"
           placeholder="Eventuele opmerkingen..."
         />
       </div>
