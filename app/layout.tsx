@@ -1,9 +1,15 @@
-import type { Metadata } from "next";
+import type {
+  Metadata,
+  Viewport,
+} from "next";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Clevers Bestelsysteem",
+    default:
+      "Clevers Bestelsysteem",
+
     template:
       "%s | Clevers Bestelsysteem",
   },
@@ -24,13 +30,17 @@ export const metadata: Metadata = {
     icon: "/favicon.png",
   },
 
-  viewport:
-    "width=device-width, initial-scale=1",
-
   robots: {
     index: false,
     follow: false,
   },
+};
+
+export const viewport: Viewport = {
+  width:
+    "device-width",
+
+  initialScale: 1,
 };
 
 interface Props {
