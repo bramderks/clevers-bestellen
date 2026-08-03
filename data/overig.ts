@@ -20,6 +20,7 @@ export const overig: Product[] = [
       "kleine bekers",
     ],
   },
+
   {
     id: "bekers-middel",
     naam: "Bekers Middel",
@@ -40,6 +41,7 @@ export const overig: Product[] = [
       "medium bekers",
     ],
   },
+
   {
     id: "lepels",
     naam: "Lepels",
@@ -58,6 +60,7 @@ export const overig: Product[] = [
       "lepels klein",
     ],
   },
+
   {
     id: "softijs",
     naam: "Softijs",
@@ -76,11 +79,12 @@ export const overig: Product[] = [
       "soft ijs",
     ],
   },
+
   {
     id: "slagroom",
     naam: "Slagroom",
-    categorie: "drooggoed",
-    telCategorie: "drooggoed",
+    categorie: "ijs",
+    telCategorie: "speciaalsmaken",
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {

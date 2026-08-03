@@ -12,78 +12,154 @@ interface PdfOpties {
   bestelling: BestelAdvies[];
 }
 
+interface PdfRegel {
+  naam: string;
+  geteld: number;
+  buffer: number;
+  bestellen: number;
+}
+
+function huidigeDatum(
+  datum: string
+) {
+  return new Date(
+    datum
+  ).toLocaleDateString(
+    "nl-NL"
+  );
+}
+
 function tekenHeader(
   doc: jsPDF,
   vestiging: Vestiging,
   datum: string
 ) {
-  doc.setFillColor(35, 91, 170);
-  doc.rect(0, 0, 210, 28, "F");
+  doc.setFillColor(
+    35,
+    91,
+    170
+  );
 
-  doc.setTextColor(255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
+  doc.rect(
+    0,
+    0,
+    210,
+    32,
+    "F"
+  );
+
+  doc.setTextColor(
+    255,
+    255,
+    255
+  );
+
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
+  doc.setFontSize(20);
 
   doc.text(
     "CLEVERS",
     14,
-    17
+    15
   );
 
   doc.setFontSize(13);
 
   doc.text(
-    "BESTELADVIES",
-    105,
-    17,
-    {
-      align: "center",
-    }
+    "BESTELCONTROLE",
+    14,
+    25
   );
 
-  doc.setTextColor(40);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+  doc.setTextColor(
+    40,
+    40,
+    40
+  );
+
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  doc.setFontSize(11);
 
   doc.text(
     `Vestiging: ${vestiging}`,
     14,
-    38
+    45
   );
 
   doc.text(
-    `Datum: ${new Date(
+    `Datum: ${huidigeDatum(
       datum
-    ).toLocaleDateString("nl-NL")}`,
+    )}`,
     14,
-    44
+    52
   );
 
   doc.line(
     14,
-    49,
+    58,
     196,
-    49
+    58
   );
+}
+
+function controleerPagina(
+  doc: jsPDF,
+  y: number
+) {
+  if (y > 250) {
+    doc.addPage();
+
+    return 20;
+  }
+
+  return y;
 }
 
 function tekenTabel(
   doc: jsPDF,
   titel: string,
   y: number,
-  regels: {
-    naam: string;
-    geteld: number;
-    buffer: number;
-    bestellen: number;
-  }[]
+  regels: PdfRegel[]
 ) {
+  const zichtbareRegels =
+    regels
+      .filter(
+        (regel) =>
+          regel.bestellen > 0
+      )
+      .sort((a, b) =>
+        a.naam.localeCompare(
+          b.naam,
+          "nl"
+        )
+      );
+
+  if (
+    zichtbareRegels.length === 0
+  ) {
+    return y;
+  }
+
+  y =
+    controleerPagina(
+      doc,
+      y
+    );
+
   doc.setFont(
     "helvetica",
     "bold"
   );
 
-  doc.setFontSize(12);
+  doc.setFontSize(13);
 
   doc.text(
     titel,
@@ -91,8 +167,21 @@ function tekenTabel(
     y
   );
 
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
+
+  doc.setFontSize(10);
+
+  doc.text(
+    `${zichtbareRegels.length} artikelen`,
+    160,
+    y
+  );
+
   autoTable(doc, {
-    startY: y + 4,
+    startY: y + 5,
 
     theme: "grid",
 
@@ -105,14 +194,15 @@ function tekenTabel(
       ],
     ],
 
-    body: regels.map(
-      (regel) => [
-        regel.naam,
-        regel.geteld,
-        regel.buffer,
-        regel.bestellen,
-      ]
-    ),
+    body:
+      zichtbareRegels.map(
+        (regel) => [
+          regel.naam,
+          regel.geteld,
+          regel.buffer,
+          regel.bestellen,
+        ]
+      ),
 
     headStyles: {
       fillColor: [
@@ -120,23 +210,56 @@ function tekenTabel(
         91,
         170,
       ],
+      textColor: 255,
+      fontStyle: "bold",
+      halign: "center",
+    },
+
+    columnStyles: {
+      0: {
+        cellWidth: 90,
+      },
+      1: {
+        cellWidth: 25,
+        halign: "center",
+      },
+      2: {
+        cellWidth: 25,
+        halign: "center",
+      },
+      3: {
+        cellWidth: 30,
+        halign: "center",
+      },
     },
 
     styles: {
       font: "helvetica",
       fontSize: 10,
+      cellPadding: 3,
+    },
+
+    alternateRowStyles: {
+      fillColor: [
+        245,
+        247,
+        250,
+      ],
     },
   });
 
-  return (
+  const laatstePositie =
     (
       doc as jsPDF & {
         lastAutoTable?: {
           finalY: number;
         };
       }
-    ).lastAutoTable?.finalY ?? y
-  );
+    )
+      .lastAutoTable
+      ?.finalY ?? y;
+
+  return laatstePositie + 15;
 }
 
 export function genereerBestelPdf({
@@ -144,15 +267,14 @@ export function genereerBestelPdf({
   datum,
   bestelling,
 }: PdfOpties) {
-  const doc = new jsPDF();
+  const doc =
+    new jsPDF();
 
   tekenHeader(
     doc,
     vestiging,
     datum
   );
-
-  let y = 58;
 
   const ijs =
     bestelling.filter(
@@ -163,29 +285,51 @@ export function genereerBestelPdf({
   const drooggoed =
     bestelling.filter(
       (regel) =>
-        regel.bestelGroep === "drooggoed"
+        regel.bestelGroep ===
+        "drooggoed"
     );
 
-  y =
-    tekenTabel(
-      doc,
-      "🍦 IJs",
-      y,
-      ijs
-    ) + 12;
+
+  let y = 70;
 
   y =
     tekenTabel(
       doc,
-      "📦 Drooggoed",
+      "IJS",
+      y,
+      ijs
+    );
+
+
+  y =
+    controleerPagina(
+      doc,
+      y
+    );
+
+
+  y =
+    tekenTabel(
+      doc,
+      "DROOGGOED",
       y,
       drooggoed
-    ) + 15;
+    );
+
+
+  y =
+    controleerPagina(
+      doc,
+      y
+    );
+
 
   doc.setFont(
     "helvetica",
     "bold"
   );
+
+  doc.setFontSize(13);
 
   doc.text(
     "SAMENVATTING",
@@ -193,56 +337,80 @@ export function genereerBestelPdf({
     y
   );
 
+
   doc.setFont(
     "helvetica",
     "normal"
   );
 
-  doc.text(
-    `Totaal ijs: ${ijs.reduce(
+  doc.setFontSize(11);
+
+
+  const totaalIJs =
+    ijs.reduce(
       (totaal, regel) =>
-        totaal + regel.bestellen,
+        totaal +
+        regel.bestellen,
       0
-    )}`,
-    14,
-    y + 8
-  );
+    );
+
+
+  const totaalDrooggoed =
+    drooggoed.reduce(
+      (totaal, regel) =>
+        totaal +
+        regel.bestellen,
+      0
+    );
+
 
   doc.text(
-    `Totaal drooggoed: ${drooggoed.reduce(
-      (totaal, regel) =>
-        totaal + regel.bestellen,
-      0
-    )}`,
+    `Totaal ijs: ${totaalIJs}`,
     14,
-    y + 15
+    y + 10
   );
 
-  const paginaTotaal =
+
+  doc.text(
+    `Totaal drooggoed: ${totaalDrooggoed}`,
+    14,
+    y + 18
+  );
+
+
+  const aantalPaginas =
     doc.getNumberOfPages();
 
+
   for (
-    let i = 1;
-    i <= paginaTotaal;
-    i++
+    let pagina = 1;
+    pagina <= aantalPaginas;
+    pagina++
   ) {
-    doc.setPage(i);
+    doc.setPage(
+      pagina
+    );
 
     doc.setFontSize(8);
 
     doc.text(
-      `Pagina ${i} van ${paginaTotaal}`,
+      `Pagina ${pagina} van ${aantalPaginas}`,
       170,
       290
     );
   }
 
+
   const bestandsDatum =
     new Date(datum)
       .toISOString()
-      .slice(0, 10);
+      .slice(
+        0,
+        10
+      );
+
 
   doc.save(
-    `${bestandsDatum}_${vestiging}_Besteladvies.pdf`
+    `${bestandsDatum}_${vestiging}_Bestelcontrole.pdf`
   );
 }
