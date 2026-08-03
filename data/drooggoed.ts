@@ -9,13 +9,24 @@ export const drooggoed: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "drooggoed",
     buffers: {
-
       roermond: 6,
-
       nijmegen: 4,
-
     },
     volgorde: 100,
+    actief: true,
+  },
+  {
+    id: "slagroom",
+    naam: "Slagroom",
+    categorie: "drooggoed",
+    telCategorie: "speciaalsmaken",
+    bestelBij: "ijskeuken",
+    bestelGroep: "drooggoed",
+    buffers: {
+      roermond: 1,
+      nijmegen: 2,
+    },
+    volgorde: 101,
     actief: true,
   },
   {
@@ -26,11 +37,8 @@ export const drooggoed: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "drooggoed",
     buffers: {
-
       roermond: 1,
-
       nijmegen: 1,
-
     },
     volgorde: 102,
     actief: true,
@@ -43,11 +51,8 @@ export const drooggoed: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "drooggoed",
     buffers: {
-
       roermond: 1,
-
       nijmegen: 1,
-
     },
     volgorde: 103,
     actief: true,
@@ -60,30 +65,10 @@ export const drooggoed: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "drooggoed",
     buffers: {
-
       roermond: 1,
-
       nijmegen: 1,
-
     },
     volgorde: 104,
     actief: true,
   },
-  {
-  id: "slagroom",
-  naam: "Slagroom",
-  categorie: "drooggoed",
-  telCategorie: "speciaalsmaken",
-  bestelBij: "ijskeuken",
-  bestelGroep: "drooggoed",
-  buffers: {
-
-    roermond: 1,
-
-    nijmegen: 2,
-
-  },
-  volgorde: 101,
-  actief: true,
-},
 ];

@@ -3,29 +3,24 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 
-type Props = {
-  params: Promise<{
-    id: string;
-  }>;
-};
-
 export async function GET(
   request: NextRequest,
-  { params }: Props
+  context: {
+    params: Promise<{ id: string }>;
+  }
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
 
-    const dienst =
-      await prisma.dienst.findUnique({
-        where: {
-          id,
-        },
-        include: {
-          medewerker: true,
-          urenregistratie: true,
-        },
-      });
+    const dienst = await prisma.dienst.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        medewerker: true,
+        urenregistratie: true,
+      },
+    });
 
     if (!dienst) {
       return NextResponse.json(
@@ -63,20 +58,20 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: Props
+  context: {
+    params: Promise<{ id: string }>;
+  }
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
 
-    const body =
-      await request.json();
+    const body = await request.json();
 
-    const bestaande =
-      await prisma.dienst.findUnique({
-        where: {
-          id,
-        },
-      });
+    const bestaande = await prisma.dienst.findUnique({
+      where: {
+        id,
+      },
+    });
 
     if (!bestaande) {
       return NextResponse.json(
@@ -114,15 +109,11 @@ export async function PATCH(
       );
     }
 
-    if (
-      !body.begintijd ||
-      !body.eindtijd
-    ) {
+    if (!body.begintijd || !body.eindtijd) {
       return NextResponse.json(
         {
           success: false,
-          error:
-            "Begin- en eindtijd zijn verplicht.",
+          error: "Begin- en eindtijd zijn verplicht.",
         },
         {
           status: 400,
@@ -130,19 +121,17 @@ export async function PATCH(
       );
     }
 
-    const medewerker =
-      await prisma.medewerker.findUnique({
-        where: {
-          id: body.medewerkerId,
-        },
-      });
+    const medewerker = await prisma.medewerker.findUnique({
+      where: {
+        id: body.medewerkerId,
+      },
+    });
 
     if (!medewerker) {
       return NextResponse.json(
         {
           success: false,
-          error:
-            "Medewerker niet gevonden.",
+          error: "Medewerker niet gevonden.",
         },
         {
           status: 404,
@@ -150,41 +139,28 @@ export async function PATCH(
       );
     }
 
-    const dienst =
-      await prisma.dienst.update({
-        where: {
-          id,
-        },
-        data: {
-          medewerkerId:
-            body.medewerkerId,
-          datum: new Date(
-            body.datum
-          ),
-          begintijd:
-            body.begintijd,
-          eindtijd:
-            body.eindtijd,
-          vestiging:
-            body.vestiging,
-          functie:
-            body.functie ||
-            "Medewerker",
-        },
-        include: {
-          medewerker: true,
-          urenregistratie: true,
-        },
-      });
+    const dienst = await prisma.dienst.update({
+      where: {
+        id,
+      },
+      data: {
+        medewerkerId: body.medewerkerId,
+        datum: new Date(body.datum),
+        begintijd: body.begintijd,
+        eindtijd: body.eindtijd,
+        vestiging: body.vestiging,
+        functie: body.functie ?? "Medewerker",
+      },
+      include: {
+        medewerker: true,
+        urenregistratie: true,
+      },
+    });
 
     revalidatePath("/diensten");
     revalidatePath("/rooster");
-    revalidatePath(
-      "/rooster/week"
-    );
-    revalidatePath(
-      `/diensten/${id}`
-    );
+    revalidatePath("/rooster/week");
+    revalidatePath(`/diensten/${id}`);
 
     return NextResponse.json({
       success: true,
@@ -210,17 +186,18 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: Props
+  context: {
+    params: Promise<{ id: string }>;
+  }
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
 
-    const bestaande =
-      await prisma.dienst.findUnique({
-        where: {
-          id,
-        },
-      });
+    const bestaande = await prisma.dienst.findUnique({
+      where: {
+        id,
+      },
+    });
 
     if (!bestaande) {
       return NextResponse.json(
@@ -242,9 +219,7 @@ export async function DELETE(
 
     revalidatePath("/diensten");
     revalidatePath("/rooster");
-    revalidatePath(
-      "/rooster/week"
-    );
+    revalidatePath("/rooster/week");
 
     return NextResponse.json({
       success: true,

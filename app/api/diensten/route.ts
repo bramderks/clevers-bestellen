@@ -9,10 +9,11 @@ export async function GET() {
       await prisma.dienst.findMany({
         include: {
           medewerker: true,
+          urenregistratie: true,
         },
         orderBy: [
           {
-            datum: "asc",
+            datum: "desc",
           },
           {
             begintijd: "asc",
@@ -67,7 +68,7 @@ export async function POST(
         {
           success: false,
           error:
-            "Datum ontbreekt.",
+            "Datum is verplicht.",
         },
         {
           status: 400,
@@ -126,10 +127,12 @@ export async function POST(
           vestiging:
             body.vestiging,
           functie:
-            body.functie || null,
+            body.functie ??
+            "Medewerker",
         },
         include: {
           medewerker: true,
+          urenregistratie: true,
         },
       });
 

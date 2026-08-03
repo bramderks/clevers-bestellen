@@ -2,42 +2,64 @@
 
 import { useState } from "react";
 
+import type { Vestiging } from "@/types";
+
 import TopBar from "@/components/TopBar";
 import TelForm from "@/components/TelForm";
 import VestigingSelector from "@/components/VestigingSelector";
-import type { Vestiging } from "@/types";
 
 export default function NieuweTelling() {
-  const [vestiging, setVestiging] = useState<Vestiging | "">("");
+  const [vestiging, setVestiging] =
+    useState<Vestiging | null>(
+      null
+    );
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-6 md:py-10">
+
       <div className="mx-auto max-w-6xl">
-        <TopBar title="Nieuwe telling" />
 
-        <div className="rounded-2xl bg-white p-5 shadow-xl md:p-8">
-          <h1 className="mb-2 text-3xl font-bold md:text-4xl">
-            Nieuwe telling
-          </h1>
+        <TopBar
+          title="Nieuwe telling"
+        />
 
-          <p className="mb-6 text-sm text-gray-500 md:mb-8 md:text-base">
-            Selecteer eerst de vestiging.
-          </p>
+        <section className="rounded-2xl bg-white p-6 shadow-xl md:p-8">
+
+          <header className="mb-8">
+
+            <h1 className="text-4xl font-bold">
+              Nieuwe telling
+            </h1>
+
+            <p className="mt-2 text-slate-500">
+              Selecteer eerst de vestiging en vul daarna de telling in.
+            </p>
+
+          </header>
 
           <VestigingSelector
-            vestiging={vestiging}
-            onChange={(value) => setVestiging(value as Vestiging)}
+            vestiging={vestiging ?? ""}
+            onChange={(waarde) =>
+              setVestiging(
+                waarde as Vestiging
+              )
+            }
           />
 
           {vestiging && (
             <>
-              <hr className="my-6 md:my-8" />
+              <hr className="my-8" />
 
-              <TelForm vestiging={vestiging} />
+              <TelForm
+                vestiging={vestiging}
+              />
             </>
           )}
-        </div>
+
+        </section>
+
       </div>
+
     </main>
   );
 }

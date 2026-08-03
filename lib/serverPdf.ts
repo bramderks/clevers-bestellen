@@ -11,6 +11,9 @@ export interface PdfRegel {
   besteld: number;
 }
 
+const MARGE = 40;
+const REGEL_HOOGTE = 16;
+
 export async function maakBestelPdf(
   vestiging: string,
   medewerker: string,
@@ -46,7 +49,7 @@ export async function maakBestelPdf(
   page.drawText(
     "CLEVERS BESTELAPP",
     {
-      x: 40,
+      x: MARGE,
       y,
       size: 22,
       font: bold,
@@ -54,47 +57,28 @@ export async function maakBestelPdf(
     }
   );
 
-  y -= 34;
+  y -= 36;
 
-  page.drawText(
+  [
     `Vestiging: ${vestiging}`,
-    {
-      x: 40,
-      y,
-      size: 11,
-      font,
-    }
-  );
-
-  y -= 16;
-
-  page.drawText(
     `Medewerker: ${medewerker}`,
-    {
-      x: 40,
-      y,
-      size: 11,
-      font,
-    }
-  );
-
-  y -= 16;
-
-  page.drawText(
     `Datum: ${datum}`,
-    {
-      x: 40,
+  ].forEach((tekst) => {
+    page.drawText(tekst, {
+      x: MARGE,
       y,
       size: 11,
       font,
-    }
-  );
+    });
 
-  y -= 28;
+    y -= REGEL_HOOGTE;
+  });
+
+  y -= 10;
 
   page.drawLine({
     start: {
-      x: 40,
+      x: MARGE,
       y,
     },
     end: {
@@ -105,53 +89,30 @@ export async function maakBestelPdf(
     color: groen,
   });
 
-  y -= 20;
+  y -= 22;
 
-  page.drawText(
-    "Product",
-    {
-      x: 40,
-      y,
-      size: 11,
-      font: bold,
-    }
-  );
-
-  page.drawText(
-    "Geteld",
-    {
-      x: 295,
-      y,
-      size: 11,
-      font: bold,
-    }
-  );
-
-  page.drawText(
-    "Buffer",
-    {
-      x: 365,
-      y,
-      size: 11,
-      font: bold,
-    }
-  );
-
-  page.drawText(
-    "Bestellen",
-    {
-      x: 445,
-      y,
-      size: 11,
-      font: bold,
-    }
-  );
+  [
+    ["Product", 40],
+    ["Geteld", 295],
+    ["Buffer", 365],
+    ["Bestellen", 445],
+  ].forEach(([tekst, x]) => {
+    page.drawText(
+      tekst as string,
+      {
+        x: Number(x),
+        y,
+        size: 11,
+        font: bold,
+      }
+    );
+  });
 
   y -= 16;
 
   page.drawLine({
     start: {
-      x: 40,
+      x: MARGE,
       y,
     },
     end: {
@@ -183,7 +144,7 @@ export async function maakBestelPdf(
     );
 
     page.drawText(
-      String(regel.geteld),
+      `${regel.geteld}`,
       {
         x: 305,
         y,
@@ -193,7 +154,7 @@ export async function maakBestelPdf(
     );
 
     page.drawText(
-      String(regel.buffer),
+      `${regel.buffer}`,
       {
         x: 375,
         y,
@@ -203,7 +164,7 @@ export async function maakBestelPdf(
     );
 
     page.drawText(
-      String(regel.besteld),
+      `${regel.besteld}`,
       {
         x: 465,
         y,
@@ -218,18 +179,18 @@ export async function maakBestelPdf(
       bestelRegels++;
     }
 
-    y -= 16;
+    y -= REGEL_HOOGTE;
 
     if (y < 90) {
       break;
     }
   }
 
-  y -= 12;
+  y -= 10;
 
   page.drawLine({
     start: {
-      x: 40,
+      x: MARGE,
       y,
     },
     end: {
@@ -240,12 +201,12 @@ export async function maakBestelPdf(
     color: groen,
   });
 
-  y -= 22;
+  y -= 24;
 
   page.drawText(
     `Totaal te bestellen: ${totaal}`,
     {
-      x: 40,
+      x: MARGE,
       y,
       size: 12,
       font: bold,
@@ -257,7 +218,7 @@ export async function maakBestelPdf(
   page.drawText(
     `Aantal bestelregels: ${bestelRegels}`,
     {
-      x: 40,
+      x: MARGE,
       y,
       size: 11,
       font,
@@ -267,7 +228,7 @@ export async function maakBestelPdf(
   page.drawText(
     "Automatisch gegenereerd door Clevers Bestelsysteem",
     {
-      x: 40,
+      x: MARGE,
       y: 30,
       size: 9,
       font,
@@ -279,5 +240,5 @@ export async function maakBestelPdf(
     }
   );
 
-  return await pdf.save();
+  return pdf.save();
 }

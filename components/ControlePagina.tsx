@@ -1,134 +1,162 @@
-import BestelTabel from "./BestelTabel";
-import { BestelAdvies } from "@/lib/bestelEngine";
+"use client";
+
+import type {
+  ControleBestelling,
+} from "@/types";
 
 interface Props {
-  ijsBestelling: BestelAdvies[];
-  drooggoedBestelling: BestelAdvies[];
-  totaalIJs: number;
-  totaalDrooggoed: number;
+  controleBestelling: ControleBestelling;
   opmerking: string;
-  setOpmerking: (waarde: string) => void;
+  setOpmerking: (
+    waarde: string
+  ) => void;
 }
 
-export default function ControlePagina({
-  ijsBestelling,
-  drooggoedBestelling,
-  opmerking,
-  setOpmerking,
-}: Props) {
-  const gesorteerd = [...ijsBestelling].sort((a, b) =>
-    a.naam.localeCompare(b.naam, "nl")
-  );
-
-  const speciaalsmaken = gesorteerd.filter(
-    (r) => r.id === "speciaalsmaken"
-  );
-
-  const ijs = gesorteerd.filter(
-    (r) => r.id !== "speciaalsmaken"
-  );
-
-  const slagroom = drooggoedBestelling.filter(
-    (r) => r.id === "slagroom"
-  );
-
-  const drooggoed = drooggoedBestelling
-    .filter((r) => r.id !== "slagroom")
-    .sort((a, b) => a.naam.localeCompare(b.naam, "nl"));
-
-  const totaalIJsBestelling = ijs.reduce(
-    (t, r) => t + r.bestellen,
-    0
-  );
-
-  const totaalSpeciaalsmaken = speciaalsmaken.reduce(
-    (t, r) => t + r.bestellen,
-    0
-  );
-
-  const totaalSlagroom = slagroom.reduce(
-    (t, r) => t + r.bestellen,
-    0
-  );
-
-  const totaalDrooggoedBestelling = drooggoed.reduce(
-    (t, r) => t + r.bestellen,
-    0
-  );
-
-  const totaalBestelling =
-    totaalIJsBestelling +
-    totaalSpeciaalsmaken +
-    totaalSlagroom +
-    totaalDrooggoedBestelling;
-
+function Regel({
+  naam,
+  aantal,
+}: {
+  naam: string;
+  aantal: number;
+}) {
   return (
-    <div className="rounded-xl border bg-white p-4 md:p-6">
-      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-xl font-bold md:text-2xl">
-            Controle bestelling
-          </h2>
+    <div className="flex items-center justify-between border-b px-5 py-3 last:border-b-0">
+      <span>{naam}</span>
 
-          <p className="mt-1 text-sm text-gray-500">
-            Controleer de bestelling voordat deze wordt opgeslagen.
-          </p>
-        </div>
+      <span className="font-semibold">
+        {aantal}
+      </span>
+    </div>
+  );
+}
 
-        <div className="rounded-xl bg-blue-50 px-5 py-3 text-center">
-          <div className="text-sm text-gray-500">
-            Totaal te bestellen
-          </div>
+function Blok({
+  titel,
+  kleur,
+  children,
+  totaal,
+}: {
+  titel: string;
+  kleur: string;
+  children: React.ReactNode;
+  totaal?: number;
+}) {
+  return (
+    <section className="overflow-hidden rounded-xl border bg-white">
 
-          <div className="text-3xl font-bold text-blue-700">
-            {totaalBestelling}
-          </div>
-        </div>
+      <div
+        className={`border-b px-5 py-3 font-semibold text-white ${kleur}`}
+      >
+        {titel}
       </div>
 
-      {totaalBestelling === 0 && (
-        <div className="mb-6 rounded-xl border border-orange-200 bg-orange-50 p-4 text-orange-700">
-          ⚠️ Er worden geen producten besteld.
+      <div>{children}</div>
+
+      {totaal !== undefined && (
+        <div className="flex justify-between border-t bg-slate-50 px-5 py-3 font-bold">
+          <span>Totaal</span>
+          <span>{totaal}</span>
         </div>
       )}
 
-      <BestelTabel
-        titel="🍦 IJs"
-        regels={ijs}
-        totaal={totaalIJsBestelling}
-      />
+    </section>
+  );
+}
 
-      <BestelTabel
+export default function ControlePagina({
+  controleBestelling,
+  opmerking,
+  setOpmerking,
+}: Props) {
+  const {
+    ijsBestelling,
+    speciaalsmaken,
+    slagroom,
+    drooggoedBestelling,
+    totaalIJs,
+    totaalDrooggoed,
+  } = controleBestelling;
+
+  return (
+    <div className="space-y-6">
+
+      <Blok
+        titel="🍦 Regulier ijs"
+        kleur="bg-blue-700"
+        totaal={totaalIJs}
+      >
+        {ijsBestelling.map((regel) => (
+          <Regel
+            key={regel.product.id}
+            naam={regel.product.naam}
+            aantal={regel.bestellen}
+          />
+        ))}
+      </Blok>
+
+      <Blok
         titel="⭐ Speciaalsmaken"
-        regels={speciaalsmaken}
-        totaal={totaalSpeciaalsmaken}
-      />
+        kleur="bg-amber-500"
+      >
+        <Regel
+          naam="Speciaalsmaken"
+          aantal={
+            speciaalsmaken?.bestellen ??
+            0
+          }
+        />
+      </Blok>
 
-      <BestelTabel
-        titel="🥛 Slagroom"
-        regels={slagroom}
-        totaal={totaalSlagroom}
-      />
+      <Blok
+        titel="🍦 Slagroom"
+        kleur="bg-sky-600"
+      >
+        <Regel
+          naam="Slagroom"
+          aantal={
+            slagroom?.bestellen ?? 0
+          }
+        />
+      </Blok>
 
-      <BestelTabel
+      <Blok
         titel="📦 Drooggoed"
-        regels={drooggoed}
-        totaal={totaalDrooggoedBestelling}
-      />
+        kleur="bg-emerald-700"
+        totaal={totaalDrooggoed}
+      >
+        {drooggoedBestelling.map(
+          (regel) => (
+            <Regel
+              key={regel.product.id}
+              naam={regel.product.naam}
+              aantal={
+                regel.bestellen
+              }
+            />
+          )
+        )}
+      </Blok>
 
-      <div className="mt-8">
-        <label className="mb-2 block text-sm font-medium md:text-base">
+      <section className="rounded-xl border bg-white p-5">
+
+        <label className="mb-2 block font-semibold">
           Opmerking
         </label>
 
         <textarea
-          value={opmerking}
-          onChange={(e) => setOpmerking(e.target.value)}
           rows={4}
-          className="w-full resize-y rounded-lg border p-3 text-sm md:text-base"
-          placeholder="Eventuele opmerkingen..."
+          value={opmerking}
+          onChange={(e) =>
+            setOpmerking(
+              e.target.value
+            )
+          }
+          className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-600"
+          placeholder="Eventuele opmerking..."
         />
-      </div>
+
+      </section>
+
     </div>
   );
 }

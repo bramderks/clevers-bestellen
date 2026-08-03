@@ -19,30 +19,28 @@ export type Vestiging =
 
 export interface Product {
   id: string;
+
   naam: string;
 
-  // Productsoort
-  categorie: "ijs" | "drooggoed";
+  categorie:
+    | "ijs"
+    | "drooggoed";
 
-  // Op welke telformulieren komt het product
   telCategorie: TelCategorie;
 
-  // Leverancier
   bestelBij: BestelBij;
 
-  // Op welke bestelling komt het product
   bestelGroep: BestelGroep;
 
-  // Buffervoorraad per vestiging
-  buffers: Record<Vestiging, number>;
+  buffers: Record<
+    Vestiging,
+    number
+  >;
 
-  // Sorteervolgorde
   volgorde: number;
 
-  // Product actief?
   actief: boolean;
 
-  // Eventuele alternatieve namen die OCR mag herkennen
   alternatieveNamen?: string[];
 }
 
@@ -57,13 +55,60 @@ export interface OCRArtikel {
   aantal: number;
 }
 
+export interface BestelAdvies {
+  id: string;
+
+  naam: string;
+
+  categorie:
+    Product["categorie"];
+
+  bestelBij:
+    Product["bestelBij"];
+
+  bestelGroep:
+    Product["bestelGroep"];
+
+  volgorde: number;
+
+  geteld: number;
+
+  buffer: number;
+
+  bestellen: number;
+}
+
 export interface BestelRegel {
   product: Product;
+
   geteld: number;
+
+  buffer: number;
+
   bestellen: number;
+}
+
+export interface ControleBestelling {
+  ijsBestelling: BestelRegel[];
+
+  speciaalsmaken:
+    | BestelRegel
+    | null;
+
+  slagroom:
+    | BestelRegel
+    | null;
+
+  drooggoedBestelling:
+    BestelRegel[];
+
+  totaalIJs: number;
+
+  totaalDrooggoed: number;
 }
 
 export interface OCRResultaat {
   artikelen: OCRArtikel[];
+
   opmerkingen: string[];
 }

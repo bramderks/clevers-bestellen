@@ -13,42 +13,51 @@ interface BestelRegel {
   bestelGroep: string;
 }
 
-export async function POST(req: NextRequest) {
+interface RequestBody {
+  datum: string;
+  vestiging: string;
+  medewerker: string;
+  type: string;
+  opmerking?: string;
+  regels: BestelRegel[];
+}
+
+function valideer(
+  body: RequestBody
+): string | null {
+  if (!body.vestiging) {
+    return "Vestiging ontbreekt.";
+  }
+
+  if (!body.medewerker?.trim()) {
+    return "Medewerker ontbreekt.";
+  }
+
+  if (
+    !Array.isArray(body.regels) ||
+    body.regels.length === 0
+  ) {
+    return "Geen bestelregels ontvangen.";
+  }
+
+  return null;
+}
+
+export async function POST(
+  req: NextRequest
+) {
   try {
-    const body = await req.json();
+    const body =
+      (await req.json()) as RequestBody;
 
-    if (!body.vestiging) {
+    const fout =
+      valideer(body);
+
+    if (fout) {
       return NextResponse.json(
         {
           success: false,
-          error: "Vestiging ontbreekt.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    if (!body.medewerker?.trim()) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Medewerker ontbreekt.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    if (
-      !Array.isArray(body.regels) ||
-      body.regels.length === 0
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Geen bestelregels ontvangen.",
+          error: fout,
         },
         {
           status: 400,
@@ -61,26 +70,29 @@ export async function POST(req: NextRequest) {
         data: {
           datum: new Date(body.datum),
           vestiging: body.vestiging,
-          medewerker: body.medewerker.trim(),
+          medewerker:
+            body.medewerker.trim(),
           type: body.type,
           opmerking:
             body.opmerking ?? "",
 
           regels: {
-            create: (
-              body.regels as BestelRegel[]
-            ).map((regel) => ({
-              productId:
-                regel.productId,
-              productNaam:
-                regel.productNaam,
-              geteld: regel.geteld,
-              buffer: regel.buffer,
-              besteld:
-                regel.besteld,
-              bestelGroep:
-                regel.bestelGroep,
-            })),
+            create: body.regels.map(
+              (regel) => ({
+                productId:
+                  regel.productId,
+                productNaam:
+                  regel.productNaam,
+                geteld:
+                  regel.geteld,
+                buffer:
+                  regel.buffer,
+                besteld:
+                  regel.besteld,
+                bestelGroep:
+                  regel.bestelGroep,
+              })
+            ),
           },
         },
 
@@ -89,8 +101,8 @@ export async function POST(req: NextRequest) {
         },
       });
 
-    revalidatePath("/historie");
     revalidatePath("/");
+    revalidatePath("/historie");
 
     try {
       await verstuurBestelMail(
@@ -104,9 +116,9 @@ export async function POST(req: NextRequest) {
       );
     } catch (mailError) {
       console.error(
-        "❌ E-mail kon niet worden verzonden."
+        "Mail versturen mislukt:",
+        mailError
       );
-      console.error(mailError);
     }
 
     return NextResponse.json({
@@ -114,9 +126,6 @@ export async function POST(req: NextRequest) {
       bestelling,
     });
   } catch (error) {
-    console.error(
-      "❌ Fout bij opslaan van bestelling:"
-    );
     console.error(error);
 
     return NextResponse.json(
@@ -125,7 +134,7 @@ export async function POST(req: NextRequest) {
         error:
           error instanceof Error
             ? error.message
-            : "Onbekende fout",
+            : "Onbekende fout.",
       },
       {
         status: 500,

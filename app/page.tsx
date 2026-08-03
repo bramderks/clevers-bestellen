@@ -1,6 +1,20 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
+interface DashboardKaart {
+  waarde: number;
+  kleur: string;
+  label: string;
+}
+
+interface MenuKaart {
+  href: string;
+  icoon: string;
+  titel: string;
+  omschrijving: string;
+  accent?: boolean;
+}
+
 export default async function Home() {
   const [
     bestellingen,
@@ -9,181 +23,154 @@ export default async function Home() {
     medewerkers,
   ] = await Promise.all([
     prisma.bestelling.count(),
-
     prisma.week.count(),
-
     prisma.weekTaak.count({
-      where: {
-        voltooid: false,
-      },
+      where: { voltooid: false },
     }),
-
     prisma.medewerker.count({
-      where: {
-        actief: true,
-      },
+      where: { actief: true },
     }),
   ]);
 
+  const dashboard: DashboardKaart[] = [
+    {
+      waarde: bestellingen,
+      kleur: "text-blue-700",
+      label: "📦 Bestellingen",
+    },
+    {
+      waarde: weken,
+      kleur: "text-green-700",
+      label: "✅ Weken",
+    },
+    {
+      waarde: openTaken,
+      kleur: "text-orange-600",
+      label: "⏳ Open taken",
+    },
+    {
+      waarde: medewerkers,
+      kleur: "text-purple-700",
+      label: "👥 Medewerkers",
+    },
+  ];
+
+  const menu: MenuKaart[] = [
+    {
+      href: "/tellen",
+      icoon: "🍦",
+      titel: "Nieuwe telling",
+      omschrijving:
+        "Voorraad tellen en direct een bestelling genereren.",
+    },
+    {
+      href: "/weektaken",
+      icoon: "✅",
+      titel: "Weektaken",
+      omschrijving:
+        "Schoonmaak-, controle- en onderhoudstaken.",
+    },
+    {
+      href: "/historie",
+      icoon: "📚",
+      titel: "Historie",
+      omschrijving:
+        "Bekijk alle eerdere bestellingen en weektaken.",
+    },
+    {
+      href: "/producten",
+      icoon: "🛒",
+      titel: "Productbeheer",
+      omschrijving:
+        "Beheer alle producten en buffers.",
+    },
+    {
+      href: "/medewerkers",
+      icoon: "👥",
+      titel: "Medewerkers",
+      omschrijving:
+        "Beheer medewerkers, beschikbaarheid en roosters.",
+    },
+    {
+      href: "/dashboard",
+      icoon: "📊",
+      titel: "Dashboard",
+      omschrijving:
+        "Analyseer bestellingen, weektaken en prestaties.",
+      accent: true,
+    },
+  ];
+
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 md:p-10">
+
       <div className="mx-auto max-w-7xl">
-        <div className="mb-10">
+
+        <header className="mb-10">
           <h1 className="text-5xl font-bold">
             Clevers Bestelsysteem
           </h1>
 
-          <p className="mt-3 text-lg text-gray-500">
+          <p className="mt-3 text-lg text-slate-500">
             Dashboard
           </p>
-        </div>
+        </header>
 
-        <div className="mb-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="text-4xl font-bold text-blue-700">
-              {bestellingen}
+        <section className="mb-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+
+          {dashboard.map((kaart) => (
+            <div
+              key={kaart.label}
+              className="rounded-2xl bg-white p-6 shadow-sm"
+            >
+              <div className={`text-4xl font-bold ${kaart.kleur}`}>
+                {kaart.waarde}
+              </div>
+
+              <div className="mt-2 text-slate-500">
+                {kaart.label}
+              </div>
             </div>
+          ))}
 
-            <div className="mt-2 text-gray-500">
-              📦 Bestellingen
-            </div>
-          </div>
+        </section>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="text-4xl font-bold text-green-700">
-              {weken}
-            </div>
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-            <div className="mt-2 text-gray-500">
-              ✅ Weken
-            </div>
-          </div>
+          {menu.map((kaart) => (
+            <Link
+              key={kaart.titel}
+              href={kaart.href}
+              className={
+                kaart.accent
+                  ? "rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
+                  : "rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+              }
+            >
+              <div className="mb-5 text-5xl">
+                {kaart.icoon}
+              </div>
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="text-4xl font-bold text-orange-600">
-              {openTaken}
-            </div>
+              <h2 className="text-2xl font-bold">
+                {kaart.titel}
+              </h2>
 
-            <div className="mt-2 text-gray-500">
-              ⏳ Open taken
-            </div>
-          </div>
+              <p
+                className={`mt-3 ${
+                  kaart.accent
+                    ? "text-blue-100"
+                    : "text-slate-500"
+                }`}
+              >
+                {kaart.omschrijving}
+              </p>
+            </Link>
+          ))}
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm">
-            <div className="text-4xl font-bold text-purple-700">
-              {medewerkers}
-            </div>
+        </section>
 
-            <div className="mt-2 text-gray-500">
-              👥 Medewerkers
-            </div>
-          </div>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <Link
-            href="/tellen"
-            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="mb-5 text-5xl">
-              🍦
-            </div>
-
-            <h2 className="text-2xl font-bold">
-              Nieuwe telling
-            </h2>
-
-            <p className="mt-3 text-gray-500">
-              Voorraad tellen en direct een bestelling genereren.
-            </p>
-          </Link>
-
-          <Link
-            href="/weektaken"
-            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="mb-5 text-5xl">
-              ✅
-            </div>
-
-            <h2 className="text-2xl font-bold">
-              Weektaken
-            </h2>
-
-            <p className="mt-3 text-gray-500">
-              Schoonmaak-, controle- en onderhoudstaken.
-            </p>
-          </Link>
-
-          <Link
-            href="/historie"
-            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="mb-5 text-5xl">
-              📚
-            </div>
-
-            <h2 className="text-2xl font-bold">
-              Historie
-            </h2>
-
-            <p className="mt-3 text-gray-500">
-              Bekijk alle eerdere bestellingen en weektaken.
-            </p>
-          </Link>
-
-          <Link
-            href="/producten"
-            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="mb-5 text-5xl">
-              🛒
-            </div>
-
-            <h2 className="text-2xl font-bold">
-              Productbeheer
-            </h2>
-
-            <p className="mt-3 text-gray-500">
-              Beheer alle producten en buffers.
-            </p>
-          </Link>
-
-          <Link
-            href="/medewerkers"
-            className="rounded-2xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-          >
-            <div className="mb-5 text-5xl">
-              👥
-            </div>
-
-            <h2 className="text-2xl font-bold">
-              Medewerkers
-            </h2>
-
-            <p className="mt-3 text-gray-500">
-              Beheer medewerkers, beschikbaarheid en roosters.
-            </p>
-          </Link>
-
-          <Link
-            href="/historie"
-            className="rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 p-8 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
-          >
-            <div className="mb-5 text-5xl">
-              📊
-            </div>
-
-            <h2 className="text-2xl font-bold">
-              Dashboard
-            </h2>
-
-            <p className="mt-3 text-blue-100">
-              Analyseer bestellingen, weektaken en prestaties.
-            </p>
-          </Link>
-        </div>
       </div>
+
     </main>
   );
 }

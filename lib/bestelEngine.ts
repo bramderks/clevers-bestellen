@@ -1,18 +1,40 @@
-import { Artikel, Product, Vestiging } from "../types";
+import type {
+  Artikel,
+  BestelAdvies,
+  Product,
+  Vestiging,
+} from "@/types";
 
-export interface BestelAdvies {
-  id: string;
-  naam: string;
+function maakVoorraadMap(
+  artikelen: Artikel[]
+): Map<string, number> {
+  const voorraad = new Map<
+    string,
+    number
+  >();
 
-  categorie: Product["categorie"];
-  bestelBij: Product["bestelBij"];
-  bestelGroep: Product["bestelGroep"];
+  for (const artikel of artikelen) {
+    voorraad.set(
+      artikel.id,
+      Number.isInteger(
+        artikel.aantal
+      ) && artikel.aantal >= 0
+        ? artikel.aantal
+        : 0
+    );
+  }
 
-  volgorde: number;
+  return voorraad;
+}
 
-  geteld: number;
-  buffer: number;
-  bestellen: number;
+function berekenBestelAantal(
+  geteld: number,
+  buffer: number
+) {
+  return Math.max(
+    0,
+    buffer - geteld
+  );
 }
 
 export function berekenBestelling(
@@ -20,41 +42,52 @@ export function berekenBestelling(
   producten: Product[],
   vestiging: Vestiging
 ): BestelAdvies[] {
-  const voorraad = new Map<string, number>();
-
-  // Getelde voorraad opslaan
-  for (const artikel of artikelen) {
-    const aantal =
-      Number.isInteger(artikel.aantal) && artikel.aantal >= 0
-        ? artikel.aantal
-        : 0;
-
-    voorraad.set(artikel.id, aantal);
-  }
+  const voorraad =
+    maakVoorraadMap(
+      artikelen
+    );
 
   return producten
-    .filter((product) => product.actief)
-    .sort((a, b) => a.volgorde - b.volgorde)
-.map((product) => {
-  const geteld = voorraad.get(product.id) ?? 0;
+    .filter(
+      (product) =>
+        product.actief
+    )
+    .map((product) => {
+      const geteld =
+        voorraad.get(
+          product.id
+        ) ?? 0;
 
-  const buffer = product.buffers[vestiging];
+      const buffer =
+        product.buffers[
+          vestiging
+        ];
 
-
-  return {
+      return {
         id: product.id,
         naam: product.naam,
 
-        categorie: product.categorie,
-        bestelBij: product.bestelBij,
-        bestelGroep: product.bestelGroep,
+        categorie:
+          product.categorie,
 
-        volgorde: product.volgorde,
+        bestelBij:
+          product.bestelBij,
+
+        bestelGroep:
+          product.bestelGroep,
+
+        volgorde:
+          product.volgorde,
 
         geteld,
+
         buffer,
 
-        bestellen: Math.max(0, buffer - geteld),
+        bestellen:
+          berekenBestelAantal(
+            geteld,
+            buffer
+          ),
       };
     });
 }

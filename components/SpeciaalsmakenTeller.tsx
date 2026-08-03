@@ -16,19 +16,25 @@ export default function SpeciaalsmakenTeller({
   onSlagroomChange,
 }: Props) {
   return (
-    <section className="rounded-xl bg-white p-4 shadow md:p-6">
-      <div className="mb-6 flex flex-col gap-2">
+    <section className="rounded-xl bg-white p-5 shadow">
+
+      <div className="mb-6">
+
         <h2 className="text-2xl font-bold">
           ⭐ Speciaalsmaken
         </h2>
 
-        <p className="text-sm text-gray-500">
-          Tel het totaal aantal bakken speciaalsmaken en de aanwezige slagroom.
+        <p className="mt-2 text-sm text-slate-500">
+          Tel alleen het totaal aantal bakken speciaalsmaken en de aanwezige slagroom.
         </p>
+
       </div>
 
-      <div className="mb-3 grid grid-cols-[1fr_70px_90px] border-b pb-2 text-sm font-semibold md:grid-cols-[1fr_90px_140px] md:text-base">
-        <div>Product</div>
+      <div className="mb-3 grid grid-cols-[1fr_60px_152px] border-b pb-2 text-sm font-semibold md:grid-cols-[1fr_90px_190px]">
+
+        <div>
+          Product
+        </div>
 
         <div className="text-center">
           Buffer
@@ -37,12 +43,14 @@ export default function SpeciaalsmakenTeller({
         <div className="text-center">
           Geteld
         </div>
+
       </div>
 
       <div className="space-y-2">
+
         <TelRij
           naam="Speciaalsmaken"
-          buffer={6}
+          buffer={12}
           aantal={waarde}
           onChange={onChange}
         />
@@ -53,12 +61,19 @@ export default function SpeciaalsmakenTeller({
           aantal={slagroom}
           onChange={onSlagroomChange}
         />
+
       </div>
 
       <div className="mt-6 rounded-xl bg-blue-50 p-4 text-sm text-blue-900">
-        <strong>Let op:</strong> tel alleen de daadwerkelijk aanwezige voorraad.
-        Aangebroken bakken worden volgens de vaste telafspraken verwerkt.
+
+        <strong>Let op:</strong><br />
+
+        • Tel alleen het totaal aantal bakken speciaalsmaken.<br />
+        • Losse smaken worden niet afzonderlijk geteld.<br />
+        • Slagroom wordt apart geregistreerd.
+
       </div>
+
     </section>
   );
 }

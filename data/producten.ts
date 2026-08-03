@@ -14,7 +14,9 @@ if (process.env.NODE_ENV !== "production") {
 
   for (const product of producten) {
     if (ids.has(product.id)) {
-      console.warn(`Dubbele product-id gevonden: ${product.id}`);
+      console.warn(
+        `Dubbele product-id gevonden: ${product.id}`
+      );
     }
 
     ids.add(product.id);
