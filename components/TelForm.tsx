@@ -29,7 +29,10 @@ export default function TelForm({
 }: Props) {
   const router = useRouter();
 
-  const stappen = getStappen(vestiging);
+const stappen = useMemo(
+  () => getStappen(vestiging),
+  [vestiging]
+);
 
   const [telling, setTelling] = useState<Record<string, number>>({});
   const [stap, setStap] = useState(0);

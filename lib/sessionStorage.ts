@@ -1,6 +1,7 @@
-import { BestelAdvies } from "./bestelEngine";
+import type { BestelAdvies } from "@/types";
 
-const STORAGE_KEY = "clevers-bestelling";
+const STORAGE_KEY =
+  "clevers-bestelling";
 
 export interface OpgeslagenBestelling {
   datum: string;
@@ -13,8 +14,11 @@ export function bewaarBestelling(
   bestelling: BestelAdvies[]
 ): void {
   const data: OpgeslagenBestelling = {
-    datum: new Date().toISOString(),
+    datum:
+      new Date().toISOString(),
+
     vestiging,
+
     bestelling,
   };
 
@@ -24,20 +28,29 @@ export function bewaarBestelling(
   );
 }
 
-export function laadBestelling(): OpgeslagenBestelling | null {
-  const data = sessionStorage.getItem(STORAGE_KEY);
+export function laadBestelling():
+  | OpgeslagenBestelling
+  | null {
+  const data =
+    sessionStorage.getItem(
+      STORAGE_KEY
+    );
 
   if (!data) {
     return null;
   }
 
   try {
-    return JSON.parse(data) as OpgeslagenBestelling;
+    return JSON.parse(
+      data
+    ) as OpgeslagenBestelling;
   } catch {
     return null;
   }
 }
 
 export function verwijderBestelling(): void {
-  sessionStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem(
+    STORAGE_KEY
+  );
 }

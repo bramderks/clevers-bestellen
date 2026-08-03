@@ -1,12 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
+  reactStrictMode: true,
+
+  poweredByHeader: false,
+
+  compress: true,
 
   typescript: {
     ignoreBuildErrors: false,
+  },
+
+  experimental: {
+    optimizePackageImports: [
+      "jspdf",
+      "pdf-lib",
+      "react-chartjs-2",
+    ],
   },
 };
 

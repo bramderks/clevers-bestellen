@@ -3,27 +3,22 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 
-interface Props {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
 export async function PATCH(
   request: NextRequest,
-  { params }: Props
+  context: {
+    params: Promise<{ id: string }>;
+  }
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
 
     const body = await request.json();
 
-    const bestaande =
-      await prisma.medewerker.findUnique({
-        where: {
-          id,
-        },
-      });
+    const bestaande = await prisma.medewerker.findUnique({
+      where: {
+        id,
+      },
+    });
 
     if (!bestaande) {
       return NextResponse.json(
@@ -116,34 +111,30 @@ export async function PATCH(
             body.actief,
 
           functie:
-            body.functie || null,
+            body.functie ?? null,
 
           uurloon:
-            body.uurloon
+            body.uurloon != null
               ? Number(body.uurloon)
               : null,
 
           contractUren:
-            body.contractUren
+            body.contractUren != null
               ? Number(body.contractUren)
               : null,
 
           datumInDienst:
             body.datumInDienst
-              ? new Date(
-                  body.datumInDienst
-                )
+              ? new Date(body.datumInDienst)
               : null,
 
           geboortedatum:
             body.geboortedatum
-              ? new Date(
-                  body.geboortedatum
-                )
+              ? new Date(body.geboortedatum)
               : null,
 
           opmerkingen:
-            body.opmerkingen || null,
+            body.opmerkingen ?? null,
         },
       });
 
@@ -174,10 +165,12 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: Props
+  context: {
+    params: Promise<{ id: string }>;
+  }
 ) {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
 
     const bestaande =
       await prisma.medewerker.findUnique({

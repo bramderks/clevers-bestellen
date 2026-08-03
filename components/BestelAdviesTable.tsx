@@ -1,6 +1,6 @@
 "use client";
 
-import { BestelAdvies } from "../lib/bestelEngine";
+import type { BestelAdvies } from "@/types";
 
 interface Props {
   advies: BestelAdvies[];
@@ -11,11 +11,11 @@ export default function BestelAdviesTable({
 }: Props) {
   return (
     <div className="mt-10">
-      <h2 className="text-2xl font-bold mb-4">
+      <h2 className="mb-4 text-2xl font-bold">
         Besteladvies
       </h2>
 
-      <table className="w-full border border-gray-300 rounded-lg overflow-hidden">
+      <table className="w-full overflow-hidden rounded-lg border border-gray-300">
         <thead className="bg-green-600 text-white">
           <tr>
             <th className="p-3 text-left">
@@ -23,15 +23,15 @@ export default function BestelAdviesTable({
             </th>
 
             <th className="p-3 text-center">
-              Getelde voorraad
+              Geteld
             </th>
 
             <th className="p-3 text-center">
-              Buffervoorraad
+              Buffer
             </th>
 
             <th className="p-3 text-center">
-              Te bestellen
+              Bestellen
             </th>
           </tr>
         </thead>
@@ -54,7 +54,7 @@ export default function BestelAdviesTable({
                 {regel.buffer}
               </td>
 
-              <td className="text-center font-bold text-green-700 text-lg">
+              <td className="text-center text-lg font-bold text-green-700">
                 {regel.bestellen}
               </td>
             </tr>

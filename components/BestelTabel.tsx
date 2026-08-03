@@ -1,4 +1,10 @@
-import { BestelAdvies } from "@/lib/bestelEngine";
+interface BestelAdvies {
+  id: string;
+  naam: string;
+  geteld: number;
+  buffer: number;
+  bestellen: number;
+}
 
 interface Props {
   titel: string;

@@ -6,8 +6,6 @@ import type {
   Vestiging,
 } from "@/types";
 
-import { getControleBestelling } from "@/lib/tellen/getControleBestelling";
-
 interface PdfOpties {
   vestiging: Vestiging;
   datum: string;
@@ -25,12 +23,23 @@ function tekenHeader(
   doc.setTextColor(255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
-  doc.text("CLEVERS", 14, 17);
+
+  doc.text(
+    "CLEVERS",
+    14,
+    17
+  );
 
   doc.setFontSize(13);
-  doc.text("BESTELADVIES", 105, 17, {
-    align: "center",
-  });
+
+  doc.text(
+    "BESTELADVIES",
+    105,
+    17,
+    {
+      align: "center",
+    }
+  );
 
   doc.setTextColor(40);
   doc.setFont("helvetica", "normal");
@@ -50,7 +59,12 @@ function tekenHeader(
     44
   );
 
-  doc.line(14, 49, 196, 49);
+  doc.line(
+    14,
+    49,
+    196,
+    49
+  );
 }
 
 function tekenTabel(
@@ -64,31 +78,48 @@ function tekenTabel(
     bestellen: number;
   }[]
 ) {
-  doc.setFont("helvetica", "bold");
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
   doc.setFontSize(12);
-  doc.text(titel, 14, y);
+
+  doc.text(
+    titel,
+    14,
+    y
+  );
 
   autoTable(doc, {
     startY: y + 4,
 
     theme: "grid",
 
-    head: [[
-      "Product",
-      "Geteld",
-      "Buffer",
-      "Bestellen",
-    ]],
+    head: [
+      [
+        "Product",
+        "Geteld",
+        "Buffer",
+        "Bestellen",
+      ],
+    ],
 
-    body: regels.map((r) => [
-      r.naam,
-      r.geteld,
-      r.buffer,
-      r.bestellen,
-    ]),
+    body: regels.map(
+      (regel) => [
+        regel.naam,
+        regel.geteld,
+        regel.buffer,
+        regel.bestellen,
+      ]
+    ),
 
     headStyles: {
-      fillColor: [35, 91, 170],
+      fillColor: [
+        35,
+        91,
+        170,
+      ],
     },
 
     styles: {
@@ -121,69 +152,26 @@ export function genereerBestelPdf({
     datum
   );
 
-  const controle =
-    getControleBestelling(
-      bestelling,
-      vestiging
-    );
-
   let y = 58;
 
-  y =
-    tekenTabel(
-      doc,
-      "🍦 Regulier ijs",
-      y,
-      controle.ijsBestelling.map(
-        (r) => ({
-          naam: r.product.naam,
-          geteld: r.geteld,
-          buffer: r.buffer,
-          bestellen: r.bestellen,
-        })
-      )
-    ) + 12;
+  const ijs =
+    bestelling.filter(
+      (regel) =>
+        regel.bestelGroep === "ijs"
+    );
+
+  const drooggoed =
+    bestelling.filter(
+      (regel) =>
+        regel.bestelGroep === "drooggoed"
+    );
 
   y =
     tekenTabel(
       doc,
-      "⭐ Speciaalsmaken",
+      "🍦 IJs",
       y,
-      [
-        {
-          naam: "Speciaalsmaken",
-          geteld:
-            controle.speciaalsmaken
-              ?.geteld ?? 0,
-          buffer:
-            controle.speciaalsmaken
-              ?.buffer ?? 0,
-          bestellen:
-            controle.speciaalsmaken
-              ?.bestellen ?? 0,
-        },
-      ]
-    ) + 12;
-
-  y =
-    tekenTabel(
-      doc,
-      "🍦 Slagroom",
-      y,
-      [
-        {
-          naam: "Slagroom",
-          geteld:
-            controle.slagroom
-              ?.geteld ?? 0,
-          buffer:
-            controle.slagroom
-              ?.buffer ?? 0,
-          bestellen:
-            controle.slagroom
-              ?.bestellen ?? 0,
-        },
-      ]
+      ijs
     ) + 12;
 
   y =
@@ -191,33 +179,41 @@ export function genereerBestelPdf({
       doc,
       "📦 Drooggoed",
       y,
-      controle.drooggoedBestelling.map(
-        (r) => ({
-          naam: r.product.naam,
-          geteld: r.geteld,
-          buffer: r.buffer,
-          bestellen: r.bestellen,
-        })
-      )
+      drooggoed
     ) + 15;
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont(
+    "helvetica",
+    "bold"
+  );
+
   doc.text(
     "SAMENVATTING",
     14,
     y
   );
 
-  doc.setFont("helvetica", "normal");
+  doc.setFont(
+    "helvetica",
+    "normal"
+  );
 
   doc.text(
-    `Totaal ijs: ${controle.totaalIJs}`,
+    `Totaal ijs: ${ijs.reduce(
+      (totaal, regel) =>
+        totaal + regel.bestellen,
+      0
+    )}`,
     14,
     y + 8
   );
 
   doc.text(
-    `Totaal drooggoed: ${controle.totaalDrooggoed}`,
+    `Totaal drooggoed: ${drooggoed.reduce(
+      (totaal, regel) =>
+        totaal + regel.bestellen,
+      0
+    )}`,
     14,
     y + 15
   );

@@ -1,4 +1,7 @@
-import { BestelAdvies } from "@/lib/bestelEngine";
+interface BestelAdvies {
+  naam: string;
+  bestellen: number;
+}
 
 export interface CleversRegel {
   naam: string;
@@ -9,7 +12,9 @@ export function maakCleversBestelling(
   advies: BestelAdvies[]
 ): CleversRegel[] {
   return advies
-    .filter((regel) => regel.bestellen > 0)
+    .filter(
+      (regel) => regel.bestellen > 0
+    )
     .map((regel) => ({
       naam: regel.naam.toLowerCase(),
       aantal: regel.bestellen,

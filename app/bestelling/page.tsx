@@ -3,8 +3,10 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import { laadBestelling } from "../../lib/sessionStorage";
-import { BestelAdvies } from "../../lib/bestelEngine";
+import { laadBestelling } from "@/lib/sessionStorage";
+import type { BestelAdvies } from "@/types";
+
+import BestelTabel from "@/components/BestelTabel";
 
 interface BestellingData {
   datum: string;
@@ -26,7 +28,7 @@ export default function BestellingPagina() {
 
   if (!data) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="flex min-h-screen items-center justify-center">
         <h1 className="text-2xl font-bold">
           Geen bestelling gevonden.
         </h1>
@@ -34,39 +36,54 @@ export default function BestellingPagina() {
     );
   }
 
-  const bestelling = data.bestelling
-    .filter((p) => p.bestellen > 0)
-    .sort((a, b) => a.volgorde - b.volgorde);
+  const bestelling =
+    data.bestelling
+      .filter(
+        (regel) =>
+          regel.bestellen > 0
+      )
+      .sort(
+        (a, b) =>
+          a.volgorde - b.volgorde
+      );
 
-  const ijskeuken = bestelling.filter(
-    (p) => p.bestelBij === "ijskeuken"
-  );
+  const ijskeuken =
+    bestelling.filter(
+      (regel) =>
+        regel.bestelBij === "ijskeuken"
+    );
 
-  const drooggoed = bestelling.filter(
-    (p) => p.bestelBij === "drooggoed"
-  );
+  const drooggoed =
+    bestelling.filter(
+      (regel) =>
+        regel.bestelBij === "drooggoed"
+    );
 
   return (
-    <main className="bg-gray-100 min-h-screen py-10 print:bg-white print:py-0">
-      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-xl p-10 print:shadow-none print:rounded-none">
+    <main className="min-h-screen bg-gray-100 py-10 print:bg-white print:py-0">
+      <div className="mx-auto max-w-4xl rounded-xl bg-white p-10 shadow-xl print:rounded-none print:shadow-none">
 
-        <div className="flex justify-between mb-8 print:hidden">
+        <div className="mb-8 flex justify-between print:hidden">
           <button
-            onClick={() => window.close()}
-            className="bg-gray-200 hover:bg-gray-300 px-5 py-2 rounded-lg"
+            onClick={() =>
+              window.close()
+            }
+            className="rounded-lg bg-gray-200 px-5 py-2 hover:bg-gray-300"
           >
             ← Sluiten
           </button>
 
           <button
-            onClick={() => window.print()}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
+            onClick={() =>
+              window.print()
+            }
+            className="rounded-lg bg-green-600 px-6 py-2 text-white hover:bg-green-700"
           >
             🖨️ Afdrukken / PDF
           </button>
         </div>
 
-        <div className="flex justify-center mb-8">
+        <div className="mb-8 flex justify-center">
           <Image
             src="/logo-clevers.png"
             alt="Clevers"
@@ -76,30 +93,36 @@ export default function BestellingPagina() {
           />
         </div>
 
-        <div className="text-center border-b pb-6 mb-8">
+        <div className="mb-8 border-b pb-6 text-center">
           <h1 className="text-4xl font-bold">
             Bestelbon
           </h1>
 
-          <p className="text-gray-600 mt-2">
+          <p className="mt-2 text-gray-600">
             Clevers {data.vestiging}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-10">
+        <div className="mb-10 grid grid-cols-2 gap-8">
           <div>
             <p className="font-semibold">
               Vestiging
             </p>
-            <p>{data.vestiging}</p>
+
+            <p>
+              {data.vestiging}
+            </p>
           </div>
 
           <div>
             <p className="font-semibold">
               Datum
             </p>
+
             <p>
-              {new Date(data.datum).toLocaleString(
+              {new Date(
+                data.datum
+              ).toLocaleString(
                 "nl-NL"
               )}
             </p>
@@ -110,6 +133,14 @@ export default function BestellingPagina() {
           <BestelTabel
             titel="🍦 IJskeuken"
             regels={ijskeuken}
+            totaal={
+              ijskeuken.reduce(
+                (totaal, regel) =>
+                  totaal +
+                  regel.bestellen,
+                0
+              )
+            }
           />
         )}
 
@@ -117,76 +148,31 @@ export default function BestellingPagina() {
           <BestelTabel
             titel="📦 Drooggoed"
             regels={drooggoed}
+            totaal={
+              drooggoed.reduce(
+                (totaal, regel) =>
+                  totaal +
+                  regel.bestellen,
+                0
+              )
+            }
           />
         )}
 
         <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className="mb-4 text-2xl font-bold">
             Opmerkingen
           </h2>
 
-          <div className="border rounded-lg h-40 p-5">
-            <div className="border-b h-8"></div>
-            <div className="border-b h-8"></div>
-            <div className="border-b h-8"></div>
-            <div className="h-8"></div>
+          <div className="h-40 rounded-lg border p-5">
+            <div className="h-8 border-b" />
+            <div className="h-8 border-b" />
+            <div className="h-8 border-b" />
+            <div className="h-8" />
           </div>
         </div>
 
       </div>
     </main>
-  );
-}
-
-function BestelTabel({
-  titel,
-  regels,
-}: {
-  titel: string;
-  regels: BestelAdvies[];
-}) {
-  return (
-    <div className="mb-10">
-      <h2 className="text-2xl font-bold bg-gray-100 p-3 rounded-lg mb-4">
-        {titel}
-      </h2>
-
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="text-left p-3 w-12"></th>
-
-            <th className="text-left p-3">
-              Product
-            </th>
-
-            <th className="text-center p-3 w-28">
-              Aantal
-            </th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {regels.map((regel) => (
-            <tr
-              key={regel.id}
-              className="border-t"
-            >
-              <td className="text-center">
-                ☐
-              </td>
-
-              <td className="p-3">
-                {regel.naam}
-              </td>
-
-              <td className="text-center font-bold">
-                {regel.bestellen}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
   );
 }

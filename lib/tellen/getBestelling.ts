@@ -1,6 +1,4 @@
-import type {
-  BestelAdvies,
-} from "@/types";
+import type { BestelAdvies } from "@/types";
 
 interface Resultaat {
   ijsBestelling: BestelAdvies[];
@@ -16,28 +14,28 @@ export function getBestelling(
     advies
       .filter(
         (regel) =>
-          regel.bestelGroep ===
-          "ijs"
+          regel.bestelGroep === "ijs"
       )
-      .sort((a, b) =>
-        a.naam.localeCompare(
-          b.naam,
-          "nl"
-        )
+      .sort(
+        (a, b) =>
+          a.naam.localeCompare(
+            b.naam,
+            "nl"
+          )
       );
 
   const drooggoedBestelling =
     advies
       .filter(
         (regel) =>
-          regel.bestelGroep ===
-          "drooggoed"
+          regel.bestelGroep === "drooggoed"
       )
-      .sort((a, b) =>
-        a.naam.localeCompare(
-          b.naam,
-          "nl"
-        )
+      .sort(
+        (a, b) =>
+          a.naam.localeCompare(
+            b.naam,
+            "nl"
+          )
       );
 
   const totaalIJs =
