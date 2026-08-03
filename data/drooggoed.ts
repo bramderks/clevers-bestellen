@@ -16,20 +16,6 @@ export const drooggoed: Product[] = [
     actief: true,
   },
   {
-    id: "slagroom",
-    naam: "Slagroom",
-    categorie: "drooggoed",
-    telCategorie: "speciaalsmaken",
-    bestelBij: "ijskeuken",
-    bestelGroep: "drooggoed",
-    buffers: {
-      roermond: 1,
-      nijmegen: 2,
-    },
-    volgorde: 101,
-    actief: true,
-  },
-  {
     id: "lepels",
     naam: "Lepels",
     categorie: "drooggoed",
