@@ -1,0 +1,48 @@
+/* TEAM */
+
+Product:
+Clevers Bestellen
+
+Owner:
+B. Derks Holding
+
+Lead Developer:
+Bram Derks
+
+Contact:
+bram.derks@outlook.com
+
+Status:
+Private proprietary software
+
+/* COPYRIGHT */
+
+Copyright (c) 2026 B. Derks Holding.
+All rights reserved.
+
+This software, including its source code, architecture, database design,
+business logic, documentation and user interface, is proprietary and may
+not be copied, distributed, modified or commercially exploited without
+prior written permission from B. Derks Holding.
+
+/* PROJECT */
+
+Framework:
+Next.js 16
+
+Language:
+TypeScript
+
+Database:
+PostgreSQL
+
+ORM:
+Prisma
+
+UI:
+React 19 + Tailwind CSS
+
+License:
+Proprietary
+
+Authorized use only.

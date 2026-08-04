@@ -25,33 +25,47 @@ export function getControleBestelling(
   const ijsBestelling: BestelRegel[] = [];
   const drooggoedBestelling: BestelRegel[] = [];
 
-  let speciaalsmaken: BestelRegel | null =
-    null;
+  let speciaalsmaken:
+    | BestelRegel
+    | null = null;
 
-  let slagroom: BestelRegel | null =
-    null;
+  let slagroom:
+    | BestelRegel
+    | null = null;
 
   for (const regel of advies) {
     const product: Product = {
       id: regel.id,
       naam: regel.naam,
-      categorie: regel.categorie,
-      bestelBij: regel.bestelBij,
-      bestelGroep: regel.bestelGroep,
+
+      categorie:
+        regel.categorie,
+
+      bestelBij:
+        regel.bestelBij,
+
+      bestelGroep:
+        regel.bestelGroep,
+
       buffers: {
-        roermond: regel.buffer,
-        nijmegen: regel.buffer,
+        roermond:
+          regel.buffer,
+        nijmegen:
+          regel.buffer,
       },
+
       telCategorie:
-        regel.id ===
-        "speciaalsmaken"
+        regel.id === "speciaalsmaken"
           ? "speciaalsmaken"
-          : regel.bestelGroep ===
-              "drooggoed"
+          : regel.bestelGroep === "drooggoed"
             ? "drooggoed"
             : "hardlopers",
-      volgorde: regel.volgorde,
+
+      volgorde:
+        regel.volgorde,
+
       actief: true,
+
       alternatieveNamen: [],
     };
 
@@ -67,6 +81,7 @@ export function getControleBestelling(
     ) {
       speciaalsmaken =
         controleRegel;
+
       continue;
     }
 
@@ -76,6 +91,7 @@ export function getControleBestelling(
     ) {
       slagroom =
         controleRegel;
+
       continue;
     }
 
@@ -93,11 +109,12 @@ export function getControleBestelling(
     }
   }
 
-  ijsBestelling.sort((a, b) =>
-    a.product.naam.localeCompare(
-      b.product.naam,
-      "nl"
-    )
+  ijsBestelling.sort(
+    (a, b) =>
+      a.product.naam.localeCompare(
+        b.product.naam,
+        "nl"
+      )
   );
 
   drooggoedBestelling.sort(
@@ -110,14 +127,18 @@ export function getControleBestelling(
 
   return {
     ijsBestelling,
+
     speciaalsmaken,
+
     slagroom,
+
     drooggoedBestelling,
 
     totaalIJs:
       ijsBestelling.reduce(
-        (t, r) =>
-          t + r.bestellen,
+        (totaal, regel) =>
+          totaal +
+          regel.bestellen,
         0
       ) +
       (speciaalsmaken?.bestellen ??
@@ -125,8 +146,9 @@ export function getControleBestelling(
 
     totaalDrooggoed:
       drooggoedBestelling.reduce(
-        (t, r) =>
-          t + r.bestellen,
+        (totaal, regel) =>
+          totaal +
+          regel.bestellen,
         0
       ),
   };

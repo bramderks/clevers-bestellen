@@ -8,17 +8,13 @@ import type {
 function maakVoorraadMap(
   artikelen: Artikel[]
 ): Map<string, number> {
-  const voorraad = new Map<
-    string,
-    number
-  >();
+  const voorraad = new Map<string, number>();
 
   for (const artikel of artikelen) {
     voorraad.set(
       artikel.id,
-      Number.isInteger(
-        artikel.aantal
-      ) && artikel.aantal >= 0
+      Number.isInteger(artikel.aantal) &&
+        artikel.aantal >= 0
         ? artikel.aantal
         : 0
     );
@@ -30,7 +26,7 @@ function maakVoorraadMap(
 function berekenBestelAantal(
   geteld: number,
   buffer: number
-) {
+): number {
   return Math.max(
     0,
     buffer - geteld
@@ -43,51 +39,52 @@ export function berekenBestelling(
   vestiging: Vestiging
 ): BestelAdvies[] {
   const voorraad =
-    maakVoorraadMap(
-      artikelen
-    );
+    maakVoorraadMap(artikelen);
 
   return producten
     .filter(
       (product) =>
         product.actief
     )
-    .map((product) => {
-      const geteld =
-        voorraad.get(
-          product.id
-        ) ?? 0;
+    .map(
+      (product): BestelAdvies => {
+        const geteld =
+          voorraad.get(
+            product.id
+          ) ?? 0;
 
-      const buffer =
-        product.buffers[
-          vestiging
-        ];
+        const buffer =
+          product.buffers[
+            vestiging
+          ];
 
-      return {
-        id: product.id,
-        naam: product.naam,
+        return {
+          id: product.id,
 
-        categorie:
-          product.categorie,
+          naam: product.naam,
 
-        bestelBij:
-          product.bestelBij,
+          categorie:
+            product.categorie,
 
-        bestelGroep:
-          product.bestelGroep,
+          bestelBij:
+            product.bestelBij,
 
-        volgorde:
-          product.volgorde,
+          bestelGroep:
+            product.bestelGroep,
 
-        geteld,
+          volgorde:
+            product.volgorde,
 
-        buffer,
+          geteld,
 
-        bestellen:
-          berekenBestelAantal(
-            geteld,
-            buffer
-          ),
-      };
-    });
+          buffer,
+
+          bestellen:
+            berekenBestelAantal(
+              geteld,
+              buffer
+            ),
+        };
+      }
+    );
 }

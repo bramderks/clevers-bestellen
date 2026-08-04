@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { APP } from "@/lib/config/app";
 
 interface DashboardKaart {
   waarde: number;
@@ -103,21 +104,28 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 md:p-10">
-
       <div className="mx-auto max-w-7xl">
 
         <header className="mb-10">
-          <h1 className="text-5xl font-bold">
-            Clevers Bestelsysteem
-          </h1>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h1 className="text-5xl font-bold">
+                {APP.naam}
+              </h1>
 
-          <p className="mt-3 text-lg text-slate-500">
-            Dashboard
-          </p>
+              <p className="mt-3 text-lg text-slate-500">
+                Dashboard
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-right text-xs text-slate-500 shadow-sm">
+              <div>{APP.versie}</div>
+              <div>{APP.eigenaar}</div>
+            </div>
+          </div>
         </header>
 
         <section className="mb-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-
           {dashboard.map((kaart) => (
             <div
               key={kaart.label}
@@ -132,11 +140,9 @@ export default async function Home() {
               </div>
             </div>
           ))}
-
         </section>
 
         <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-
           {menu.map((kaart) => (
             <Link
               key={kaart.titel}
@@ -166,11 +172,9 @@ export default async function Home() {
               </p>
             </Link>
           ))}
-
         </section>
 
       </div>
-
     </main>
   );
 }

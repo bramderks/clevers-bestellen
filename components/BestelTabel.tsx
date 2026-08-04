@@ -1,10 +1,4 @@
-interface BestelAdvies {
-  id: string;
-  naam: string;
-  geteld: number;
-  buffer: number;
-  bestellen: number;
-}
+import type { BestelAdvies } from "@/types";
 
 interface Props {
   titel: string;

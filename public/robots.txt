@@ -1,0 +1,7 @@
+# Clevers Bestellen
+# Proprietary Software
+# © 2026 B. Derks Holding
+# Uitsluitend bestemd voor geautoriseerde gebruikers en gelicentieerde vestigingen.
+
+User-agent: *
+Disallow: /

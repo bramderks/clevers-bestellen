@@ -3,6 +3,29 @@
   "version": "0.1.0",
   "private": true,
 
+  "description": "Professioneel voorraad-, bestel- en operationeel managementsysteem voor geautoriseerde Clevers-vestigingen.",
+
+  "author": "B. Derks Holding <bram.derks@outlook.com>",
+
+  "license": "SEE LICENSE IN LICENSE",
+
+  "homepage": "",
+
+  "repository": {
+    "type": "git"
+  },
+
+  "keywords": [
+    "clevers",
+    "ice-cream",
+    "inventory",
+    "ordering",
+    "planning",
+    "operations",
+    "nextjs",
+    "prisma"
+  ],
+
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
