@@ -7,6 +7,96 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Vestiging {
+  id String @id @default(cuid())
+
+  naam String @unique
+  code String @unique
+
+  actief Boolean @default(true)
+
+  aangemaakt DateTime @default(now())
+  gewijzigd  DateTime @updatedAt
+
+  @@index([actief])
+}
+
+model Gebruiker {
+  id String @id @default(cuid())
+
+  naam String
+
+  email String @unique
+
+  wachtwoordHash String?
+
+  actief Boolean @default(true)
+
+  laatsteLogin DateTime?
+
+  aangemaakt    DateTime       @default(now())
+  gewijzigd     DateTime       @updatedAt
+  gebruikerRols GebruikerRol[]
+
+  @@index([actief])
+}
+
+model Rol {
+  id String @id @default(cuid())
+
+  naam String @unique
+
+  omschrijving String?
+
+  aangemaakt    DateTime       @default(now())
+  gebruikerRols GebruikerRol[]
+}
+
+model GebruikerRol {
+  id String @id @default(cuid())
+
+  gebruikerId String
+  rolId       String
+
+  gebruiker Gebruiker @relation(fields: [gebruikerId], references: [id], onDelete: Cascade)
+  rol       Rol       @relation(fields: [rolId], references: [id], onDelete: Cascade)
+
+  @@unique([gebruikerId, rolId])
+}
+
+model Instelling {
+  id String @id @default(cuid())
+
+  sleutel String @unique
+
+  waarde String
+
+  omschrijving String?
+
+  aangemaakt DateTime @default(now())
+  gewijzigd  DateTime @updatedAt
+}
+
+model AuditLog {
+  id String @id @default(cuid())
+
+  gebruikerId String?
+
+  actie String
+
+  entiteit String
+
+  entiteitId String?
+
+  details Json?
+
+  aangemaakt DateTime @default(now())
+
+  @@index([actie])
+  @@index([entiteit])
+  @@index([aangemaakt])
+}
+
 model Bestelling {
   id         Int      @id @default(autoincrement())
   datum      DateTime
@@ -59,7 +149,7 @@ model WeekTaak {
   id String @id @default(cuid())
 
   weekId String
-  week   Week @relation(fields: [weekId], references: [id], onDelete: Cascade)
+  week   Week   @relation(fields: [weekId], references: [id], onDelete: Cascade)
 
   categorie String
   taak      String
@@ -78,13 +168,13 @@ model WeekTaak {
 model Medewerker {
   id String @id @default(cuid())
 
-  voornaam  String
+  voornaam   String
   achternaam String
 
   naam String
 
-  email     String?
-  telefoon  String?
+  email    String?
+  telefoon String?
 
   vestiging String
 
@@ -92,9 +182,9 @@ model Medewerker {
 
   kleur String @default("#2563eb")
 
-  functie String?                // Medewerker, Floormanager, Bedrijfsleider
+  functie String? // Medewerker, Floormanager, Bedrijfsleider
 
-  uurloon Decimal? @db.Decimal(6,2)
+  uurloon Decimal? @db.Decimal(6, 2)
 
   contractUren Int?
 
@@ -109,8 +199,8 @@ model Medewerker {
   aangemaakt DateTime @default(now())
 
   beschikbaarheden Beschikbaarheid[]
-  diensten Dienst[]
-  uren UurRegistratie[]
+  diensten         Dienst[]
+  uren             UurRegistratie[]
 
   @@index([vestiging])
   @@index([actief])
@@ -121,7 +211,7 @@ model Beschikbaarheid {
   id String @id @default(cuid())
 
   medewerkerId String
-  medewerker Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+  medewerker   Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
 
   weekdag Int
 
@@ -137,12 +227,12 @@ model Dienst {
   id String @id @default(cuid())
 
   medewerkerId String
-  medewerker Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+  medewerker   Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
 
   datum DateTime
 
   begintijd String
-  eindtijd   String
+  eindtijd  String
 
   vestiging String
 
@@ -161,10 +251,10 @@ model UurRegistratie {
   id String @id @default(cuid())
 
   dienstId String @unique
-  dienst Dienst @relation(fields: [dienstId], references: [id], onDelete: Cascade)
+  dienst   Dienst @relation(fields: [dienstId], references: [id], onDelete: Cascade)
 
   medewerkerId String
-  medewerker Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+  medewerker   Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
 
   geplandeStart String
   geplandeEinde String
