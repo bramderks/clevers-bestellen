@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -10,23 +11,27 @@ export async function GET(
   }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } =
+      await context.params;
 
-    const dienst = await prisma.dienst.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        medewerker: true,
-        urenregistratie: true,
-      },
-    });
+    const dienst =
+      await prisma.dienst.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          medewerker: true,
+          vestiging: true,
+          urenregistratie: true,
+        },
+      });
 
     if (!dienst) {
       return NextResponse.json(
         {
           success: false,
-          error: "Dienst niet gevonden.",
+          error:
+            "Dienst niet gevonden.",
         },
         {
           status: 404,
@@ -63,21 +68,25 @@ export async function PATCH(
   }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } =
+      await context.params;
 
-    const body = await request.json();
+    const body =
+      await request.json();
 
-    const bestaande = await prisma.dienst.findUnique({
-      where: {
-        id,
-      },
-    });
+    const bestaande =
+      await prisma.dienst.findUnique({
+        where: {
+          id,
+        },
+      });
 
     if (!bestaande) {
       return NextResponse.json(
         {
           success: false,
-          error: "Dienst niet gevonden.",
+          error:
+            "Dienst niet gevonden.",
         },
         {
           status: 404,
@@ -89,7 +98,8 @@ export async function PATCH(
       return NextResponse.json(
         {
           success: false,
-          error: "Kies een medewerker.",
+          error:
+            "Kies een medewerker.",
         },
         {
           status: 400,
@@ -101,7 +111,8 @@ export async function PATCH(
       return NextResponse.json(
         {
           success: false,
-          error: "Datum is verplicht.",
+          error:
+            "Datum is verplicht.",
         },
         {
           status: 400,
@@ -109,11 +120,15 @@ export async function PATCH(
       );
     }
 
-    if (!body.begintijd || !body.eindtijd) {
+    if (
+      !body.begintijd ||
+      !body.eindtijd
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: "Begin- en eindtijd zijn verplicht.",
+          error:
+            "Begin- en eindtijd zijn verplicht.",
         },
         {
           status: 400,
@@ -121,17 +136,19 @@ export async function PATCH(
       );
     }
 
-    const medewerker = await prisma.medewerker.findUnique({
-      where: {
-        id: body.medewerkerId,
-      },
-    });
+    const medewerker =
+      await prisma.medewerker.findUnique({
+        where: {
+          id: body.medewerkerId,
+        },
+      });
 
     if (!medewerker) {
       return NextResponse.json(
         {
           success: false,
-          error: "Medewerker niet gevonden.",
+          error:
+            "Medewerker niet gevonden.",
         },
         {
           status: 404,
@@ -139,28 +156,69 @@ export async function PATCH(
       );
     }
 
-    const dienst = await prisma.dienst.update({
-      where: {
-        id,
-      },
-      data: {
-        medewerkerId: body.medewerkerId,
-        datum: new Date(body.datum),
-        begintijd: body.begintijd,
-        eindtijd: body.eindtijd,
-        vestiging: body.vestiging,
-        functie: body.functie ?? "Medewerker",
-      },
-      include: {
-        medewerker: true,
-        urenregistratie: true,
-      },
-    });
+    const dienst =
+      await prisma.dienst.update({
+        where: {
+          id,
+        },
 
-    revalidatePath("/diensten");
-    revalidatePath("/rooster");
-    revalidatePath("/rooster/week");
-    revalidatePath(`/diensten/${id}`);
+        data: {
+          medewerker: {
+            connect: {
+              id: body.medewerkerId,
+            },
+          },
+
+          vestiging:
+            body.vestigingId
+              ? {
+                  connect: {
+                    id: body.vestigingId,
+                  },
+                }
+              : {
+                  disconnect: true,
+                },
+
+          vestigingSnapshot:
+            body.vestigingNaam ??
+            body.vestigingId ??
+            "",
+
+          datum: new Date(
+            body.datum
+          ),
+
+          begintijd:
+            body.begintijd,
+
+          eindtijd:
+            body.eindtijd,
+
+          functie:
+            body.functie ??
+            "Medewerker",
+        },
+
+        include: {
+          medewerker: true,
+          vestiging: true,
+          urenregistratie: true,
+        },
+      });
+
+    revalidatePath(
+      "/diensten"
+    );
+    revalidatePath(
+      "/rooster"
+    );
+    revalidatePath(
+      "/rooster/week"
+    );
+    revalidatePath(
+      `/diensten/${id}`
+    );
 
     return NextResponse.json({
       success: true,
@@ -191,19 +249,22 @@ export async function DELETE(
   }
 ) {
   try {
-    const { id } = await context.params;
+    const { id } =
+      await context.params;
 
-    const bestaande = await prisma.dienst.findUnique({
-      where: {
-        id,
-      },
-    });
+    const bestaande =
+      await prisma.dienst.findUnique({
+        where: {
+          id,
+        },
+      });
 
     if (!bestaande) {
       return NextResponse.json(
         {
           success: false,
-          error: "Dienst niet gevonden.",
+          error:
+            "Dienst niet gevonden.",
         },
         {
           status: 404,
@@ -217,9 +278,15 @@ export async function DELETE(
       },
     });
 
-    revalidatePath("/diensten");
-    revalidatePath("/rooster");
-    revalidatePath("/rooster/week");
+    revalidatePath(
+      "/diensten"
+    );
+    revalidatePath(
+      "/rooster"
+    );
+    revalidatePath(
+      "/rooster/week"
+    );
 
     return NextResponse.json({
       success: true,

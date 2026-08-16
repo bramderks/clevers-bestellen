@@ -4,29 +4,27 @@ import TopBar from "@/components/TopBar";
 import { prisma } from "@/lib/prisma";
 
 export default async function DienstenPagina() {
-  const diensten =
-    await prisma.dienst.findMany({
-      include: {
-        medewerker: true,
+  const diensten = await prisma.dienst.findMany({
+    include: {
+      medewerker: true,
+      vestiging: true,
+    },
+    orderBy: [
+      {
+        datum: "desc",
       },
-      orderBy: [
-        {
-          datum: "desc",
-        },
-        {
-          begintijd: "asc",
-        },
-      ],
-    });
+      {
+        begintijd: "asc",
+      },
+    ],
+  });
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 md:p-10">
       <div className="mx-auto max-w-7xl">
-
         <TopBar title="Diensten" />
 
         <div className="mb-8 flex items-center justify-between">
-
           <div>
             <h2 className="text-3xl font-bold">
               Diensten
@@ -43,12 +41,10 @@ export default async function DienstenPagina() {
           >
             ➕ Nieuwe dienst
           </Link>
-
         </div>
 
         {diensten.length === 0 ? (
           <div className="rounded-2xl bg-white p-12 text-center shadow-sm">
-
             <div className="text-6xl">
               📅
             </div>
@@ -60,23 +56,15 @@ export default async function DienstenPagina() {
             <p className="mt-3 text-gray-500">
               Maak de eerste dienst aan.
             </p>
-
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-
             <div className="hidden grid-cols-[180px_220px_180px_140px_120px] bg-blue-700 px-6 py-4 font-bold text-white md:grid">
-
               <div>Datum</div>
-
               <div>Medewerker</div>
-
               <div>Tijd</div>
-
               <div>Vestiging</div>
-
               <div></div>
-
             </div>
 
             {diensten.map((dienst) => (
@@ -85,9 +73,7 @@ export default async function DienstenPagina() {
                 className="border-t px-6 py-5 md:grid md:grid-cols-[180px_220px_180px_140px_120px] md:items-center"
               >
                 <div>
-                  {dienst.datum.toLocaleDateString(
-                    "nl-NL"
-                  )}
+                  {dienst.datum.toLocaleDateString("nl-NL")}
                 </div>
 
                 <div className="mt-2 font-semibold md:mt-0">
@@ -99,25 +85,23 @@ export default async function DienstenPagina() {
                 </div>
 
                 <div className="mt-2 md:mt-0">
-                  {dienst.vestiging}
+                  {dienst.vestigingSnapshot ??
+                    dienst.vestiging?.naam ??
+                    "-"}
                 </div>
 
                 <div className="mt-4 md:mt-0">
-
                   <Link
                     href={`/diensten/${dienst.id}`}
                     className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700"
                   >
                     Open
                   </Link>
-
                 </div>
               </div>
             ))}
-
           </div>
         )}
-
       </div>
     </main>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import TopBar from "@/components/TopBar";
 import { prisma } from "@/lib/prisma";
 
@@ -11,7 +12,7 @@ type Props = {
 
 export default async function HistorieWeekPagina({
   params,
-}: Props) {
+}: Readonly<Props>) {
   const { id } = await params;
 
   const week = await prisma.week.findUnique({
@@ -19,6 +20,7 @@ export default async function HistorieWeekPagina({
       id,
     },
     include: {
+      vestiging: true,
       taken: {
         orderBy: [
           {
@@ -47,9 +49,12 @@ export default async function HistorieWeekPagina({
   const percentage =
     totaal === 0
       ? 0
-      : Math.round(
-          (gereed / totaal) * 100
-        );
+      : Math.round((gereed / totaal) * 100);
+
+  const vestigingNaam =
+    week.vestigingSnapshot ??
+    week.vestiging?.naam ??
+    "-";
 
   return (
     <main className="min-h-screen bg-slate-100 p-6 md:p-8">
@@ -59,7 +64,7 @@ export default async function HistorieWeekPagina({
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-4xl font-bold">
-              {week.vestiging}
+              {vestigingNaam}
             </h1>
 
             <p className="mt-2 text-gray-500">
@@ -86,7 +91,6 @@ export default async function HistorieWeekPagina({
             <div className="text-3xl font-bold text-blue-700">
               {totaal}
             </div>
-
             <div className="mt-1 text-sm text-gray-500">
               📋 Totaal
             </div>
@@ -96,7 +100,6 @@ export default async function HistorieWeekPagina({
             <div className="text-3xl font-bold text-green-700">
               {gereed}
             </div>
-
             <div className="mt-1 text-sm text-gray-500">
               ✅ Gereed
             </div>
@@ -106,7 +109,6 @@ export default async function HistorieWeekPagina({
             <div className="text-3xl font-bold text-orange-600">
               {open}
             </div>
-
             <div className="mt-1 text-sm text-gray-500">
               ⏳ Open
             </div>
@@ -116,7 +118,6 @@ export default async function HistorieWeekPagina({
             <div className="text-3xl font-bold text-blue-700">
               {percentage}%
             </div>
-
             <div className="mt-1 text-sm text-gray-500">
               📈 Voortgang
             </div>
@@ -150,9 +151,7 @@ export default async function HistorieWeekPagina({
               }`}
             >
               <div className="font-semibold">
-                {taak.voltooid
-                  ? "✅"
-                  : "⬜"}
+                {taak.voltooid ? "✅" : "⬜"}
               </div>
 
               <div className="mt-2 font-medium md:mt-0">
@@ -167,9 +166,7 @@ export default async function HistorieWeekPagina({
                 {taak.voltooidOp
                   ? new Date(
                       taak.voltooidOp
-                    ).toLocaleString(
-                      "nl-NL"
-                    )
+                    ).toLocaleString("nl-NL")
                   : "-"}
               </div>
             </div>

@@ -4,33 +4,28 @@ import type {
 } from "next";
 
 import "./globals.css";
+import { APP } from "@/lib/config/app";
 
 export const metadata: Metadata = {
   title: {
-    default:
-      "Clevers Bestellen",
-
-    template:
-      "%s | Clevers Bestellen",
+    default: APP.naam,
+    template: `%s | ${APP.naam}`,
   },
 
   description:
     "Intern voorraad-, bestel- en operationeel managementsysteem voor geautoriseerde Clevers-vestigingen.",
 
-  applicationName:
-    "Clevers Bestellen",
+  applicationName: APP.naam,
 
   authors: [
     {
-      name: "Bram Derks Holding B.V.",
+      name: APP.eigenaar,
     },
   ],
 
-  creator:
-    "Bram Derks Holding B.V.",
+  creator: APP.eigenaar,
 
-  publisher:
-    "Bram Derks Holding B.V.",
+  publisher: APP.eigenaar,
 
   icons: {
     icon: "/favicon.png",
@@ -43,9 +38,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  width:
-    "device-width",
-
+  width: "device-width",
   initialScale: 1,
 };
 
@@ -68,7 +61,7 @@ export default function RootLayout({
           </main>
 
           <footer className="border-t border-slate-200 bg-white px-4 py-2 text-center text-xs text-slate-500">
-            © 2026 Bram Derks Holding B.V. • Clevers Bestellen • Uitsluitend bestemd voor geautoriseerde gebruikers en gelicentieerde vestigingen.
+            {APP.copyright} • {APP.naam} • {APP.footer}
           </footer>
         </div>
       </body>

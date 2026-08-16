@@ -4,15 +4,14 @@ import { getWeekInfo } from "./week";
 export async function haalOfMaakWeek(
   vestiging: string
 ) {
-  const { jaar, week } =
-    getWeekInfo();
+  const { jaar, week } = getWeekInfo();
 
   try {
     const bestaandeWeek =
       await prisma.week.findUnique({
         where: {
-          vestiging_jaar_week: {
-            vestiging,
+          vestigingSnapshot_jaar_week: {
+            vestigingSnapshot: vestiging,
             jaar,
             week,
           },
@@ -25,7 +24,7 @@ export async function haalOfMaakWeek(
 
     return await prisma.week.create({
       data: {
-        vestiging,
+        vestigingSnapshot: vestiging,
         jaar,
         week,
         afgesloten: false,

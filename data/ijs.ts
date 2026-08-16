@@ -11,7 +11,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 7,
+      roermond: -1,
 
       nijmegen: 5,
 
@@ -29,7 +29,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 6,
+      roermond: -1,
 
       nijmegen: 4,
 
@@ -47,7 +47,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 4,
+      roermond: -1,
 
       nijmegen: 3,
 
@@ -65,7 +65,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 5,
+      roermond: -1,
 
       nijmegen: 3,
 
@@ -83,7 +83,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 4,
+      roermond: -1,
 
       nijmegen: 3,
 
@@ -101,7 +101,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 4,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -119,7 +119,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 4,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -137,7 +137,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 3,
 
@@ -161,7 +161,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -179,7 +179,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -197,7 +197,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -215,7 +215,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -233,7 +233,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -251,7 +251,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -269,7 +269,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -287,7 +287,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 2,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -305,7 +305,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -323,7 +323,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -341,7 +341,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -359,7 +359,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -377,7 +377,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 3,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -397,7 +397,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 1,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -415,7 +415,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 1,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -433,7 +433,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 2,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -451,7 +451,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 1,
+      roermond: -1,
 
       nijmegen: 0,
 
@@ -469,7 +469,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 1,
+      roermond: -1,
 
       nijmegen: 2,
 
@@ -487,7 +487,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 1,
+      roermond: -1,
 
       nijmegen: 1,
 
@@ -505,7 +505,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 1,
+      roermond: -1,
 
       nijmegen: 0,
 
@@ -523,7 +523,7 @@ export const ijs: Product[] = [
     bestelGroep: "ijs",
     buffers: {
 
-      roermond: 1,
+      roermond: -1,
 
       nijmegen: 0,
 
@@ -541,7 +541,7 @@ export const ijs: Product[] = [
   bestelGroep: "ijs",
   buffers: {
 
-    roermond: 12,
+    roermond: -1,
 
     nijmegen: 12,
 

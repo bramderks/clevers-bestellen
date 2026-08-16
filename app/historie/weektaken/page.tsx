@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import TopBar from "@/components/TopBar";
 import { prisma } from "@/lib/prisma";
 
@@ -57,6 +58,7 @@ export default async function HistorieWeektakenPagina() {
     await prisma.week.findMany({
       include: {
         taken: true,
+        vestiging: true,
       },
       orderBy: [
         {
@@ -66,7 +68,7 @@ export default async function HistorieWeektakenPagina() {
           week: "desc",
         },
         {
-          vestiging: "asc",
+          vestigingSnapshot: "asc",
         },
       ],
     });
@@ -114,6 +116,11 @@ export default async function HistorieWeektakenPagina() {
                       100
                   );
 
+            const vestigingNaam =
+              week.vestigingSnapshot ??
+              week.vestiging?.naam ??
+              "-";
+
             return (
               <Link
                 key={week.id}
@@ -124,9 +131,7 @@ export default async function HistorieWeektakenPagina() {
                   <div>
                     <div className="flex flex-wrap items-center gap-3">
                       <h2 className="text-2xl font-bold">
-                        {
-                          week.vestiging
-                        }
+                        {vestigingNaam}
                       </h2>
 
                       <span

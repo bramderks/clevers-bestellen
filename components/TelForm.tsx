@@ -14,7 +14,7 @@ import SpeciaalsmakenTeller from "./SpeciaalsmakenTeller";
 import TelHeader from "@/components/tellen/TelHeader";
 import TelNavigatie from "@/components/tellen/TelNavigatie";
 
-import { berekenBestelling } from "@/lib/bestelEngine";
+import { berekenBestelling } from "@/modules/bestelling/services/bestelEngine";
 import { getControleBestelling } from "@/lib/tellen/getControleBestelling";
 import { getProductenVoorStap } from "@/lib/tellen/getProductenVoorStap";
 import { getStappen } from "@/lib/tellen/getStappen";

@@ -1,29 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 
-type Props = {
+interface Props {
   params: Promise<{
     id: string;
   }>;
-};
+}
 
-type BeschikbaarheidInput = {
+interface BeschikbaarheidInput {
   weekdag: number;
   beschikbaar: boolean;
   vanaf: string | null;
   tot: string | null;
-};
+}
 
 export async function PUT(
   request: NextRequest,
   { params }: Props
 ) {
   try {
-    const { id } = await params;
+    const { id } =
+      await params;
 
-    const body = await request.json();
+    const body =
+      await request.json();
 
     const medewerker =
       await prisma.medewerker.findUnique({
@@ -36,7 +39,8 @@ export async function PUT(
       return NextResponse.json(
         {
           success: false,
-          error: "Medewerker niet gevonden.",
+          error:
+            "Medewerker niet gevonden.",
         },
         {
           status: 404,
@@ -45,7 +49,9 @@ export async function PUT(
     }
 
     const beschikbaarheden =
-      body.beschikbaarheden as BeschikbaarheidInput[];
+      (body
+        .beschikbaarheden ??
+        []) as BeschikbaarheidInput[];
 
     await prisma.beschikbaarheid.deleteMany({
       where: {
@@ -53,23 +59,44 @@ export async function PUT(
       },
     });
 
-    if (beschikbaarheden.length > 0) {
+    if (
+      beschikbaarheden.length >
+      0
+    ) {
       await prisma.beschikbaarheid.createMany({
-        data: beschikbaarheden.map((dag) => ({
-          medewerkerId: id,
-          weekdag: dag.weekdag,
-          beschikbaar: dag.beschikbaar,
-          vanaf: dag.beschikbaar
-            ? dag.vanaf
-            : null,
-          tot: dag.beschikbaar
-            ? dag.tot
-            : null,
-        })),
+        data:
+          beschikbaarheden.map(
+            (dag) => ({
+              medewerkerId:
+                id,
+
+              weekdag:
+                Number(
+                  dag.weekdag
+                ),
+
+              beschikbaar:
+                Boolean(
+                  dag.beschikbaar
+                ),
+
+              vanaf:
+                dag.beschikbaar
+                  ? dag.vanaf
+                  : null,
+
+              tot:
+                dag.beschikbaar
+                  ? dag.tot
+                  : null,
+            })
+          ),
       });
     }
 
-    revalidatePath("/medewerkers");
+    revalidatePath(
+      "/medewerkers"
+    );
     revalidatePath(
       `/medewerkers/${id}`
     );
@@ -87,7 +114,8 @@ export async function PUT(
       {
         success: false,
         error:
-          error instanceof Error
+          error instanceof
+          Error
             ? error.message
             : "Onbekende fout",
       },

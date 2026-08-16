@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -7,6 +8,10 @@ export async function GET() {
   try {
     const medewerkers =
       await prisma.medewerker.findMany({
+        include: {
+          gebruiker: true,
+          vestiging: true,
+        },
         orderBy: [
           {
             actief: "desc",
@@ -109,21 +114,73 @@ export async function POST(
         data: {
           voornaam:
             body.voornaam.trim(),
+
           achternaam:
             body.achternaam.trim(),
+
           naam,
+
           email:
-            body.email?.trim() ||
+            body.email?.trim() ??
             null,
+
           telefoon:
-            body.telefoon?.trim() ||
+            body.telefoon?.trim() ??
             null,
-          vestiging:
-            body.vestiging,
+
+          vestiging: body.vestigingId
+            ? {
+                connect: {
+                  id: body.vestigingId,
+                },
+              }
+            : undefined,
+
+          vestigingSnapshot:
+            body.vestigingNaam ??
+            body.vestigingId ??
+            "",
+
+          functie:
+            body.functie ??
+            null,
+
           kleur:
-            body.kleur,
+            body.kleur ??
+            "#2563eb",
+
           actief:
-            body.actief,
+            body.actief ?? true,
+
+          uurloon:
+            body.uurloon ?? null,
+
+          contractUren:
+            body.contractUren ??
+            null,
+
+          datumInDienst:
+            body.datumInDienst
+              ? new Date(
+                  body.datumInDienst
+                )
+              : null,
+
+          geboortedatum:
+            body.geboortedatum
+              ? new Date(
+                  body.geboortedatum
+                )
+              : null,
+
+          opmerkingen:
+            body.opmerkingen ??
+            null,
+        },
+
+        include: {
+          gebruiker: true,
+          vestiging: true,
         },
       });
 

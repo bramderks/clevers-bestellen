@@ -1,35 +1,47 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-import { APP } from "@/lib/config/app";
+const PROTECTED_PATHS = [
+  "/dashboard",
+  "/tellen",
+  "/historie",
+  "/producten",
+  "/medewerkers",
+  "/planning",
+  "/weektaken",
+  "/instellingen",
+];
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
+  const { pathname } = request.nextUrl;
 
-  // Applicatie-informatie
-  response.headers.set("X-App-Name", APP.naam);
-  response.headers.set("X-App-Version", APP.versie);
-  response.headers.set("X-License", APP.licentie);
-  response.headers.set("X-Copyright", APP.copyright);
-
-  // Basisbeveiliging
-  response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set(
-    "Referrer-Policy",
-    "strict-origin-when-cross-origin",
+  const beveiligd = PROTECTED_PATHS.some((pad) =>
+    pathname.startsWith(pad),
   );
 
-  response.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=()",
-  );
+  if (!beveiligd) {
+    return NextResponse.next();
+  }
 
-  return response;
+  const sessie = request.cookies.get("clevers_session");
+
+  if (!sessie) {
+    return NextResponse.redirect(
+      new URL("/login", request.url),
+    );
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)",
+    "/dashboard/:path*",
+    "/tellen/:path*",
+    "/historie/:path*",
+    "/producten/:path*",
+    "/medewerkers/:path*",
+    "/planning/:path*",
+    "/weektaken/:path*",
+    "/instellingen/:path*",
   ],
 };

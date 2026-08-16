@@ -15,6 +15,7 @@ type Dienst = {
   datum: string;
   begintijd: string;
   eindtijd: string;
+  vestigingId?: string;
   vestiging: string;
   functie: string;
 };
@@ -32,37 +33,29 @@ export default function DienstForm({
 
   const bewerken = !!dienst;
 
-  const [medewerkerId, setMedewerkerId] =
-    useState(
-      dienst?.medewerkerId ?? ""
-    );
+  const [medewerkerId, setMedewerkerId] = useState(
+    dienst?.medewerkerId ?? ""
+  );
 
-  const [datum, setDatum] =
-    useState(
-      dienst?.datum ?? ""
-    );
+  const [datum, setDatum] = useState(
+    dienst?.datum ?? ""
+  );
 
-  const [begintijd, setBegintijd] =
-    useState(
-      dienst?.begintijd ?? ""
-    );
+  const [begintijd, setBegintijd] = useState(
+    dienst?.begintijd ?? ""
+  );
 
-  const [eindtijd, setEindtijd] =
-    useState(
-      dienst?.eindtijd ?? ""
-    );
+  const [eindtijd, setEindtijd] = useState(
+    dienst?.eindtijd ?? ""
+  );
 
-  const [vestiging, setVestiging] =
-    useState(
-      dienst?.vestiging ??
-        "Nijmegen"
-    );
+  const [vestiging, setVestiging] = useState(
+    dienst?.vestiging ?? "Nijmegen"
+  );
 
-  const [functie, setFunctie] =
-    useState(
-      dienst?.functie ??
-        "Medewerker"
-    );
+  const [functie, setFunctie] = useState(
+    dienst?.functie ?? "Medewerker"
+  );
 
   const [opslaanBezig, setOpslaanBezig] =
     useState(false);
@@ -83,9 +76,7 @@ export default function DienstForm({
     }
 
     if (!begintijd || !eindtijd) {
-      alert(
-        "Vul begin- en eindtijd in."
-      );
+      alert("Vul begin- en eindtijd in.");
       return;
     }
 
@@ -97,12 +88,9 @@ export default function DienstForm({
           ? `/api/diensten/${dienst!.id}`
           : "/api/diensten",
         {
-          method: bewerken
-            ? "PATCH"
-            : "POST",
+          method: bewerken ? "PATCH" : "POST",
           headers: {
-            "Content-Type":
-              "application/json",
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             medewerkerId,
@@ -115,13 +103,11 @@ export default function DienstForm({
         }
       );
 
-      const result =
-        await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          result.error ??
-            "Opslaan mislukt."
+          result.error ?? "Opslaan mislukt."
         );
       }
 
@@ -165,19 +151,15 @@ export default function DienstForm({
         }
       );
 
-      const result =
-        await response.json();
+      const result = await response.json();
 
       if (!response.ok) {
         throw new Error(
-          result.error ??
-            "Verwijderen mislukt."
+          result.error ?? "Verwijderen mislukt."
         );
       }
 
-      alert(
-        "✅ Dienst verwijderd."
-      );
+      alert("✅ Dienst verwijderd.");
 
       router.push("/diensten");
       router.refresh();
@@ -199,7 +181,6 @@ export default function DienstForm({
       }}
     >
       <div className="grid gap-6 md:grid-cols-2">
-
         <div>
           <label className="mb-2 block font-medium">
             Medewerker
@@ -208,9 +189,7 @@ export default function DienstForm({
           <select
             value={medewerkerId}
             onChange={(e) =>
-              setMedewerkerId(
-                e.target.value
-              )
+              setMedewerkerId(e.target.value)
             }
             className="w-full rounded-xl border px-4 py-3"
           >
@@ -218,18 +197,14 @@ export default function DienstForm({
               Kies medewerker...
             </option>
 
-            {medewerkers.map(
-              (medewerker) => (
-                <option
-                  key={medewerker.id}
-                  value={
-                    medewerker.id
-                  }
-                >
-                  {medewerker.naam}
-                </option>
-              )
-            )}
+            {medewerkers.map((medewerker) => (
+              <option
+                key={medewerker.id}
+                value={medewerker.id}
+              >
+                {medewerker.naam}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -241,26 +216,17 @@ export default function DienstForm({
           <select
             value={vestiging}
             onChange={(e) =>
-              setVestiging(
-                e.target.value
-              )
+              setVestiging(e.target.value)
             }
             className="w-full rounded-xl border px-4 py-3"
           >
-            <option>
-              Nijmegen
-            </option>
-
-            <option>
-              Roermond
-            </option>
+            <option>Nijmegen</option>
+            <option>Roermond</option>
           </select>
         </div>
-
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-
         <div>
           <label className="mb-2 block font-medium">
             Datum
@@ -270,9 +236,7 @@ export default function DienstForm({
             type="date"
             value={datum}
             onChange={(e) =>
-              setDatum(
-                e.target.value
-              )
+              setDatum(e.target.value)
             }
             className="w-full rounded-xl border px-4 py-3"
           />
@@ -287,9 +251,7 @@ export default function DienstForm({
             type="time"
             value={begintijd}
             onChange={(e) =>
-              setBegintijd(
-                e.target.value
-              )
+              setBegintijd(e.target.value)
             }
             className="w-full rounded-xl border px-4 py-3"
           />
@@ -304,18 +266,14 @@ export default function DienstForm({
             type="time"
             value={eindtijd}
             onChange={(e) =>
-              setEindtijd(
-                e.target.value
-              )
+              setEindtijd(e.target.value)
             }
             className="w-full rounded-xl border px-4 py-3"
           />
         </div>
-
       </div>
 
       <div>
-
         <label className="mb-2 block font-medium">
           Functie
         </label>
@@ -324,23 +282,17 @@ export default function DienstForm({
           type="text"
           value={functie}
           onChange={(e) =>
-            setFunctie(
-              e.target.value
-            )
+            setFunctie(e.target.value)
           }
           className="w-full rounded-xl border px-4 py-3"
         />
-
       </div>
 
       <div className="flex justify-between">
-
         {bewerken ? (
           <button
             type="button"
-            onClick={
-              verwijderen
-            }
+            onClick={verwijderen}
             className="rounded-xl bg-red-600 px-8 py-3 font-semibold text-white transition hover:bg-red-700"
           >
             🗑 Verwijderen
@@ -351,20 +303,16 @@ export default function DienstForm({
 
         <button
           type="submit"
-          disabled={
-            opslaanBezig
-          }
+          disabled={opslaanBezig}
           className="rounded-xl bg-green-600 px-8 py-3 font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
         >
           {opslaanBezig
             ? "Opslaan..."
             : bewerken
-            ? "Wijzigingen opslaan"
-            : "Dienst opslaan"}
+              ? "Wijzigingen opslaan"
+              : "Dienst opslaan"}
         </button>
-
       </div>
-
     </form>
   );
 }

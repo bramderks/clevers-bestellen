@@ -24,7 +24,7 @@ export default function TelRij({
         {buffer}
       </div>
 
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center gap-1">
 
         <button
           type="button"
@@ -36,7 +36,8 @@ export default function TelRij({
               )
             )
           }
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-l-xl bg-red-500 text-2xl font-bold text-white transition hover:bg-red-600 active:scale-95"
+          aria-label={`${naam} verlagen`}
+          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-red-500 p-0 text-2xl font-bold leading-none text-white transition-colors hover:bg-red-600 active:bg-red-700"
         >
           −
         </button>
@@ -56,7 +57,8 @@ export default function TelRij({
               )
             )
           }
-          className="h-11 w-20 rounded-none border-y border-slate-300 text-center text-lg font-bold outline-none [appearance:textfield] focus:border-blue-500 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          aria-label={`${naam} aantal`}
+          className="h-11 w-20 rounded-xl border border-slate-300 text-center text-lg font-bold outline-none [appearance:textfield] focus:border-blue-500 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
 
         <button
@@ -66,7 +68,8 @@ export default function TelRij({
               aantal + 1
             )
           }
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-r-xl bg-green-600 text-2xl font-bold text-white transition hover:bg-green-700 active:scale-95"
+          aria-label={`${naam} verhogen`}
+          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-600 p-0 text-2xl font-bold leading-none text-white transition-colors hover:bg-green-700 active:bg-green-800"
         >
           +
         </button>

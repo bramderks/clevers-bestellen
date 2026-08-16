@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 
 interface Params {
@@ -12,24 +14,13 @@ export async function PATCH(
   { params }: Params
 ) {
   try {
-    const { id } = await params;
+    const { id } =
+      await params;
 
     const {
       naam,
       voltooid,
     } = await req.json();
-
-    if (!naam?.trim()) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Naam ontbreekt.",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
 
     const bestaandeTaak =
       await prisma.weekTaak.findUnique({
@@ -45,7 +36,8 @@ export async function PATCH(
       return NextResponse.json(
         {
           success: false,
-          error: "Taak niet gevonden.",
+          error:
+            "Taak niet gevonden.",
         },
         {
           status: 404,
@@ -54,7 +46,8 @@ export async function PATCH(
     }
 
     if (
-      bestaandeTaak.week.afgesloten
+      bestaandeTaak.week
+        .afgesloten
     ) {
       return NextResponse.json(
         {
@@ -74,18 +67,25 @@ export async function PATCH(
           id,
         },
         data: {
-          naam: naam.trim(),
+          naam:
+            naam?.trim() ??
+            null,
+
           voltooid:
-            Boolean(voltooid),
-          voltooidOp: voltooid
-            ? new Date()
-            : null,
+            Boolean(
+              voltooid
+            ),
+
+          voltooidOp:
+            voltooid
+              ? new Date()
+              : null,
         },
       });
 
     return NextResponse.json({
       success: true,
-      ...taak,
+      taak,
     });
   } catch (error) {
     console.error(

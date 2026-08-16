@@ -31,29 +31,31 @@ export async function initialiseerWeektaken(
         },
       });
 
-    const bestaandeSet =
-      new Set(
-        bestaandeTaken.map(
-          (taak) =>
-            `${taak.categorie}|${taak.taak}`
-        )
-      );
+    const bestaandeSet = new Set(
+      bestaandeTaken.map(
+        (taak) =>
+          `${taak.categorie}|${taak.taak}`
+      )
+    );
 
     const taken =
-      week.vestiging ===
+      week.vestigingSnapshot ===
       "Roermond"
         ? weektakenNijmegen
         : weektakenNijmegen;
 
-    const nieuweTaken = [];
+    const nieuweTaken: {
+      weekId: string;
+      categorie: string;
+      taak: string;
+      voltooid: boolean;
+    }[] = [];
 
     for (const categorie of taken) {
       for (const taak of categorie.taken) {
         const sleutel = `${categorie.categorie}|${taak.taak}`;
 
-        if (
-          bestaandeSet.has(sleutel)
-        ) {
+        if (bestaandeSet.has(sleutel)) {
           continue;
         }
 
@@ -67,9 +69,7 @@ export async function initialiseerWeektaken(
       }
     }
 
-    if (
-      nieuweTaken.length > 0
-    ) {
+    if (nieuweTaken.length > 0) {
       await prisma.weekTaak.createMany({
         data: nieuweTaken,
       });

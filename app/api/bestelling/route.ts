@@ -1,5 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+
+import {
+  BestellingType,
+} from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { verstuurBestelMail } from "@/lib/mail";
@@ -15,26 +20,37 @@ interface BestelRegel {
 
 interface RequestBody {
   datum: string;
-  vestiging: string;
+
+  vestigingId: string;
+
+  vestigingNaam: string;
+
   medewerker: string;
-  type: string;
+
+  type: BestellingType;
+
   opmerking?: string;
+
   regels: BestelRegel[];
 }
 
 function valideer(
   body: RequestBody
 ): string | null {
-  if (!body.vestiging) {
+  if (!body.vestigingId) {
     return "Vestiging ontbreekt.";
   }
 
-  if (!body.medewerker?.trim()) {
+  if (
+    !body.medewerker?.trim()
+  ) {
     return "Medewerker ontbreekt.";
   }
 
   if (
-    !Array.isArray(body.regels) ||
+    !Array.isArray(
+      body.regels
+    ) ||
     body.regels.length === 0
   ) {
     return "Geen bestelregels ontvangen.";
@@ -68,46 +84,88 @@ export async function POST(
     const bestelling =
       await prisma.bestelling.create({
         data: {
-          datum: new Date(body.datum),
-          vestiging: body.vestiging,
-          medewerker:
+          datum: new Date(
+            body.datum
+          ),
+
+          vestiging: {
+            connect: {
+              id:
+                body.vestigingId,
+            },
+          },
+
+          vestigingSnapshot:
+            body.vestigingNaam,
+
+          medewerkerSnapshot:
             body.medewerker.trim(),
-          type: body.type,
+
+          type:
+            body.type,
+
           opmerking:
-            body.opmerking ?? "",
+            body.opmerking ??
+            null,
 
           regels: {
-            create: body.regels.map(
-              (regel) => ({
-                productId:
-                  regel.productId,
-                productNaam:
-                  regel.productNaam,
-                geteld:
-                  regel.geteld,
-                buffer:
-                  regel.buffer,
-                besteld:
-                  regel.besteld,
-                bestelGroep:
-                  regel.bestelGroep,
-              })
-            ),
+            create:
+              body.regels.map(
+                (
+                  regel
+                ) => ({
+                  product: regel.productId
+                    ? {
+                        connect:
+                          {
+                            id:
+                              regel.productId,
+                          },
+                      }
+                    : undefined,
+
+                  productNaam:
+                    regel.productNaam,
+
+                  geteld:
+                    Number(
+                      regel.geteld
+                    ),
+
+                  buffer:
+                    Number(
+                      regel.buffer
+                    ),
+
+                  besteld:
+                    Number(
+                      regel.besteld
+                    ),
+
+                  bestelGroep:
+                    regel.bestelGroep,
+                })
+              ),
           },
         },
 
         include: {
           regels: true,
+          vestiging: true,
         },
       });
 
     revalidatePath("/");
-    revalidatePath("/historie");
+    revalidatePath(
+      "/historie"
+    );
 
     try {
       await verstuurBestelMail(
-        bestelling.vestiging,
-        bestelling.medewerker ??
+        bestelling
+          .vestigingSnapshot,
+        bestelling
+          .medewerkerSnapshot ??
           "Onbekend",
         bestelling.datum.toLocaleDateString(
           "nl-NL"
@@ -132,7 +190,8 @@ export async function POST(
       {
         success: false,
         error:
-          error instanceof Error
+          error instanceof
+          Error
             ? error.message
             : "Onbekende fout.",
       },

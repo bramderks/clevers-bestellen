@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -9,6 +10,7 @@ export async function GET() {
       await prisma.dienst.findMany({
         include: {
           medewerker: true,
+          vestiging: true,
           urenregistratie: true,
         },
         orderBy: [
@@ -115,23 +117,43 @@ export async function POST(
     const dienst =
       await prisma.dienst.create({
         data: {
-          medewerkerId:
-            body.medewerkerId,
+          medewerker: {
+            connect: {
+              id: body.medewerkerId,
+            },
+          },
+
+          vestiging: body.vestigingId
+            ? {
+                connect: {
+                  id: body.vestigingId,
+                },
+              }
+            : undefined,
+
+          vestigingSnapshot:
+            body.vestigingNaam ??
+            body.vestigingId ??
+            "",
+
           datum: new Date(
             body.datum
           ),
+
           begintijd:
             body.begintijd,
+
           eindtijd:
             body.eindtijd,
-          vestiging:
-            body.vestiging,
+
           functie:
             body.functie ??
             "Medewerker",
         },
+
         include: {
           medewerker: true,
+          vestiging: true,
           urenregistratie: true,
         },
       });

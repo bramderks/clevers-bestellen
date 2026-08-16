@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
@@ -14,7 +15,8 @@ export async function PATCH(
       return NextResponse.json(
         {
           success: false,
-          error: "WeekId ontbreekt.",
+          error:
+            "WeekId ontbreekt.",
         },
         {
           status: 400,
@@ -33,7 +35,8 @@ export async function PATCH(
       return NextResponse.json(
         {
           success: false,
-          error: "Week niet gevonden.",
+          error:
+            "Week niet gevonden.",
         },
         {
           status: 404,
@@ -82,9 +85,15 @@ export async function PATCH(
         },
       });
 
-    revalidatePath("/weektaken");
-    revalidatePath("/historie/weektaken");
-    revalidatePath("/historie");
+    revalidatePath(
+      "/weektaken"
+    );
+    revalidatePath(
+      "/historie/weektaken"
+    );
+    revalidatePath(
+      "/historie"
+    );
     revalidatePath("/");
 
     return NextResponse.json({
@@ -101,7 +110,8 @@ export async function PATCH(
       {
         success: false,
         error:
-          error instanceof Error
+          error instanceof
+          Error
             ? error.message
             : "Er is een fout opgetreden.",
       },

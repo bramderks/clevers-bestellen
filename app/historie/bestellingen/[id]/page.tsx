@@ -7,7 +7,9 @@ interface Props {
   }>;
 }
 
-export default async function BestellingDetail({ params }: Props) {
+export default async function BestellingDetail({
+  params,
+}: Readonly<Props>) {
   const { id } = await params;
 
   const bestelling = await prisma.bestelling.findUnique({
@@ -16,6 +18,7 @@ export default async function BestellingDetail({ params }: Props) {
     },
     include: {
       regels: true,
+      vestiging: true,
     },
   });
 
@@ -41,11 +44,15 @@ export default async function BestellingDetail({ params }: Props) {
     0
   );
 
+  const vestigingNaam =
+    bestelling.vestigingSnapshot ??
+    bestelling.vestiging?.naam ??
+    "-";
+
   return (
     <main className="min-h-screen bg-slate-100 p-10">
-      <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-xl p-8">
-
-        <div className="flex justify-between items-center mb-8">
+      <div className="mx-auto max-w-5xl rounded-2xl bg-white p-8 shadow-xl">
+        <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">
               Bestelling #{bestelling.id}
@@ -53,13 +60,13 @@ export default async function BestellingDetail({ params }: Props) {
 
             <p className="text-gray-500">
               {new Date(bestelling.datum).toLocaleDateString("nl-NL")} •{" "}
-              {bestelling.vestiging} • {bestelling.type}
+              {vestigingNaam} • {bestelling.type}
             </p>
           </div>
 
           <Link
             href="/historie"
-            className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+            className="rounded-lg bg-blue-600 px-5 py-2 text-white"
           >
             Terug
           </Link>
@@ -68,10 +75,18 @@ export default async function BestellingDetail({ params }: Props) {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b font-semibold">
-              <th className="text-left py-3">Product</th>
-              <th className="text-right">Geteld</th>
-              <th className="text-right">Buffer</th>
-              <th className="text-right">Besteld</th>
+              <th className="py-3 text-left">
+                Product
+              </th>
+              <th className="text-right">
+                Geteld
+              </th>
+              <th className="text-right">
+                Buffer
+              </th>
+              <th className="text-right">
+                Besteld
+              </th>
             </tr>
           </thead>
 
@@ -81,9 +96,18 @@ export default async function BestellingDetail({ params }: Props) {
                 key={regel.id}
                 className="border-b"
               >
-                <td className="py-2">{regel.productNaam}</td>
-                <td className="text-right">{regel.geteld}</td>
-                <td className="text-right">{regel.buffer}</td>
+                <td className="py-2">
+                  {regel.productNaam}
+                </td>
+
+                <td className="text-right">
+                  {regel.geteld}
+                </td>
+
+                <td className="text-right">
+                  {regel.buffer}
+                </td>
+
                 <td className="text-right font-semibold">
                   {regel.besteld}
                 </td>
@@ -92,10 +116,9 @@ export default async function BestellingDetail({ params }: Props) {
           </tbody>
         </table>
 
-        <div className="mt-8 text-xl font-bold text-right">
+        <div className="mt-8 text-right text-xl font-bold">
           Totaal te bestellen: {totaal}
         </div>
-
       </div>
     </main>
   );

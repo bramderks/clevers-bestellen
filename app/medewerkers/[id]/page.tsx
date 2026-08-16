@@ -5,15 +5,15 @@ import TopBar from "@/components/TopBar";
 import MedewerkerForm from "@/components/medewerkers/MedewerkerForm";
 import { prisma } from "@/lib/prisma";
 
-type Props = {
+interface Props {
   params: Promise<{
     id: string;
   }>;
-};
+}
 
 export default async function MedewerkerPagina({
   params,
-}: Props) {
+}: Readonly<Props>) {
   const { id } = await params;
 
   const medewerker =
@@ -21,11 +21,20 @@ export default async function MedewerkerPagina({
       where: {
         id,
       },
+      include: {
+        vestiging: true,
+      },
     });
 
   if (!medewerker) {
     notFound();
   }
+
+  const medewerkerVoorForm = {
+    ...medewerker,
+    vestiging:
+      medewerker.vestiging?.naam ?? "",
+  };
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 md:p-10">
@@ -42,7 +51,7 @@ export default async function MedewerkerPagina({
           </p>
 
           <MedewerkerForm
-            medewerker={medewerker}
+            medewerker={medewerkerVoorForm}
           />
 
           <div className="mt-8 border-t pt-6">

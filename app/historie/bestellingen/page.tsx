@@ -1,9 +1,13 @@
 import Link from "next/link";
+
 import TopBar from "@/components/TopBar";
 import { prisma } from "@/lib/prisma";
 
 export default async function BestellingenHistorie() {
   const bestellingen = await prisma.bestelling.findMany({
+    include: {
+      vestiging: true,
+    },
     orderBy: {
       datum: "desc",
     },
@@ -28,10 +32,21 @@ export default async function BestellingenHistorie() {
           <table className="w-full">
             <thead className="bg-slate-100">
               <tr>
-                <th className="px-6 py-4 text-left">Datum</th>
-                <th className="px-6 py-4 text-left">Vestiging</th>
-                <th className="px-6 py-4 text-left">Type</th>
-                <th className="px-6 py-4 text-right">Bekijken</th>
+                <th className="px-6 py-4 text-left">
+                  Datum
+                </th>
+
+                <th className="px-6 py-4 text-left">
+                  Vestiging
+                </th>
+
+                <th className="px-6 py-4 text-left">
+                  Type
+                </th>
+
+                <th className="px-6 py-4 text-right">
+                  Bekijken
+                </th>
               </tr>
             </thead>
 
@@ -42,11 +57,15 @@ export default async function BestellingenHistorie() {
                   className="border-t hover:bg-slate-50"
                 >
                   <td className="px-6 py-4">
-                    {new Date(bestelling.datum).toLocaleDateString("nl-NL")}
+                    {new Date(
+                      bestelling.datum
+                    ).toLocaleDateString("nl-NL")}
                   </td>
 
                   <td className="px-6 py-4">
-                    {bestelling.vestiging}
+                    {bestelling.vestigingSnapshot ??
+                      bestelling.vestiging?.naam ??
+                      "-"}
                   </td>
 
                   <td className="px-6 py-4">

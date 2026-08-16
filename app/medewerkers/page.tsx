@@ -1,11 +1,14 @@
 import Link from "next/link";
+
 import { prisma } from "@/lib/prisma";
 import TopBar from "@/components/TopBar";
-import MedewerkerCard from "@/components/medewerkers/MedewerkerCard";
 
 export default async function MedewerkersPagina() {
   const medewerkers =
     await prisma.medewerker.findMany({
+      include: {
+        vestiging: true,
+      },
       orderBy: [
         {
           actief: "desc",
@@ -21,18 +24,21 @@ export default async function MedewerkersPagina() {
 
   const nijmegen =
     medewerkers.filter(
-      (m) => m.vestiging === "Nijmegen"
+      (m) =>
+        m.vestiging?.naam ===
+        "Nijmegen"
     ).length;
 
   const roermond =
     medewerkers.filter(
-      (m) => m.vestiging === "Roermond"
+      (m) =>
+        m.vestiging?.naam ===
+        "Roermond"
     ).length;
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-8 md:p-10">
       <div className="mx-auto max-w-7xl">
-
         <TopBar title="Medewerkers" />
 
         <div className="mb-8 grid gap-4 md:grid-cols-3">
@@ -67,7 +73,7 @@ export default async function MedewerkersPagina() {
           </div>
         </div>
 
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold">
             Medewerkers
           </h2>
@@ -92,9 +98,7 @@ export default async function MedewerkersPagina() {
                 className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="flex items-start justify-between">
-
                   <div className="flex items-center gap-4">
-
                     <div
                       className="flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold text-white"
                       style={{
@@ -118,7 +122,6 @@ export default async function MedewerkersPagina() {
                           "-"}
                       </div>
                     </div>
-
                   </div>
 
                   {medewerker.actief ? (
@@ -133,13 +136,13 @@ export default async function MedewerkersPagina() {
                 </div>
 
                 <div className="mt-6 space-y-2 text-sm">
-
                   <div>
                     📍{" "}
                     <strong>
                       Vestiging:
                     </strong>{" "}
-                    {medewerker.vestiging}
+                    {medewerker.vestiging
+                      ?.naam ?? "-"}
                   </div>
 
                   <div>
@@ -159,7 +162,6 @@ export default async function MedewerkersPagina() {
                     {medewerker.functie ??
                       "Medewerker"}
                   </div>
-
                 </div>
 
                 <div className="mt-6 flex justify-end">
@@ -174,7 +176,6 @@ export default async function MedewerkersPagina() {
             ))}
           </div>
         )}
-
       </div>
     </main>
   );

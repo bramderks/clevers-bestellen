@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bestelling {
+  id         Int               @id @default(autoincrement())
+  datum      DateTime
+  vestiging  String
+  type       String
+  aangemaakt DateTime          @default(now())
+  medewerker String?
+  opmerking  String?
+  regels     BestellingRegel[]
+}
+
+model BestellingRegel {
+  id           Int        @id @default(autoincrement())
+  bestellingId Int
+  productId    String
+  productNaam  String
+  geteld       Int
+  buffer       Int
+  besteld      Int
+  bestelGroep  String
+  bestelling   Bestelling @relation(fields: [bestellingId], references: [id], onDelete: Cascade)
+}
+
+model Medewerker {
+  id               String            @id @default(cuid())
+  voornaam         String
+  achternaam       String
+  naam             String
+  email            String?
+  telefoon         String?
+  vestiging        String
+  actief           Boolean           @default(true)
+  kleur            String            @default("#2563eb")
+  aangemaakt       DateTime          @default(now())
+  contractUren     Int?
+  datumInDienst    DateTime?
+  functie          String?
+  geboortedatum    DateTime?
+  opmerkingen      String?
+  pushToken        String?
+  uurloon          Decimal?          @db.Decimal(6, 2)
+  beschikbaarheden Beschikbaarheid[]
+  diensten         Dienst[]
+  urenregistraties UurRegistratie[]
+
+  @@index([actief])
+  @@index([functie])
+  @@index([vestiging])
+}
+
+model Beschikbaarheid {
+  id           String     @id @default(cuid())
+  medewerkerId String
+  weekdag      Int
+  beschikbaar  Boolean    @default(true)
+  vanaf        String?
+  tot          String?
+  medewerker   Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+
+  @@index([medewerkerId])
+}
+
+model Week {
+  id           String     @id @default(cuid())
+  vestiging    String
+  jaar         Int
+  week         Int
+  aangemaakt   DateTime   @default(now())
+  afgesloten   Boolean    @default(false)
+  afgeslotenOp DateTime?
+  taken        WeekTaak[]
+
+  @@unique([vestiging, jaar, week])
+  @@index([jaar, week])
+  @@index([afgesloten])
+  @@index([vestiging])
+}
+
+model WeekTaak {
+  id         String    @id @default(cuid())
+  weekId     String
+  categorie  String
+  taak       String
+  voltooid   Boolean   @default(false)
+  naam       String?
+  voltooidOp DateTime?
+  aangemaakt DateTime  @default(now())
+  week       Week      @relation(fields: [weekId], references: [id], onDelete: Cascade)
+
+  @@index([weekId])
+  @@index([categorie])
+  @@index([voltooid])
+}
+
+model Dienst {
+  id              String          @id @default(cuid())
+  medewerkerId    String
+  datum           DateTime
+  begintijd       String
+  eindtijd        String
+  vestiging       String
+  functie         String?
+  aangemaakt      DateTime        @default(now())
+  medewerker      Medewerker      @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+  urenregistratie UurRegistratie?
+
+  @@index([medewerkerId])
+  @@index([datum])
+  @@index([vestiging])
+}
+
+model UurRegistratie {
+  id            String     @id @default(cuid())
+  dienstId      String     @unique
+  medewerkerId  String
+  geplandeStart String
+  geplandeEinde String
+  gewerkteStart String?
+  gewerkteEinde String?
+  pauze         Int        @default(0)
+  opmerking     String?
+  goedgekeurd   Boolean    @default(false)
+  dienst        Dienst     @relation(fields: [dienstId], references: [id], onDelete: Cascade)
+  medewerker    Medewerker @relation(fields: [medewerkerId], references: [id], onDelete: Cascade)
+
+  @@index([medewerkerId])
+}

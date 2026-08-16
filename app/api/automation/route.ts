@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
+
 import { verstuurBestelling } from "@/lib/automation/verzenden";
 
-export async function POST(req: Request) {
+export async function POST(
+  request: Request
+) {
   try {
-    const bestelling = await req.json();
+    const bestelling =
+      await request.json();
 
-    await verstuurBestelling(bestelling);
+    await verstuurBestelling(
+      bestelling
+    );
 
     return NextResponse.json({
       success: true,
@@ -16,9 +22,12 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: "Automatisch bestellen mislukt.",
+        error:
+          "Automatisch bestellen mislukt.",
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }

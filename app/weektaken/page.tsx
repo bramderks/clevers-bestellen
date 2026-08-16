@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import TopBar from "@/components/TopBar";
 import { prisma } from "@/lib/prisma";
 
@@ -6,16 +7,23 @@ export default async function WeektakenHome() {
   const weken = await prisma.week.findMany({
     where: {
       vestiging: {
-        in: ["Nijmegen", "Roermond"],
+        naam: {
+          in: ["Nijmegen", "Roermond"],
+        },
       },
     },
     include: {
+      vestiging: true,
       taken: true,
     },
   });
 
   function gegevens(vestiging: string) {
-    const week = weken.find((w) => w.vestiging === vestiging);
+    const week = weken.find(
+      (w) =>
+        (w.vestigingSnapshot ??
+          w.vestiging?.naam) === vestiging
+    );
 
     if (!week) {
       return {
@@ -26,13 +34,17 @@ export default async function WeektakenHome() {
     }
 
     const totaal = week.taken.length;
-    const gereed = week.taken.filter((t) => t.voltooid).length;
+    const gereed = week.taken.filter(
+      (t) => t.voltooid
+    ).length;
     const open = totaal - gereed;
 
     const percentage =
       totaal === 0
         ? 0
-        : Math.round((gereed / totaal) * 100);
+        : Math.round(
+            (gereed / totaal) * 100
+          );
 
     return {
       percentage,
