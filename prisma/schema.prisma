@@ -24,6 +24,7 @@ model Vestiging {
 
   gebruikers Gebruiker[]
   medewerkers Medewerker[]
+  diensten Dienst[]
 
   bestellingen Bestelling[]
   weken Week[]
@@ -35,6 +36,17 @@ model Vestiging {
   documenten Document[]
 
   instellingen VestigingInstelling[]
+  leverancierBestellingen LeverancierBestelling[]
+  voorraadTellingen VoorraadTelling[]
+  aiAdviezen AIAdvies[]
+  importTaken ImportTaak[]
+  dashboardMeldingen DashboardMelding[]
+  dagAfsluitingen DagAfsluiting[]
+  leveringen Levering[]
+  werkLijsten WerkLijst[]
+  rapporten Rapport[]
+  taken Taak[]
+  activiteiten Activiteit[]
 
   @@index([actief])
 }
@@ -64,6 +76,30 @@ model Gebruiker {
   notificaties Notificatie[]
 
   documenten Document[]
+
+  goedgekeurdeUurRegistraties UurRegistratie[]
+  bestellingen Bestelling[]
+  voltooideWeekTaken WeekTaak[]
+  voorraadMutatiesAlsGebruiker VoorraadMutatie[]
+  dashboardFavorieten DashboardFavoriet[]
+  dashboardWidgets DashboardWidget[]
+  loginSessies LoginSessie[]
+  apiLogs ApiLog[]
+  leverancierBestellingen LeverancierBestelling[]
+  voorraadTellingen VoorraadTelling[]
+  aiAdviezen AIAdvies[]
+  importTaken ImportTaak[]
+  exportTaken ExportTaak[]
+  dagAfsluitingen DagAfsluiting[]
+  gecontroleerdeLeveringen Levering[]
+  gewijzigdeConfiguraties SysteemConfiguratie[]
+  aangemaakteRapporten Rapport[]
+  rapportUitvoeringen RapportUitvoering[]
+  activiteiten Activiteit[]
+  opgeslagenFilters OpgeslagenFilter[]
+  favorieten Favoriet[]
+  aangemaakteTaken Taak[] @relation("TaakAangemaaktDoor")
+  toegewezenTaken Taak[] @relation("TaakToegewezenAan")
 
   aangemaaktOp DateTime @default(now())
   gewijzigdOp DateTime @updatedAt
@@ -228,6 +264,7 @@ model Medewerker {
   beschikbaarheden Beschikbaarheid[]
   diensten Dienst[]
   urenregistraties UurRegistratie[]
+  werkLijstUitvoeringen WerkLijstUitvoering[]
 
   aangemaaktOp DateTime @default(now())
   gewijzigdOp DateTime @updatedAt
@@ -362,6 +399,7 @@ model Leverancier {
   actief Boolean @default(true)
 
   producten Product[]
+  bestellingen LeverancierBestelling[]
 
   aangemaaktOp DateTime @default(now())
   gewijzigdOp DateTime @updatedAt
@@ -411,6 +449,10 @@ model Product {
   bestelregels BestellingRegel[]
 
   voorraadMutaties VoorraadMutatie[]
+  leverancierBestellingRegels LeverancierBestellingRegel[]
+  voorraadTellingRegels VoorraadTellingRegel[]
+  aiAdviesRegels AIBestelAdviesRegel[]
+  leveringRegels LeveringRegel[]
 
   aangemaaktOp DateTime @default(now())
   gewijzigdOp DateTime @updatedAt
@@ -467,6 +509,7 @@ model Bestelling {
   opmerking String?
 
   regels BestellingRegel[]
+  aiAdviezen AIBestelAdvies[]
 
   aangemaaktOp DateTime @default(now())
   gewijzigdOp DateTime @updatedAt
@@ -610,6 +653,8 @@ model Document {
   mimeType String
 
   grootte Int
+
+  bijlagen Bijlage[]
 
   categorie String?
 
@@ -795,6 +840,7 @@ model LeverancierBestelling {
   opmerking String?
 
   regels LeverancierBestellingRegel[]
+  leveringen Levering[]
 
   aangemaaktOp DateTime @default(now())
   gewijzigdOp DateTime @updatedAt
@@ -1289,6 +1335,7 @@ model WerkLijst {
   actief Boolean @default(true)
 
   regels WerkLijstRegel[]
+  uitvoeringen WerkLijstUitvoering[]
 
   aangemaaktOp DateTime @default(now())
   gewijzigdOp DateTime @updatedAt
