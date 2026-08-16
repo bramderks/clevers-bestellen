@@ -1482,25 +1482,6 @@ model Label {
   @@index([actief])
 }
 
-model Bijlage {
-  id String @id @default(cuid())
-
-  documentId String
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  naam String
-
-  bestand String
-
-  mimeType String
-
-  grootte Int
-
-  aangemaaktOp DateTime @default(now())
-
-  @@index([documentId])
-}
-
 model OpgeslagenFilter {
   id String @id @default(cuid())
 
