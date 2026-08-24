@@ -6,21 +6,10 @@ import { APP } from "@/lib/app";
 export default async function DashboardPagina() {
   const [
     bestellingen,
-    medewerkers,
-    vestigingen,
     openWeken,
   ] = await Promise.all([
     prisma.bestelling.count(),
-    prisma.medewerker.count({
-      where: {
-        actief: true,
-      },
-    }),
-    prisma.vestiging.count({
-      where: {
-        actief: true,
-      },
-    }),
+
     prisma.week.count({
       where: {
         afgesloten: false,
@@ -33,16 +22,6 @@ export default async function DashboardPagina() {
       titel: "Bestellingen",
       waarde: bestellingen,
       icoon: "📦",
-    },
-    {
-      titel: "Medewerkers",
-      waarde: medewerkers,
-      icoon: "👥",
-    },
-    {
-      titel: "Vestigingen",
-      waarde: vestigingen,
-      icoon: "🏪",
     },
     {
       titel: "Open weken",
@@ -77,7 +56,7 @@ export default async function DashboardPagina() {
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-6 p-6 md:grid-cols-2 xl:grid-cols-4">
+      <section className="mx-auto grid max-w-7xl gap-6 p-6 md:grid-cols-2">
 
         {kaarten.map((kaart) => (
           <article

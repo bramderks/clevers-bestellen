@@ -123,12 +123,12 @@ const stappen = useMemo(
         advies,
       });
 
-      alert(
-        "✅ Bestelling opgeslagen."
-      );
+alert(
+  "✅ Telling verzonden per mail."
+);
 
-      router.push("/historie");
-      router.refresh();
+router.push("/tellen");
+router.refresh();
     } catch (error) {
       alert(
         error instanceof Error

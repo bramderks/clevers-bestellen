@@ -5,17 +5,14 @@ const PROTECTED_PATHS = [
   "/tellen",
   "/historie",
   "/producten",
-  "/medewerkers",
-  "/planning",
   "/weektaken",
-  "/instellingen",
 ];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const beveiligd = PROTECTED_PATHS.some((pad) =>
-    pathname.startsWith(pad),
+    pathname.startsWith(pad)
   );
 
   if (!beveiligd) {
@@ -26,7 +23,7 @@ export function middleware(request: NextRequest) {
 
   if (!sessie) {
     return NextResponse.redirect(
-      new URL("/login", request.url),
+      new URL("/login", request.url)
     );
   }
 
@@ -39,9 +36,6 @@ export const config = {
     "/tellen/:path*",
     "/historie/:path*",
     "/producten/:path*",
-    "/medewerkers/:path*",
-    "/planning/:path*",
     "/weektaken/:path*",
-    "/instellingen/:path*",
   ],
 };

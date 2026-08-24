@@ -20,29 +20,9 @@ const MENU = [
     titel: "Historie",
   },
   {
-    href: "/producten",
-    icoon: "🛒",
-    titel: "Producten",
-  },
-  {
-    href: "/medewerkers",
-    icoon: "👥",
-    titel: "Medewerkers",
-  },
-  {
-    href: "/planning",
-    icoon: "📅",
-    titel: "Planning",
-  },
-  {
     href: "/weektaken",
     icoon: "✅",
     titel: "Weektaken",
-  },
-  {
-    href: "/instellingen",
-    icoon: "⚙️",
-    titel: "Instellingen",
   },
 ];
 
@@ -51,7 +31,6 @@ export default function AppSidebar() {
 
   return (
     <aside className="flex h-screen w-72 flex-col border-r bg-white">
-
       <div className="border-b px-6 py-6">
         <h2 className="text-2xl font-bold">
           Clevers
@@ -63,9 +42,7 @@ export default function AppSidebar() {
       </div>
 
       <nav className="flex-1 p-4">
-
         <ul className="space-y-2">
-
           {MENU.map((item) => {
             const actief =
               pathname === item.href ||
@@ -92,11 +69,8 @@ export default function AppSidebar() {
               </li>
             );
           })}
-
         </ul>
-
       </nav>
-
     </aside>
   );
 }

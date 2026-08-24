@@ -1,5 +1,3 @@
-import { genereerBestelPdf } from "@/lib/genereerPdf";
-
 import type {
   BestelAdvies,
   Vestiging,
@@ -12,64 +10,83 @@ interface OpslaanParams {
   advies: BestelAdvies[];
 }
 
+function vestigingNaam(
+  vestiging: Vestiging
+): string {
+  switch (vestiging) {
+    case "roermond":
+      return "Roermond";
+
+    case "nijmegen":
+      return "Nijmegen";
+
+    default:
+      return vestiging;
+  }
+}
+
 export async function opslaanBestelling({
   vestiging,
   medewerker,
   opmerking,
   advies,
 }: OpslaanParams) {
+  if (!medewerker.trim()) {
+    throw new Error(
+      "Vul de naam van de medewerker in."
+    );
+  }
+
   const datum =
     new Date().toISOString();
 
-  const regels =
-    advies.map(
-      (regel) => ({
-        productId:
-          regel.id,
+  const regels = advies.map(
+    (regel) => ({
+      productId: regel.id,
 
-        productNaam:
-          regel.naam,
+      productNaam:
+        regel.naam,
 
-        geteld:
-          regel.geteld,
+      geteld:
+        regel.geteld,
 
-        buffer:
-          regel.buffer,
+      buffer:
+        regel.buffer,
 
-        besteld:
-          regel.bestellen,
+      besteld:
+        regel.bestellen,
 
-        bestelGroep:
-          regel.bestelGroep,
-      })
-    );
+      bestelGroep:
+        regel.bestelGroep,
+    })
+  );
 
-  const response =
-    await fetch(
-      "/api/bestelling",
-      {
-        method: "POST",
+  const response = await fetch(
+    "/api/bestelling",
+    {
+      method: "POST",
 
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
+      headers: {
+        "Content-Type":
+          "application/json",
+      },
 
-        body: JSON.stringify({
-          datum,
+      body: JSON.stringify({
+        datum,
 
-          vestiging,
+        vestiging:
+          vestigingNaam(vestiging),
 
-          medewerker,
+        medewerker:
+          medewerker.trim(),
 
-          type: "telling",
+        opmerking:
+          opmerking.trim(),
 
-          opmerking,
-
-          regels,
-        }),
-      }
-    );
+        regels,
+      }),
+    }
+  );
 
   const result =
     await response.json();
@@ -77,17 +94,9 @@ export async function opslaanBestelling({
   if (!response.ok) {
     throw new Error(
       result.error ??
-        "Opslaan mislukt."
+        "Versturen mislukt."
     );
   }
-
-  genereerBestelPdf({
-    vestiging,
-
-    datum,
-
-    bestelling: advies,
-  });
 
   return result;
 }
