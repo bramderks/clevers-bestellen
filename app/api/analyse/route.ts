@@ -6,14 +6,29 @@ import { normaliseerArtikelen } from "@/lib/normaliseerArtikelen";
 import { valideerArtikelen } from "@/lib/validator";
 import { OCRArtikel } from "@/types";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
-
 export async function POST(request: Request) {
   console.log("========== ANALYSE GESTART ==========");
 
   try {
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (!apiKey) {
+      console.error("OPENAI_API_KEY ontbreekt.");
+
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "OpenAI is niet geconfigureerd. OPENAI_API_KEY ontbreekt.",
+        },
+        { status: 500 }
+      );
+    }
+
+    const openai = new OpenAI({
+      apiKey,
+    });
+
     const formData = await request.formData();
 
     const image = formData.get("image") as File | null;
@@ -77,7 +92,9 @@ export async function POST(request: Request) {
     console.log("========== AI ARTIKELEN ==========");
     console.table(json.artikelen);
 
-    const artikelen = normaliseerArtikelen(json.artikelen ?? []);
+    const artikelen = normaliseerArtikelen(
+      json.artikelen ?? []
+    );
 
     console.log("========== GENORMALISEERD ==========");
     console.table(artikelen);
@@ -112,16 +129,23 @@ export async function POST(request: Request) {
       artikelen,
       opmerkingen: json.opmerkingen ?? [],
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(error);
+
+    const err = error as {
+      message?: string;
+      status?: number;
+      code?: string;
+      type?: string;
+    };
 
     return NextResponse.json(
       {
         success: false,
-        message: error.message,
-        status: error.status,
-        code: error.code,
-        type: error.type,
+        message: err.message ?? "Onbekende fout.",
+        status: err.status,
+        code: err.code,
+        type: err.type,
       },
       { status: 500 }
     );
