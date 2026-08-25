@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import TaakRij from "./TaakRij";
 
-type Taak = {
+export type Taak = {
   id: string;
-  taak: string;
-  categorie: string;
+  titel: string;
+  categorie: string | null;
+  omschrijving: string | null;
+  prioriteit: string | null;
   voltooid: boolean;
-  naam: string | null;
   voltooidOp: string | null;
 };
 
@@ -26,7 +27,6 @@ export default function CategorieBlok({
   onUpdate,
 }: Props) {
   const [open, setOpen] = useState(true);
-
   const [takenState, setTakenState] =
     useState<Taak[]>(taken);
 
@@ -36,10 +36,10 @@ export default function CategorieBlok({
 
   useEffect(() => {
     const handler = (event: Event) => {
-      const custom =
+      const customEvent =
         event as CustomEvent<boolean>;
 
-      setOpen(custom.detail);
+      setOpen(customEvent.detail);
     };
 
     window.addEventListener(
@@ -55,16 +55,13 @@ export default function CategorieBlok({
     };
   }, []);
 
-  const totaal =
-    takenState.length;
+  const totaal = takenState.length;
 
-  const gereed =
-    takenState.filter(
-      (t) => t.voltooid
-    ).length;
+  const gereed = takenState.filter(
+    (taak) => taak.voltooid
+  ).length;
 
-  const openTaken =
-    totaal - gereed;
+  const openTaken = totaal - gereed;
 
   const percentage =
     totaal === 0
@@ -88,8 +85,8 @@ export default function CategorieBlok({
     if (
       a.voltooid === b.voltooid
     ) {
-      return a.taak.localeCompare(
-        b.taak,
+      return a.titel.localeCompare(
+        b.titel,
         "nl"
       );
     }
@@ -97,12 +94,36 @@ export default function CategorieBlok({
     return a.voltooid ? 1 : -1;
   });
 
+  const updateTaak = (
+    id: string,
+    naam: string,
+    datum: string
+  ) => {
+    setTakenState((vorige) => {
+      const nieuw = vorige.map(
+        (bestaandeTaak) =>
+          bestaandeTaak.id === id
+            ? {
+                ...bestaandeTaak,
+                voltooid: true,
+                naam: naam ?? null,
+                voltooidOp: datum,
+              }
+            : bestaandeTaak
+      );
+
+      onUpdate?.(nieuw);
+
+      return nieuw;
+    });
+  };
+
   return (
     <section className="mb-8 overflow-hidden rounded-2xl border bg-white shadow-sm">
       <button
         type="button"
         onClick={() =>
-          setOpen(!open)
+          setOpen((vorige) => !vorige)
         }
         className="flex w-full items-center justify-between bg-blue-700 px-6 py-5 text-left text-white transition hover:bg-blue-800"
       >
@@ -122,7 +143,8 @@ export default function CategorieBlok({
               {percentage}%
             </div>
 
-            {gereed === totaal ? (
+            {totaal > 0 &&
+            gereed === totaal ? (
               <div className="rounded-full bg-green-500 px-4 py-1 text-sm font-bold text-white">
                 ✅ Gereed
               </div>
@@ -168,7 +190,7 @@ export default function CategorieBlok({
 
       {open && (
         <>
-          <div className="hidden md:grid grid-cols-[80px_1fr_220px_180px] border-b bg-slate-100 px-4 py-3 font-semibold">
+          <div className="hidden grid-cols-[80px_1fr_220px_180px] border-b bg-slate-100 px-4 py-3 font-semibold md:grid">
             <div>Gereed</div>
             <div>Taak</div>
             <div>Medewerker</div>
@@ -181,38 +203,10 @@ export default function CategorieBlok({
                 <TaakRij
                   key={taak.id}
                   taak={taak}
-                  afgesloten={
-                    afgesloten
+                  afgesloten={afgesloten}
+                  onVoltooid={
+                    updateTaak
                   }
-                  onVoltooid={(
-                    id,
-                    naam,
-                    datum
-                  ) => {
-                    setTakenState(
-                      (vorige) => {
-                        const nieuw =
-                          vorige.map(
-                            (t) =>
-                              t.id === id
-                                ? {
-                                    ...t,
-                                    voltooid: true,
-                                    naam,
-                                    voltooidOp:
-                                      datum,
-                                  }
-                                : t
-                          );
-
-                        onUpdate?.(
-                          nieuw
-                        );
-
-                        return nieuw;
-                      }
-                    );
-                  }}
                 />
               )
             )}

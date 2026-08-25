@@ -4,14 +4,15 @@ import TopBar from "@/components/TopBar";
 import { prisma } from "@/lib/prisma";
 
 export default async function BestellingenHistorie() {
-  const bestellingen = await prisma.bestelling.findMany({
-    include: {
-      vestiging: true,
-    },
-    orderBy: {
-      datum: "desc",
-    },
-  });
+  const bestellingen =
+    await prisma.bestelling.findMany({
+      include: {
+        vestiging: true,
+      },
+      orderBy: {
+        besteldatum: "desc",
+      },
+    });
 
   return (
     <main className="min-h-screen bg-slate-100 p-6 md:p-8">
@@ -24,7 +25,8 @@ export default async function BestellingenHistorie() {
           </h1>
 
           <p className="mt-2 text-gray-500">
-            Overzicht van alle opgeslagen bestellingen.
+            Overzicht van alle opgeslagen
+            bestellingen.
           </p>
         </div>
 
@@ -41,7 +43,7 @@ export default async function BestellingenHistorie() {
                 </th>
 
                 <th className="px-6 py-4 text-left">
-                  Type
+                  Status
                 </th>
 
                 <th className="px-6 py-4 text-right">
@@ -51,45 +53,51 @@ export default async function BestellingenHistorie() {
             </thead>
 
             <tbody>
-              {bestellingen.map((bestelling) => (
-                <tr
-                  key={bestelling.id}
-                  className="border-t hover:bg-slate-50"
-                >
-                  <td className="px-6 py-4">
-                    {new Date(
-                      bestelling.datum
-                    ).toLocaleDateString("nl-NL")}
-                  </td>
+              {bestellingen.map(
+                (bestelling) => (
+                  <tr
+                    key={bestelling.id}
+                    className="border-t hover:bg-slate-50"
+                  >
+                    <td className="px-6 py-4">
+                      {new Date(
+                        bestelling.besteldatum
+                      ).toLocaleDateString(
+                        "nl-NL"
+                      )}
+                    </td>
 
-                  <td className="px-6 py-4">
-                    {bestelling.vestigingSnapshot ??
-                      bestelling.vestiging?.naam ??
-                      "-"}
-                  </td>
+                    <td className="px-6 py-4">
+                      {bestelling.vestiging
+                        ?.naam ?? "-"}
+                    </td>
 
-                  <td className="px-6 py-4">
-                    {bestelling.type}
-                  </td>
+                    <td className="px-6 py-4">
+                      {bestelling.status}
+                    </td>
 
-                  <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/historie/bestellingen/${bestelling.id}`}
-                      className="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
-                    >
-                      Openen
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+                    <td className="px-6 py-4 text-right">
+                      <Link
+                        href={`/historie/bestellingen/${bestelling.id}`}
+                        className="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+                      >
+                        Openen
+                      </Link>
+                    </td>
+                  </tr>
+                )
+              )}
 
-              {bestellingen.length === 0 && (
+              {bestellingen.length ===
+                0 && (
                 <tr>
                   <td
                     colSpan={4}
                     className="px-6 py-10 text-center text-gray-500"
                   >
-                    Er zijn nog geen bestellingen opgeslagen.
+                    Er zijn nog geen
+                    bestellingen
+                    opgeslagen.
                   </td>
                 </tr>
               )}

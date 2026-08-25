@@ -3,26 +3,17 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 interface HistorieInput {
-  bestellingId?: number;
   gebruikerId?: string;
   vestigingId?: string;
-
   type: string;
   gebeurtenis: string;
-
   omschrijving?: string;
-
   details?: Prisma.InputJsonValue | null;
-
   ipAdres?: string;
   userAgent?: string;
-
-  appVersie?: string;
-  buildVersie?: string;
 }
 
 export async function schrijfHistorie({
-  bestellingId,
   gebruikerId,
   vestigingId,
   type,
@@ -31,25 +22,18 @@ export async function schrijfHistorie({
   details,
   ipAdres,
   userAgent,
-  appVersie,
-  buildVersie,
 }: HistorieInput) {
-  return prisma.historie.create({
+  return prisma.activiteit.create({
     data: {
-      bestellingId,
       gebruikerId,
       vestigingId,
-      type,
-      gebeurtenis,
-      omschrijving,
-      details:
+      module: type,
+      actie: gebeurtenis,
+      entiteit: omschrijving,
+      metadata:
         details === null
           ? Prisma.JsonNull
           : details,
-      ipAdres,
-      userAgent,
-      appVersie,
-      buildVersie,
     },
   });
 }

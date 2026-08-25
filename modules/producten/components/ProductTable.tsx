@@ -9,9 +9,24 @@ import {
   Table,
 } from "@/modules/shared/ui";
 
-import type {
-  Product,
-} from "../types/product";
+interface Product {
+  id: string;
+  naam: string;
+  actief: boolean;
+  buffer: number;
+  volgorde: number;
+
+  categorie: {
+    id: string;
+    naam: string;
+    volgorde: number;
+  };
+
+  leverancier: {
+    id: string;
+    naam: string;
+  } | null;
+}
 
 interface Props {
   producten: Product[];
@@ -56,18 +71,16 @@ export default function ProductTable({
               return product.naam;
 
             case "categorie":
-              return product.categorie;
+              return product.categorie.naam;
 
             case "leverancier":
               return (
-                product.leverancier ??
+                product.leverancier?.naam ??
                 "-"
               );
 
             case "buffer":
-              return (
-                product.standaardBuffer
-              );
+              return product.buffer;
 
             case "status":
               return product.actief ? (

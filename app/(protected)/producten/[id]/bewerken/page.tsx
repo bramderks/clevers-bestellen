@@ -24,6 +24,10 @@ export default async function BewerkProductPagina({
       where: {
         id,
       },
+      include: {
+        categorie: true,
+        leverancier: true,
+      },
     });
 
   if (!product) {
@@ -31,7 +35,7 @@ export default async function BewerkProductPagina({
   }
 
   async function opslaan(
-    data: ProductFormData
+    data: ProductFormData,
   ) {
     "use server";
 
@@ -44,12 +48,12 @@ export default async function BewerkProductPagina({
             "application/json",
         },
         body: JSON.stringify(data),
-      }
+      },
     );
 
     if (!response.ok) {
       throw new Error(
-        "Product kon niet worden bijgewerkt."
+        "Product kon niet worden bijgewerkt.",
       );
     }
   }
@@ -59,43 +63,50 @@ export default async function BewerkProductPagina({
       initialData={{
         naam: product.naam,
 
-        zoekNaam:
-          product.zoekNaam ?? "",
+        categorieId:
+          product.categorieId,
 
-        categorie:
-          product.categorie,
+        leverancierId:
+          product.leverancierId ?? "",
 
-        bestelBij:
-          product.bestelBij ?? "",
+        code:
+          product.code ?? "",
 
-        leverancier:
-          product.leverancier ?? "",
+        omschrijving:
+          product.omschrijving ?? "",
 
-        artikelNummer:
-          product.artikelNummer ??
-          "",
+        type:
+          product.type,
 
-        barcode:
-          product.barcode ?? "",
+        bestelEenheid:
+          product.bestelEenheid ?? "",
 
-        eenheid:
-          product.eenheid ?? "",
+        bestelAantal:
+          product.bestelAantal,
 
-        standaardBuffer:
-          product.standaardBuffer,
+        buffer:
+          product.buffer,
 
-        volgorde:
-          product.volgorde,
+        minimumVoorraad:
+          product.minimumVoorraad,
+
+        maximumVoorraad:
+          product.maximumVoorraad,
+
+        vitrineProduct:
+          product.vitrineProduct,
+
+        seizoensProduct:
+          product.seizoensProduct,
+
+        bestelbaar:
+          product.bestelbaar,
 
         actief:
           product.actief,
 
-        opmerking:
-          product.opmerking ?? "",
-
-        alternatieveNamen:
-          product.alternatieveNamen ??
-          null,
+        volgorde:
+          product.volgorde,
       }}
       onSubmit={opslaan}
     />

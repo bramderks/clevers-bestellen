@@ -14,13 +14,9 @@ export async function PATCH(
   { params }: Params
 ) {
   try {
-    const { id } =
-      await params;
+    const { id } = await params;
 
-    const {
-      naam,
-      voltooid,
-    } = await req.json();
+    const body = await req.json();
 
     const bestaandeTaak =
       await prisma.weekTaak.findUnique({
@@ -36,8 +32,7 @@ export async function PATCH(
       return NextResponse.json(
         {
           success: false,
-          error:
-            "Taak niet gevonden.",
+          error: "Taak niet gevonden.",
         },
         {
           status: 404,
@@ -45,10 +40,7 @@ export async function PATCH(
       );
     }
 
-    if (
-      bestaandeTaak.week
-        .afgesloten
-    ) {
+    if (bestaandeTaak.week.afgesloten) {
       return NextResponse.json(
         {
           success: false,
@@ -61,26 +53,74 @@ export async function PATCH(
       );
     }
 
+    const data: {
+      titel?: string;
+      categorie?: string | null;
+      omschrijving?: string | null;
+      prioriteit?: string | null;
+      voltooid?: boolean;
+      voltooidOp?: Date | null;
+    } = {};
+
+    if (body.titel !== undefined) {
+      if (
+        typeof body.titel !== "string" ||
+        !body.titel.trim()
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              "Een titel is verplicht.",
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+
+      data.titel = body.titel.trim();
+    }
+
+    if (body.categorie !== undefined) {
+      data.categorie =
+        typeof body.categorie === "string"
+          ? body.categorie.trim() || null
+          : null;
+    }
+
+    if (body.omschrijving !== undefined) {
+      data.omschrijving =
+        typeof body.omschrijving === "string"
+          ? body.omschrijving.trim() || null
+          : null;
+    }
+
+    if (body.prioriteit !== undefined) {
+      data.prioriteit =
+        typeof body.prioriteit === "string"
+          ? body.prioriteit.trim() || null
+          : null;
+    }
+
+    if (body.voltooid !== undefined) {
+      const voltooid = Boolean(
+        body.voltooid
+      );
+
+      data.voltooid = voltooid;
+
+      data.voltooidOp = voltooid
+        ? new Date()
+        : null;
+    }
+
     const taak =
       await prisma.weekTaak.update({
         where: {
           id,
         },
-        data: {
-          naam:
-            naam?.trim() ??
-            null,
-
-          voltooid:
-            Boolean(
-              voltooid
-            ),
-
-          voltooidOp:
-            voltooid
-              ? new Date()
-              : null,
-        },
+        data,
       });
 
     return NextResponse.json({

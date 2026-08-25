@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import TopBar from "@/components/TopBar";
 import { prisma } from "@/lib/prisma";
 
@@ -10,11 +11,12 @@ export default async function HistorieHome() {
     laatsteWeek,
   ] = await Promise.all([
     prisma.bestelling.count(),
+
     prisma.week.count(),
 
     prisma.bestelling.findFirst({
       orderBy: {
-        datum: "desc",
+        besteldatum: "desc",
       },
     }),
 
@@ -41,7 +43,8 @@ export default async function HistorieHome() {
           </h1>
 
           <p className="mt-2 text-gray-500">
-            Overzicht van alle opgeslagen gegevens.
+            Overzicht van alle opgeslagen
+            gegevens.
           </p>
         </div>
 
@@ -70,8 +73,10 @@ export default async function HistorieHome() {
             <div className="text-lg font-bold">
               {laatsteBestelling
                 ? new Date(
-                    laatsteBestelling.datum
-                  ).toLocaleDateString("nl-NL")
+                    laatsteBestelling.besteldatum
+                  ).toLocaleDateString(
+                    "nl-NL"
+                  )
                 : "-"}
             </div>
 
@@ -103,7 +108,8 @@ export default async function HistorieHome() {
             </h2>
 
             <p className="mb-6 text-gray-500">
-              Bekijk alle opgeslagen bestellingen.
+              Bekijk alle opgeslagen
+              bestellingen.
             </p>
 
             <div className="text-4xl font-bold text-blue-700">
@@ -120,7 +126,8 @@ export default async function HistorieHome() {
             </h2>
 
             <p className="mb-6 text-gray-500">
-              Bekijk de historie van alle weektaken.
+              Bekijk de historie van alle
+              weektaken.
             </p>
 
             <div className="text-4xl font-bold text-green-700">

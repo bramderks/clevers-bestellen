@@ -10,9 +10,7 @@ import {
   Textarea,
 } from "@/modules/shared/ui";
 
-import type {
-  ProductFormData,
-} from "../types/product";
+import type { ProductFormData } from "../types/product";
 
 interface Props {
   initialData?: Partial<ProductFormData>;
@@ -34,54 +32,55 @@ export default function ProductForm({
       naam:
         initialData?.naam ?? "",
 
-      zoekNaam:
-        initialData?.zoekNaam ?? "",
+      categorieId:
+        initialData?.categorieId ?? "",
 
-      categorie:
-        initialData?.categorie ?? "",
+      leverancierId:
+        initialData?.leverancierId ?? "",
 
-      bestelBij:
-        initialData?.bestelBij ?? "",
+      code:
+        initialData?.code ?? "",
 
-      leverancier:
-        initialData?.leverancier ?? "",
+      omschrijving:
+        initialData?.omschrijving ?? "",
 
-      artikelNummer:
-        initialData?.artikelNummer ??
-        "",
+      type:
+        initialData?.type ?? "",
 
-      barcode:
-        initialData?.barcode ?? "",
+      bestelEenheid:
+        initialData?.bestelEenheid ?? "",
 
-      eenheid:
-        initialData?.eenheid ?? "",
+      bestelAantal:
+        initialData?.bestelAantal ?? 1,
 
-      standaardBuffer:
-        initialData?.standaardBuffer ??
-        0,
+      buffer:
+        initialData?.buffer ?? 0,
 
-      volgorde:
-        initialData?.volgorde ?? 0,
+      minimumVoorraad:
+        initialData?.minimumVoorraad ?? 0,
+
+      maximumVoorraad:
+        initialData?.maximumVoorraad ?? null,
+
+      vitrineProduct:
+        initialData?.vitrineProduct ?? false,
+
+      seizoensProduct:
+        initialData?.seizoensProduct ?? false,
+
+      bestelbaar:
+        initialData?.bestelbaar ?? true,
 
       actief:
         initialData?.actief ?? true,
 
-      opmerking:
-        initialData?.opmerking ?? "",
-
-      alternatieveNamen:
-        initialData?.alternatieveNamen ??
-        null,
+      volgorde:
+        initialData?.volgorde ?? 0,
     });
 
-  function wijzig(
-    veld: keyof ProductFormData,
-    waarde:
-      | string
-      | number
-      | boolean
-      | null
-      | unknown,
+  function wijzig<K extends keyof ProductFormData>(
+    veld: K,
+    waarde: ProductFormData[K],
   ) {
     setForm((vorige) => ({
       ...vorige,
@@ -109,7 +108,6 @@ export default function ProductForm({
       className="space-y-6"
     >
       <FormSection titel="Product">
-
         <Input
           label="Naam"
           value={form.naam}
@@ -122,77 +120,35 @@ export default function ProductForm({
         />
 
         <Input
-          label="Zoeknaam"
-          value={form.zoekNaam}
+          label="Productcode"
+          value={form.code ?? ""}
           onChange={(e) =>
             wijzig(
-              "zoekNaam",
+              "code",
               e.target.value,
             )
           }
         />
 
         <Input
-          label="Categorie"
-          value={form.categorie}
+          label="Type"
+          value={form.type}
           onChange={(e) =>
             wijzig(
-              "categorie",
+              "type",
               e.target.value,
             )
           }
         />
 
         <Input
-          label="Bestellen bij"
-          value={form.bestelBij}
-          onChange={(e) =>
-            wijzig(
-              "bestelBij",
-              e.target.value,
-            )
+          label="Besteleenheid"
+          value={
+            form.bestelEenheid ?? ""
           }
-        />
-
-        <Input
-          label="Leverancier"
-          value={form.leverancier}
           onChange={(e) =>
             wijzig(
-              "leverancier",
-              e.target.value,
-            )
-          }
-        />
-
-        <Input
-          label="Artikelnummer"
-          value={form.artikelNummer}
-          onChange={(e) =>
-            wijzig(
-              "artikelNummer",
-              e.target.value,
-            )
-          }
-        />
-
-        <Input
-          label="Barcode"
-          value={form.barcode}
-          onChange={(e) =>
-            wijzig(
-              "barcode",
-              e.target.value,
-            )
-          }
-        />
-
-        <Input
-          label="Eenheid"
-          value={form.eenheid}
-          onChange={(e) =>
-            wijzig(
-              "eenheid",
+              "bestelEenheid",
               e.target.value,
             )
           }
@@ -200,28 +156,160 @@ export default function ProductForm({
 
         <Input
           type="number"
-          label="Standaardbuffer"
-          value={form.standaardBuffer}
+          label="Bestelaantal"
+          value={form.bestelAantal}
+          min={1}
           onChange={(e) =>
             wijzig(
-              "standaardBuffer",
-              Number(
-                e.target.value,
-              ),
+              "bestelAantal",
+              Number(e.target.value) || 1,
             )
           }
+        />
+
+        <Input
+          type="number"
+          label="Buffer"
+          value={form.buffer}
+          min={0}
+          onChange={(e) =>
+            wijzig(
+              "buffer",
+              Number(e.target.value) || 0,
+            )
+          }
+        />
+
+        <Input
+          type="number"
+          label="Minimumvoorraad"
+          value={form.minimumVoorraad}
+          min={0}
+          onChange={(e) =>
+            wijzig(
+              "minimumVoorraad",
+              Number(e.target.value) || 0,
+            )
+          }
+        />
+
+        <Input
+          type="number"
+          label="Maximumvoorraad"
+          value={
+            form.maximumVoorraad ?? ""
+          }
+          min={0}
+          onChange={(e) => {
+            const waarde =
+              e.target.value;
+
+            wijzig(
+              "maximumVoorraad",
+              waarde === ""
+                ? null
+                : Number(waarde),
+            );
+          }}
         />
 
         <Input
           type="number"
           label="Volgorde"
           value={form.volgorde}
+          min={0}
           onChange={(e) =>
             wijzig(
               "volgorde",
-              Number(
-                e.target.value,
-              ),
+              Number(e.target.value) || 0,
+            )
+          }
+        />
+
+        <Textarea
+          label="Omschrijving"
+          value={
+            form.omschrijving ?? ""
+          }
+          onChange={(e) =>
+            wijzig(
+              "omschrijving",
+              e.target.value,
+            )
+          }
+        />
+
+        <Select
+          label="Vitrineproduct"
+          value={
+            form.vitrineProduct
+              ? "true"
+              : "false"
+          }
+          opties={[
+            {
+              waarde: "true",
+              label: "Ja",
+            },
+            {
+              waarde: "false",
+              label: "Nee",
+            },
+          ]}
+          onChange={(e) =>
+            wijzig(
+              "vitrineProduct",
+              e.target.value === "true",
+            )
+          }
+        />
+
+        <Select
+          label="Seizoensproduct"
+          value={
+            form.seizoensProduct
+              ? "true"
+              : "false"
+          }
+          opties={[
+            {
+              waarde: "true",
+              label: "Ja",
+            },
+            {
+              waarde: "false",
+              label: "Nee",
+            },
+          ]}
+          onChange={(e) =>
+            wijzig(
+              "seizoensProduct",
+              e.target.value === "true",
+            )
+          }
+        />
+
+        <Select
+          label="Bestelbaar"
+          value={
+            form.bestelbaar
+              ? "true"
+              : "false"
+          }
+          opties={[
+            {
+              waarde: "true",
+              label: "Ja",
+            },
+            {
+              waarde: "false",
+              label: "Nee",
+            },
+          ]}
+          onChange={(e) =>
+            wijzig(
+              "bestelbaar",
+              e.target.value === "true",
             )
           }
         />
@@ -246,23 +334,10 @@ export default function ProductForm({
           onChange={(e) =>
             wijzig(
               "actief",
-              e.target.value ===
-                "true",
+              e.target.value === "true",
             )
           }
         />
-
-        <Textarea
-          label="Opmerking"
-          value={form.opmerking}
-          onChange={(e) =>
-            wijzig(
-              "opmerking",
-              e.target.value,
-            )
-          }
-        />
-
       </FormSection>
 
       <div className="flex justify-end">

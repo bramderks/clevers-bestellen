@@ -7,13 +7,9 @@ interface AuditInput {
   actie: string;
   entiteit: string;
   entiteitId?: string;
-  succes?: boolean;
-  melding?: string;
   details?: Prisma.InputJsonValue | null;
   ipAdres?: string;
   userAgent?: string;
-  appVersie?: string;
-  buildVersie?: string;
 }
 
 export async function schrijfAudit({
@@ -21,13 +17,9 @@ export async function schrijfAudit({
   actie,
   entiteit,
   entiteitId,
-  succes = true,
-  melding,
   details,
   ipAdres,
   userAgent,
-  appVersie,
-  buildVersie,
 }: AuditInput) {
   return prisma.auditLog.create({
     data: {
@@ -35,16 +27,12 @@ export async function schrijfAudit({
       actie,
       entiteit,
       entiteitId,
-      succes,
-      melding,
       details:
         details === null
           ? Prisma.JsonNull
           : details,
       ipAdres,
       userAgent,
-      appVersie,
-      buildVersie,
     },
   });
 }

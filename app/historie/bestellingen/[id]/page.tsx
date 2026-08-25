@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { prisma } from "@/lib/prisma";
 
 interface Props {
@@ -12,15 +13,20 @@ export default async function BestellingDetail({
 }: Readonly<Props>) {
   const { id } = await params;
 
-  const bestelling = await prisma.bestelling.findUnique({
-    where: {
-      id: Number(id),
-    },
-    include: {
-      regels: true,
-      vestiging: true,
-    },
-  });
+  const bestelling =
+    await prisma.bestelling.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        vestiging: true,
+        regels: {
+          include: {
+            product: true,
+          },
+        },
+      },
+    });
 
   if (!bestelling) {
     return (
@@ -39,15 +45,12 @@ export default async function BestellingDetail({
     );
   }
 
-  const totaal = bestelling.regels.reduce(
-    (som, regel) => som + regel.besteld,
-    0
-  );
-
-  const vestigingNaam =
-    bestelling.vestigingSnapshot ??
-    bestelling.vestiging?.naam ??
-    "-";
+  const totaal =
+    bestelling.regels.reduce(
+      (som, regel) =>
+        som + regel.besteld,
+      0
+    );
 
   return (
     <main className="min-h-screen bg-slate-100 p-10">
@@ -59,8 +62,15 @@ export default async function BestellingDetail({
             </h1>
 
             <p className="text-gray-500">
-              {new Date(bestelling.datum).toLocaleDateString("nl-NL")} •{" "}
-              {vestigingNaam} • {bestelling.type}
+              {new Date(
+                bestelling.besteldatum
+              ).toLocaleDateString(
+                "nl-NL"
+              )}{" "}
+              •{" "}
+              {bestelling.vestiging?.naam ??
+                "-"}{" "}
+              • {bestelling.status}
             </p>
           </div>
 
@@ -78,12 +88,15 @@ export default async function BestellingDetail({
               <th className="py-3 text-left">
                 Product
               </th>
+
               <th className="text-right">
                 Geteld
               </th>
+
               <th className="text-right">
                 Buffer
               </th>
+
               <th className="text-right">
                 Besteld
               </th>
@@ -91,33 +104,36 @@ export default async function BestellingDetail({
           </thead>
 
           <tbody>
-            {bestelling.regels.map((regel) => (
-              <tr
-                key={regel.id}
-                className="border-b"
-              >
-                <td className="py-2">
-                  {regel.productNaam}
-                </td>
+            {bestelling.regels.map(
+              (regel) => (
+                <tr
+                  key={regel.id}
+                  className="border-b"
+                >
+                  <td className="py-2">
+                    {regel.product.naam}
+                  </td>
 
-                <td className="text-right">
-                  {regel.geteld}
-                </td>
+                  <td className="text-right">
+                    {regel.geteld}
+                  </td>
 
-                <td className="text-right">
-                  {regel.buffer}
-                </td>
+                  <td className="text-right">
+                    {regel.buffer}
+                  </td>
 
-                <td className="text-right font-semibold">
-                  {regel.besteld}
-                </td>
-              </tr>
-            ))}
+                  <td className="text-right font-semibold">
+                    {regel.besteld}
+                  </td>
+                </tr>
+              )
+            )}
           </tbody>
         </table>
 
         <div className="mt-8 text-right text-xl font-bold">
-          Totaal te bestellen: {totaal}
+          Totaal te bestellen:{" "}
+          {totaal}
         </div>
       </div>
     </main>

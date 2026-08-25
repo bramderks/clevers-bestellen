@@ -10,6 +10,9 @@ export async function initialiseerWeektaken(
         where: {
           id: weekId,
         },
+        include: {
+          vestiging: true,
+        },
       });
 
     if (!week) {
@@ -27,33 +30,43 @@ export async function initialiseerWeektaken(
         },
         select: {
           categorie: true,
-          taak: true,
+          titel: true,
         },
       });
 
     const bestaandeSet = new Set(
       bestaandeTaken.map(
         (taak) =>
-          `${taak.categorie}|${taak.taak}`
+          `${taak.categorie ?? ""}|${taak.titel}`
       )
     );
 
+    /*
+     * Op dit moment is alleen de weektakenlijst
+     * van Nijmegen beschikbaar.
+     *
+     * Zodra Roermond een eigen takenbestand krijgt,
+     * kan hier eenvoudig tussen de twee lijsten
+     * worden gekozen.
+     */
     const taken =
-      week.vestigingSnapshot ===
-      "Roermond"
+      week.vestiging?.naam === "Roermond"
         ? weektakenNijmegen
         : weektakenNijmegen;
 
     const nieuweTaken: {
       weekId: string;
-      categorie: string;
-      taak: string;
+      categorie: string | null;
+      titel: string;
+      omschrijving: string | null;
       voltooid: boolean;
     }[] = [];
 
     for (const categorie of taken) {
       for (const taak of categorie.taken) {
-        const sleutel = `${categorie.categorie}|${taak.taak}`;
+        const sleutel = `${
+          categorie.categorie ?? ""
+        }|${taak.taak}`;
 
         if (bestaandeSet.has(sleutel)) {
           continue;
@@ -62,18 +75,21 @@ export async function initialiseerWeektaken(
         nieuweTaken.push({
           weekId,
           categorie:
-            categorie.categorie,
-          taak: taak.taak,
+            categorie.categorie ?? null,
+          titel: taak.taak,
+          omschrijving: null,
           voltooid: false,
         });
       }
     }
 
-    if (nieuweTaken.length > 0) {
-      await prisma.weekTaak.createMany({
-        data: nieuweTaken,
-      });
+    if (nieuweTaken.length === 0) {
+      return;
     }
+
+    await prisma.weekTaak.createMany({
+      data: nieuweTaken,
+    });
   } catch (error) {
     console.error(
       "❌ Fout bij initialiseren van weektaken:"

@@ -1,71 +1,63 @@
 export interface Product {
   id: string;
 
+  categorieId: string;
+  leverancierId: string | null;
+
+  code: string | null;
+
   naam: string;
+  omschrijving: string | null;
 
-  zoekNaam: string | null;
+  type: string;
 
-  categorie: string;
+  bestelEenheid: string | null;
+  bestelAantal: number;
 
-  bestelBij: string | null;
+  buffer: number;
+  minimumVoorraad: number;
+  maximumVoorraad: number | null;
 
-  leverancier: string | null;
-
-  artikelNummer: string | null;
-
-  barcode: string | null;
-
-  eenheid: string | null;
-
-  opmerking: string | null;
-
+  vitrineProduct: boolean;
+  seizoensProduct: boolean;
+  bestelbaar: boolean;
   actief: boolean;
-
-  standaardBuffer: number;
 
   volgorde: number;
 
-  alternatieveNamen: unknown | null;
-
   aangemaaktOp: Date;
-
   gewijzigdOp: Date;
 }
 
 export interface ProductFormData {
   naam: string;
 
-  zoekNaam: string;
+  categorieId: string;
+  leverancierId: string;
 
-  categorie: string;
+  code: string;
+  omschrijving: string;
 
-  bestelBij: string;
+  type: string;
 
-  leverancier: string;
+  bestelEenheid: string;
+  bestelAantal: number;
 
-  artikelNummer: string;
+  buffer: number;
+  minimumVoorraad: number;
+  maximumVoorraad: number | null;
 
-  barcode: string;
-
-  eenheid: string;
-
-  standaardBuffer: number;
-
-  volgorde: number;
-
+  vitrineProduct: boolean;
+  seizoensProduct: boolean;
+  bestelbaar: boolean;
   actief: boolean;
 
-  opmerking: string;
-
-  alternatieveNamen: unknown | null;
+  volgorde: number;
 }
 
 export interface ProductFilter {
   zoekterm: string;
-
-  categorie: string;
-
-  leverancier: string;
-
+  categorieId: string;
+  leverancierId: string;
   status: string;
 }

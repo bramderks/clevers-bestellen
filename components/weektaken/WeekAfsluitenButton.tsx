@@ -19,7 +19,7 @@ export default function WeekAfsluitenButton({
       return;
     }
 
-    const akkoord = confirm(
+    const akkoord = window.confirm(
       "Weet je zeker dat je deze week definitief wilt afsluiten?\n\nHierna kunnen geen taken meer worden gewijzigd."
     );
 
@@ -44,15 +44,31 @@ export default function WeekAfsluitenButton({
         }
       );
 
-      if (!res.ok) {
-        throw new Error();
+      const data =
+        await res.json().catch(
+          () => null
+        );
+
+      if (!res.ok || !data?.success) {
+        throw new Error(
+          data?.error ??
+            "Het afsluiten van de week is mislukt."
+        );
       }
 
-      location.reload();
-    } catch {
-      alert(
-        "Het afsluiten van de week is mislukt."
+      window.location.reload();
+    } catch (error) {
+      console.error(
+        "❌ Fout bij afsluiten week:",
+        error
       );
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Het afsluiten van de week is mislukt."
+      );
+
       setLaden(false);
     }
   }
@@ -68,7 +84,9 @@ export default function WeekAfsluitenButton({
   return (
     <button
       type="button"
-      onClick={afsluiten}
+      onClick={() =>
+        void afsluiten()
+      }
       disabled={laden}
       className="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
     >

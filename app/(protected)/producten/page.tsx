@@ -13,9 +13,15 @@ import ProductTable from "@/modules/producten/components/ProductTable";
 export default async function ProductenPagina() {
   const producten =
     await prisma.product.findMany({
+      include: {
+        categorie: true,
+        leverancier: true,
+      },
       orderBy: [
         {
-          categorie: "asc",
+          categorie: {
+            volgorde: "asc",
+          },
         },
         {
           volgorde: "asc",
@@ -26,33 +32,34 @@ export default async function ProductenPagina() {
       ],
     });
 
-  const categorieen =
-    [
-      ...new Set(
-        producten.map(
-          (product) =>
-            product.categorie
-        )
-      ),
-    ].sort();
+  const categorieen = [
+    ...new Set(
+      producten.map(
+        (product) =>
+          product.categorie.naam
+      )
+    ),
+  ].sort((a, b) =>
+    a.localeCompare(b, "nl")
+  );
 
-  const leveranciers =
-    [
-      ...new Set(
-        producten
-          .map(
-            (product) =>
-              product.leverancier
-          )
-          .filter(
-            (
-              leverancier
-            ): leverancier is string =>
-              leverancier !==
-              null
-          ),
-      ),
-    ].sort();
+  const leveranciers = [
+    ...new Set(
+      producten
+        .map(
+          (product) =>
+            product.leverancier?.naam
+        )
+        .filter(
+          (
+            leverancier
+          ): leverancier is string =>
+            Boolean(leverancier)
+        )
+    ),
+  ].sort((a, b) =>
+    a.localeCompare(b, "nl")
+  );
 
   return (
     <>
@@ -73,12 +80,8 @@ export default async function ProductenPagina() {
         categorie=""
         leverancier=""
         status=""
-        categorieen={
-          categorieen
-        }
-        leveranciers={
-          leveranciers
-        }
+        categorieen={categorieen}
+        leveranciers={leveranciers}
         onZoektermChange={() => {}}
         onCategorieChange={() => {}}
         onLeverancierChange={() => {}}
@@ -86,9 +89,7 @@ export default async function ProductenPagina() {
       />
 
       <ProductTable
-        producten={
-          producten
-        }
+        producten={producten}
       />
     </>
   );

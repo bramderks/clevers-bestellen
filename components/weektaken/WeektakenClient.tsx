@@ -5,10 +5,11 @@ import CategorieBlok from "@/components/weektaken/CategorieBlok";
 
 type Taak = {
   id: string;
-  taak: string;
-  categorie: string;
+  titel: string;
+  categorie: string | null;
+  omschrijving: string | null;
+  prioriteit: string | null;
   voltooid: boolean;
-  naam: string | null;
   voltooidOp: string | null;
 };
 

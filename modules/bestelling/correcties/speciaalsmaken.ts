@@ -9,28 +9,35 @@ export interface SpeciaalSmaak {
 export async function haalSpeciaalsmakenOp(
   vestigingId: string,
 ): Promise<SpeciaalSmaak[]> {
-  const buffers = await prisma.productBuffer.findMany({
-    where: {
-      vestigingId,
-      product: {
-        actief: true,
-        categorie: "SPECIAAL",
+  const buffers =
+    await prisma.productBuffer.findMany({
+      where: {
+        vestigingId,
+        product: {
+          actief: true,
+          categorie: {
+            naam: "SPECIAAL",
+          },
+        },
       },
-    },
-    include: {
-      product: true,
-    },
-    orderBy: {
-      product: {
-        naam: "asc",
+      include: {
+        product: {
+          include: {
+            categorie: true,
+          },
+        },
       },
-    },
-  });
+      orderBy: {
+        product: {
+          naam: "asc",
+        },
+      },
+    });
 
   return buffers.map((buffer) => ({
     productId: buffer.product.id,
     naam: buffer.product.naam,
-    categorie: buffer.product.categorie,
+    categorie: buffer.product.categorie.naam,
   }));
 }
 
@@ -39,10 +46,13 @@ export async function isSpeciaalSmaak(
   productId: string,
 ): Promise<boolean> {
   const producten =
-    await haalSpeciaalsmakenOp(vestigingId);
+    await haalSpeciaalsmakenOp(
+      vestigingId,
+    );
 
   return producten.some(
-    (product) => product.productId === productId,
+    (product) =>
+      product.productId === productId,
   );
 }
 
@@ -50,7 +60,9 @@ export async function aantalSpeciaalsmaken(
   vestigingId: string,
 ): Promise<number> {
   const producten =
-    await haalSpeciaalsmakenOp(vestigingId);
+    await haalSpeciaalsmakenOp(
+      vestigingId,
+    );
 
   return producten.length;
 }
@@ -59,7 +71,9 @@ export async function namenSpeciaalsmaken(
   vestigingId: string,
 ): Promise<string[]> {
   const producten =
-    await haalSpeciaalsmakenOp(vestigingId);
+    await haalSpeciaalsmakenOp(
+      vestigingId,
+    );
 
   return producten.map(
     (product) => product.naam,

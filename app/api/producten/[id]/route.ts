@@ -14,31 +14,44 @@ export async function GET(
   _: NextRequest,
   { params }: Context
 ) {
-  const { id } =
-    await params;
+  try {
+    const { id } = await params;
 
-  const product =
-    await prisma.product.findUnique({
-      where: {
-        id,
-      },
-    });
+    const product =
+      await prisma.product.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          categorie: true,
+          leverancier: true,
+        },
+      });
 
-  if (!product) {
+    if (!product) {
+      return NextResponse.json(
+        {
+          error: "Product niet gevonden.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error(error);
+
     return NextResponse.json(
       {
-        error:
-          "Product niet gevonden.",
+        error: "Product kon niet worden opgehaald.",
       },
       {
-        status: 404,
+        status: 500,
       }
     );
   }
-
-  return NextResponse.json(
-    product
-  );
 }
 
 export async function PATCH(
@@ -46,11 +59,27 @@ export async function PATCH(
   { params }: Context
 ) {
   try {
-    const { id } =
-      await params;
+    const { id } = await params;
 
-    const body =
-      await request.json();
+    const body = await request.json();
+
+    const bestaand =
+      await prisma.product.findUnique({
+        where: {
+          id,
+        },
+      });
+
+    if (!bestaand) {
+      return NextResponse.json(
+        {
+          error: "Product niet gevonden.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
 
     const product =
       await prisma.product.update({
@@ -60,84 +89,132 @@ export async function PATCH(
 
         data: {
           naam:
-            body.naam.trim(),
+            typeof body.naam === "string"
+              ? body.naam.trim()
+              : bestaand.naam,
 
-          zoekNaam:
-            body.zoekNaam?.trim() ??
-            null,
+          omschrijving:
+            typeof body.omschrijving === "string"
+              ? body.omschrijving.trim() || null
+              : body.omschrijving === null
+                ? null
+                : bestaand.omschrijving,
 
-          categorie:
-            body.categorie,
+          code:
+            typeof body.code === "string"
+              ? body.code.trim() || null
+              : body.code === null
+                ? null
+                : bestaand.code,
 
-          bestelBij:
-            body.bestelBij?.trim() ??
-            null,
+          type:
+            typeof body.type === "string"
+              ? body.type.trim()
+              : bestaand.type,
 
-          leverancier:
-            body.leverancier?.trim() ??
-            null,
+          bestelEenheid:
+            typeof body.bestelEenheid === "string"
+              ? body.bestelEenheid.trim() || null
+              : body.bestelEenheid === null
+                ? null
+                : bestaand.bestelEenheid,
 
-          artikelNummer:
-            body.artikelNummer?.trim() ??
-            null,
+          bestelAantal:
+            body.bestelAantal !== undefined
+              ? Number(body.bestelAantal)
+              : bestaand.bestelAantal,
 
-          barcode:
-            body.barcode?.trim() ??
-            null,
+          buffer:
+            body.buffer !== undefined
+              ? Number(body.buffer)
+              : bestaand.buffer,
 
-          eenheid:
-            body.eenheid?.trim() ??
-            null,
+          minimumVoorraad:
+            body.minimumVoorraad !== undefined
+              ? Number(body.minimumVoorraad)
+              : body.minimum !== undefined
+                ? Number(body.minimum)
+                : bestaand.minimumVoorraad,
 
-          opmerking:
-            body.opmerking?.trim() ??
-            null,
+          maximumVoorraad:
+            body.maximumVoorraad !== undefined
+              ? body.maximumVoorraad === null
+                ? null
+                : Number(body.maximumVoorraad)
+              : body.maximum !== undefined
+                ? body.maximum === null
+                  ? null
+                  : Number(body.maximum)
+                : bestaand.maximumVoorraad,
 
-          standaardBuffer:
-            Number(
-              body.standaardBuffer ??
-                0
-            ),
+          vitrineProduct:
+            body.vitrineProduct !== undefined
+              ? Boolean(body.vitrineProduct)
+              : bestaand.vitrineProduct,
 
-          volgorde:
-            Number(
-              body.volgorde ?? 0
-            ),
+          seizoensProduct:
+            body.seizoensProduct !== undefined
+              ? Boolean(body.seizoensProduct)
+              : bestaand.seizoensProduct,
+
+          bestelbaar:
+            body.bestelbaar !== undefined
+              ? Boolean(body.bestelbaar)
+              : bestaand.bestelbaar,
 
           actief:
-            body.actief ??
-            true,
+            body.actief !== undefined
+              ? Boolean(body.actief)
+              : bestaand.actief,
 
-          alternatieveNamen:
-            body.alternatieveNamen ??
-            null,
+          volgorde:
+            body.volgorde !== undefined
+              ? Number(body.volgorde)
+              : bestaand.volgorde,
+
+          categorie:
+            body.categorieId !== undefined
+              ? {
+                  connect: {
+                    id: body.categorieId,
+                  },
+                }
+              : undefined,
+
+          leverancier:
+            body.leverancierId !== undefined
+              ? body.leverancierId
+                ? {
+                    connect: {
+                      id: body.leverancierId,
+                    },
+                  }
+                : {
+                    disconnect: true,
+                  }
+              : undefined,
+        },
+
+        include: {
+          categorie: true,
+          leverancier: true,
         },
       });
 
     await log({
-      actie:
-        "PRODUCT_BIJGEWERKT",
-
-      entiteit:
-        "Product",
-
-      entiteitId:
-        product.id,
-
-      details:
-        product,
+      actie: "PRODUCT_BIJGEWERKT",
+      entiteit: "Product",
+      entiteitId: product.id,
+      details: product,
     });
 
-    return NextResponse.json(
-      product
-    );
+    return NextResponse.json(product);
   } catch (error) {
     console.error(error);
 
     return NextResponse.json(
       {
-        error:
-          "Product kon niet worden bijgewerkt.",
+        error: "Product kon niet worden bijgewerkt.",
       },
       {
         status: 500,
@@ -151,8 +228,25 @@ export async function DELETE(
   { params }: Context
 ) {
   try {
-    const { id } =
-      await params;
+    const { id } = await params;
+
+    const bestaand =
+      await prisma.product.findUnique({
+        where: {
+          id,
+        },
+      });
+
+    if (!bestaand) {
+      return NextResponse.json(
+        {
+          error: "Product niet gevonden.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
 
     await prisma.product.delete({
       where: {
@@ -161,14 +255,9 @@ export async function DELETE(
     });
 
     await log({
-      actie:
-        "PRODUCT_VERWIJDERD",
-
-      entiteit:
-        "Product",
-
-      entiteitId:
-        id,
+      actie: "PRODUCT_VERWIJDERD",
+      entiteit: "Product",
+      entiteitId: id,
     });
 
     return NextResponse.json({
@@ -179,8 +268,7 @@ export async function DELETE(
 
     return NextResponse.json(
       {
-        error:
-          "Product kon niet worden verwijderd.",
+        error: "Product kon niet worden verwijderd.",
       },
       {
         status: 500,

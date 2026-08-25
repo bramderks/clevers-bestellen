@@ -5,15 +5,15 @@ import { useState } from "react";
 type Props = {
   taak: {
     id: string;
-    taak: string;
-    categorie: string;
+    titel: string;
+    categorie: string | null;
+    omschrijving: string | null;
+    prioriteit: string | null;
     voltooid: boolean;
-    naam: string | null;
+    naam?: string | null;
     voltooidOp: string | null;
   };
-
   afgesloten: boolean;
-
   onVoltooid?: (
     id: string,
     naam: string,
@@ -51,7 +51,9 @@ export default function TaakRij({
       return;
     }
 
-    if (!naam.trim()) {
+    const naamIngevuld = naam.trim();
+
+    if (!naamIngevuld) {
       alert("Vul je naam in.");
       return;
     }
@@ -68,25 +70,39 @@ export default function TaakRij({
               "application/json",
           },
           body: JSON.stringify({
-            naam: naam.trim(),
+            naam: naamIngevuld,
             voltooid: true,
           }),
         }
       );
 
       if (!res.ok) {
-        throw new Error();
+        throw new Error(
+          "Opslaan mislukt."
+        );
       }
 
       const data = await res.json();
 
+      if (!data.success) {
+        throw new Error(
+          data.error ??
+            "Opslaan mislukt."
+        );
+      }
+
+      const voltooidOp =
+        data.taak?.voltooidOp ??
+        new Date().toISOString();
+
       setVoltooid(true);
-      setDatum(data.voltooidOp);
+      setNaam(naamIngevuld);
+      setDatum(voltooidOp);
 
       onVoltooid?.(
         taak.id,
-        naam.trim(),
-        data.voltooidOp
+        naamIngevuld,
+        voltooidOp
       );
 
       setGelukt(true);
@@ -95,13 +111,29 @@ export default function TaakRij({
         setGelukt(false);
         setModalOpen(false);
       }, 700);
-    } catch {
+    } catch (error) {
+      console.error(
+        "❌ Fout bij afronden weektaak:",
+        error
+      );
+
       alert(
-        "Opslaan is mislukt."
+        error instanceof Error
+          ? error.message
+          : "Opslaan is mislukt."
       );
     } finally {
       setOpslaan(false);
     }
+  }
+
+  function openModal() {
+    if (afgesloten || voltooid) {
+      return;
+    }
+
+    setGelukt(false);
+    setModalOpen(true);
   }
 
   return (
@@ -120,15 +152,13 @@ export default function TaakRij({
             disabled={
               voltooid || afgesloten
             }
-            onChange={() =>
-              setModalOpen(true)
-            }
-            className="h-6 w-6 cursor-pointer"
+            onChange={openModal}
+            className="h-6 w-6 cursor-pointer disabled:cursor-default"
           />
         </div>
 
         <div className="font-medium">
-          {taak.taak}
+          {taak.titel}
         </div>
 
         <div>
@@ -160,16 +190,20 @@ export default function TaakRij({
             disabled={
               voltooid || afgesloten
             }
-            onChange={() =>
-              setModalOpen(true)
-            }
-            className="mt-1 h-8 w-8 flex-shrink-0"
+            onChange={openModal}
+            className="mt-1 h-8 w-8 flex-shrink-0 disabled:cursor-default"
           />
 
           <div className="flex-1">
             <div className="text-lg font-semibold leading-6">
-              {taak.taak}
+              {taak.titel}
             </div>
+
+            {taak.omschrijving && (
+              <div className="mt-2 text-sm text-slate-500">
+                {taak.omschrijving}
+              </div>
+            )}
 
             <div className="mt-3 text-sm text-slate-600">
               👤 {naam || "-"}
@@ -197,9 +231,15 @@ export default function TaakRij({
                 Taak afronden
               </h2>
 
-              <p className="mb-5 text-slate-600">
-                {taak.taak}
+              <p className="mb-2 text-lg font-semibold">
+                {taak.titel}
               </p>
+
+              {taak.omschrijving && (
+                <p className="mb-5 text-sm text-slate-500">
+                  {taak.omschrijving}
+                </p>
+              )}
 
               {gelukt && (
                 <div className="mb-5 rounded-xl border border-green-300 bg-green-50 px-4 py-3 text-center font-semibold text-green-700">
@@ -211,41 +251,40 @@ export default function TaakRij({
                 autoFocus
                 type="text"
                 value={naam}
-                onChange={(e) =>
+                onChange={(event) =>
                   setNaam(
-                    e.target.value
+                    event.target.value
                   )
                 }
-                onKeyDown={(e) => {
+                onKeyDown={(event) => {
                   if (
-                    e.key ===
+                    event.key ===
                     "Enter"
                   ) {
-                    opslaanTaak();
+                    event.preventDefault();
+                    void opslaanTaak();
                   }
 
                   if (
-                    e.key ===
+                    event.key ===
                     "Escape"
                   ) {
-                    setModalOpen(
-                      false
-                    );
+                    setModalOpen(false);
                   }
                 }}
                 placeholder="Naam medewerker"
                 className="mb-6 w-full rounded-xl border-2 border-blue-200 px-4 py-4 text-lg transition focus:border-blue-600 focus:outline-none"
+                disabled={opslaan}
               />
 
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() =>
-                    setModalOpen(
-                      false
-                    )
+                    setModalOpen(false)
                   }
-                  className="rounded-xl border px-6 py-3 font-semibold transition hover:bg-slate-100"
+                  disabled={opslaan}
+                  className="rounded-xl border px-6 py-3 font-semibold transition hover:bg-slate-100 disabled:opacity-60"
                 >
                   Annuleren
                 </button>
@@ -253,8 +292,8 @@ export default function TaakRij({
                 <button
                   type="button"
                   disabled={opslaan}
-                  onClick={
-                    opslaanTaak
+                  onClick={() =>
+                    void opslaanTaak()
                   }
                   className="rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
                 >

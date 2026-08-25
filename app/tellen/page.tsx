@@ -1,65 +1,39 @@
-"use client";
-
-import { useState } from "react";
-
-import type { Vestiging } from "@/types";
+import Link from "next/link";
 
 import TopBar from "@/components/TopBar";
 import TelForm from "@/components/TelForm";
-import VestigingSelector from "@/components/VestigingSelector";
 
-export default function NieuweTelling() {
-  const [vestiging, setVestiging] =
-    useState<Vestiging | null>(
-      null
-    );
+export default function TellenPagina() {
+  const vestiging = "nijmegen";
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-6 md:py-10">
+    <main className="min-h-screen bg-slate-100 p-6 md:p-8">
+      <div className="mx-auto max-w-7xl">
+        <TopBar title="Tellen" />
 
-      <div className="mx-auto max-w-6xl">
-
-        <TopBar
-          title="Nieuwe telling"
-        />
-
-        <section className="rounded-2xl bg-white p-6 shadow-xl md:p-8">
-
-          <header className="mb-8">
-
-            <h1 className="text-4xl font-bold">
-              Nieuwe telling
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Voorraad tellen
             </h1>
 
-            <p className="mt-2 text-slate-500">
-              Selecteer eerst de vestiging en vul daarna de telling in.
+            <p className="mt-1 text-slate-500">
+              Tel de actuele voorraad en bereken de bestelling.
             </p>
+          </div>
 
-          </header>
+          <Link
+            href="/"
+            className="rounded-xl border bg-white px-5 py-3 font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+          >
+            ← Terug
+          </Link>
+        </div>
 
-          <VestigingSelector
-            vestiging={vestiging ?? ""}
-            onChange={(waarde) =>
-              setVestiging(
-                waarde as Vestiging
-              )
-            }
-          />
-
-          {vestiging && (
-            <>
-              <hr className="my-8" />
-
-              <TelForm
-                vestiging={vestiging}
-              />
-            </>
-          )}
-
-        </section>
-
+        <div className="rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+          <TelForm vestiging={vestiging} />
+        </div>
       </div>
-
     </main>
   );
 }

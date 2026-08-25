@@ -11,13 +11,13 @@ import {
 
 export default async function GebruikersPagina() {
   const gebruikers = await prisma.gebruiker.findMany({
+include: {
+  rollen: {
     include: {
-      gebruikerRols: {
-        include: {
-          rol: true,
-        },
-      },
+      rol: true,
     },
+  },
+},
     orderBy: {
       naam: "asc",
     },
@@ -71,7 +71,7 @@ export default async function GebruikersPagina() {
                   return gebruiker.email;
 
                 case "rollen":
-                  return gebruiker.gebruikerRols.map(
+                  return gebruiker.rollen.map(
                     (r) => (
                       <Badge key={r.id}>
                         {r.rol.naam}

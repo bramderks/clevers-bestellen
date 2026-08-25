@@ -8,7 +8,11 @@ export async function GET() {
   const buffers =
     await prisma.productBuffer.findMany({
       include: {
-        product: true,
+        product: {
+          include: {
+            categorie: true,
+          },
+        },
         vestiging: true,
       },
 
@@ -20,7 +24,9 @@ export async function GET() {
         },
         {
           product: {
-            categorie: "asc",
+            categorie: {
+              volgorde: "asc",
+            },
           },
         },
         {
@@ -28,12 +34,15 @@ export async function GET() {
             volgorde: "asc",
           },
         },
+        {
+          product: {
+            naam: "asc",
+          },
+        },
       ],
     });
 
-  return NextResponse.json(
-    buffers
-  );
+  return NextResponse.json(buffers);
 }
 
 export async function POST(
@@ -43,22 +52,98 @@ export async function POST(
     const body =
       await request.json();
 
+    if (!body.productId) {
+      return NextResponse.json(
+        {
+          error: "Product ontbreekt.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (!body.vestigingId) {
+      return NextResponse.json(
+        {
+          error: "Vestiging ontbreekt.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
     const [product, vestiging] =
       await Promise.all([
         prisma.product.findUnique({
-          where: { id: body.productId },
-          include: { categorie: true },
+          where: {
+            id: body.productId,
+          },
+          include: {
+            categorie: true,
+          },
         }),
+
         prisma.vestiging.findUnique({
-          where: { id: body.vestigingId },
+          where: {
+            id: body.vestigingId,
+          },
         }),
       ]);
 
+    if (!product) {
+      return NextResponse.json(
+        {
+          error: "Product niet gevonden.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    if (!vestiging) {
+      return NextResponse.json(
+        {
+          error: "Vestiging niet gevonden.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
     const isRoermondIjs =
-      vestiging?.naam.toLowerCase() ===
+      vestiging.naam.toLowerCase() ===
         "roermond" &&
-      product?.categorie.naam.toLowerCase() ===
+      product.categorie.naam.toLowerCase() ===
         "ijs";
+
+    const bufferWaarde =
+      Number(body.buffer ?? 0);
+
+    const minimumWaarde =
+      Number(body.minimum ?? 0);
+
+    const maximumWaarde =
+      Number(body.maximum ?? 0);
+
+    if (
+      !Number.isFinite(bufferWaarde) ||
+      !Number.isFinite(minimumWaarde) ||
+      !Number.isFinite(maximumWaarde)
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Buffer, minimum en maximum moeten geldige getallen zijn.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
     const buffer =
       await prisma.productBuffer.create({
@@ -77,23 +162,11 @@ export async function POST(
 
           buffer: isRoermondIjs
             ? -1
-            : Number(body.buffer ?? 0),
+            : bufferWaarde,
 
-          minimumVoorraad:
-            body.minimumVoorraad !=
-            null
-              ? Number(
-                  body.minimumVoorraad
-                )
-              : null,
+          minimum: minimumWaarde,
 
-          maximaleVoorraad:
-            body.maximaleVoorraad !=
-            null
-              ? Number(
-                  body.maximaleVoorraad
-                )
-              : null,
+          maximum: maximumWaarde,
         },
 
         include: {
@@ -103,17 +176,13 @@ export async function POST(
       });
 
     await log({
-      actie:
-        "BUFFER_AANGEMAAKT",
+      actie: "BUFFER_AANGEMAAKT",
 
-      entiteit:
-        "ProductBuffer",
+      entiteit: "ProductBuffer",
 
-      entiteitId:
-        buffer.id,
+      entiteitId: buffer.id,
 
-      details:
-        buffer,
+      details: buffer,
     });
 
     return NextResponse.json(
@@ -123,7 +192,10 @@ export async function POST(
       }
     );
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Buffer aanmaken mislukt:",
+      error
+    );
 
     return NextResponse.json(
       {

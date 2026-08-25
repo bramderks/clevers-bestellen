@@ -9,30 +9,48 @@ export async function POST(request: NextRequest) {
 
     if (!email) {
       return NextResponse.json(
-        { error: "E-mailadres ontbreekt." },
-        { status: 400 },
+        {
+          error: "E-mailadres ontbreekt.",
+        },
+        {
+          status: 400,
+        },
       );
     }
 
     const gebruiker = await gebruikerOpEmail(email);
 
+    const ipAdres =
+      request.headers
+        .get("x-forwarded-for")
+        ?.split(",")[0]
+        ?.trim() ??
+      request.headers.get("x-real-ip") ??
+      undefined;
+
+    const userAgent =
+      request.headers.get("user-agent") ??
+      undefined;
+
     if (!gebruiker || !isActief(gebruiker)) {
-      await log({
-        actie: "LOGIN_MISLUKT",
-        entiteit: "Gebruiker",
-        melding: "Onbekende of inactieve gebruiker.",
-ipAdres:
-  request.headers.get("x-forwarded-for")
-    ?.split(",")[0]
-    ?.trim() ??
-  request.headers.get("x-real-ip") ??
-  undefined,
-        userAgent: request.headers.get("user-agent") ?? undefined,
-      });
+await log({
+  actie: "LOGIN_MISLUKT",
+  entiteit: "Gebruiker",
+  details: {
+    melding:
+      "Onbekende of inactieve gebruiker.",
+  },
+  ipAdres,
+  userAgent,
+});
 
       return NextResponse.json(
-        { error: "Ongeldige inloggegevens." },
-        { status: 401 },
+        {
+          error: "Ongeldige inloggegevens.",
+        },
+        {
+          status: 401,
+        },
       );
     }
 
@@ -41,13 +59,8 @@ ipAdres:
       actie: "LOGIN_GELUKT",
       entiteit: "Gebruiker",
       entiteitId: gebruiker.id,
-ipAdres:
-  request.headers.get("x-forwarded-for")
-    ?.split(",")[0]
-    ?.trim() ??
-  request.headers.get("x-real-ip") ??
-  undefined,
-      userAgent: request.headers.get("user-agent") ?? undefined,
+      ipAdres,
+      userAgent,
     });
 
     const response = NextResponse.json({
@@ -72,8 +85,12 @@ ipAdres:
     return response;
   } catch {
     return NextResponse.json(
-      { error: "Interne serverfout." },
-      { status: 500 },
+      {
+        error: "Interne serverfout.",
+      },
+      {
+        status: 500,
+      },
     );
   }
 }

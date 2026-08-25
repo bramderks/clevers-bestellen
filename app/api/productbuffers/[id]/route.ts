@@ -10,12 +10,19 @@ interface Context {
   }>;
 }
 
+interface PatchBody {
+  productId?: string;
+  vestigingId?: string;
+  buffer?: number | string | null;
+  minimum?: number | string | null;
+  maximum?: number | string | null;
+}
+
 export async function GET(
   _: NextRequest,
   { params }: Context
 ) {
-  const { id } =
-    await params;
+  const { id } = await params;
 
   const buffer =
     await prisma.productBuffer.findUnique({
@@ -31,8 +38,7 @@ export async function GET(
   if (!buffer) {
     return NextResponse.json(
       {
-        error:
-          "Buffer niet gevonden.",
+        error: "Buffer niet gevonden.",
       },
       {
         status: 404,
@@ -40,9 +46,7 @@ export async function GET(
     );
   }
 
-  return NextResponse.json(
-    buffer
-  );
+  return NextResponse.json(buffer);
 }
 
 export async function PATCH(
@@ -50,46 +54,115 @@ export async function PATCH(
   { params }: Context
 ) {
   try {
-    const { id } =
-      await params;
+    const { id } = await params;
 
     const body =
-      await request.json();
+      (await request.json()) as PatchBody;
 
     const bestaand =
       await prisma.productBuffer.findUnique({
-        where: { id },
+        where: {
+          id,
+        },
         include: {
-          product: { include: { categorie: true } },
+          product: {
+            include: {
+              categorie: true,
+            },
+          },
           vestiging: true,
         },
       });
 
     if (!bestaand) {
       return NextResponse.json(
-        { error: "Buffer niet gevonden." },
-        { status: 404 }
+        {
+          error: "Buffer niet gevonden.",
+        },
+        {
+          status: 404,
+        }
       );
     }
 
     const product = body.productId
       ? await prisma.product.findUnique({
-          where: { id: body.productId },
-          include: { categorie: true },
+          where: {
+            id: body.productId,
+          },
+          include: {
+            categorie: true,
+          },
         })
       : bestaand.product;
 
-    const vestiging = body.vestigingId
-      ? await prisma.vestiging.findUnique({
-          where: { id: body.vestigingId },
-        })
-      : bestaand.vestiging;
+    if (!product) {
+      return NextResponse.json(
+        {
+          error: "Product niet gevonden.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    const vestiging =
+      body.vestigingId
+        ? await prisma.vestiging.findUnique({
+            where: {
+              id: body.vestigingId,
+            },
+          })
+        : bestaand.vestiging;
+
+    if (!vestiging) {
+      return NextResponse.json(
+        {
+          error: "Vestiging niet gevonden.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
 
     const isRoermondIjs =
-      vestiging?.naam.toLowerCase() ===
+      vestiging.naam.toLowerCase() ===
         "roermond" &&
-      product?.categorie.naam.toLowerCase() ===
+      product.categorie.naam.toLowerCase() ===
         "ijs";
+
+    const bufferWaarde =
+      body.buffer != null
+        ? Number(body.buffer)
+        : bestaand.buffer;
+
+    const minimumWaarde =
+      body.minimum != null
+        ? Number(body.minimum)
+        : bestaand.minimum;
+
+    const maximumWaarde =
+      body.maximum != null
+        ? Number(body.maximum)
+        : bestaand.maximum;
+
+    if (
+      !Number.isFinite(bufferWaarde) ||
+      !Number.isFinite(minimumWaarde) ||
+      !Number.isFinite(maximumWaarde)
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Buffer, minimum en maximum moeten geldige getallen zijn.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
     const buffer =
       await prisma.productBuffer.update({
@@ -106,34 +179,21 @@ export async function PATCH(
               }
             : undefined,
 
-          vestiging:
-            body.vestigingId
-              ? {
-                  connect: {
-                    id: body.vestigingId,
-                  },
-                }
-              : undefined,
+          vestiging: body.vestigingId
+            ? {
+                connect: {
+                  id: body.vestigingId,
+                },
+              }
+            : undefined,
 
           buffer: isRoermondIjs
             ? -1
-            : Number(body.buffer ?? 0),
+            : bufferWaarde,
 
-          minimumVoorraad:
-            body.minimumVoorraad !=
-            null
-              ? Number(
-                  body.minimumVoorraad
-                )
-              : null,
+          minimum: minimumWaarde,
 
-          maximaleVoorraad:
-            body.maximaleVoorraad !=
-            null
-              ? Number(
-                  body.maximaleVoorraad
-                )
-              : null,
+          maximum: maximumWaarde,
         },
 
         include: {
@@ -143,24 +203,21 @@ export async function PATCH(
       });
 
     await log({
-      actie:
-        "BUFFER_BIJGEWERKT",
+      actie: "BUFFER_BIJGEWERKT",
 
-      entiteit:
-        "ProductBuffer",
+      entiteit: "ProductBuffer",
 
-      entiteitId:
-        buffer.id,
+      entiteitId: buffer.id,
 
-      details:
-        buffer,
+      details: buffer,
     });
 
-    return NextResponse.json(
-      buffer
-    );
+    return NextResponse.json(buffer);
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Buffer bijwerken mislukt:",
+      error
+    );
 
     return NextResponse.json(
       {
@@ -179,8 +236,7 @@ export async function DELETE(
   { params }: Context
 ) {
   try {
-    const { id } =
-      await params;
+    const { id } = await params;
 
     await prisma.productBuffer.delete({
       where: {
@@ -189,21 +245,21 @@ export async function DELETE(
     });
 
     await log({
-      actie:
-        "BUFFER_VERWIJDERD",
+      actie: "BUFFER_VERWIJDERD",
 
-      entiteit:
-        "ProductBuffer",
+      entiteit: "ProductBuffer",
 
-      entiteitId:
-        id,
+      entiteitId: id,
     });
 
     return NextResponse.json({
       success: true,
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Buffer verwijderen mislukt:",
+      error
+    );
 
     return NextResponse.json(
       {

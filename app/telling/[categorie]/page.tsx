@@ -1,11 +1,19 @@
 import CategorieTelling from "@/components/CategorieTelling";
 
+type Props = {
+  params: Promise<{
+    categorie: string;
+  }>;
+};
+
 export default async function Page({
   params,
-}: {
-  params: Promise<{ categorie: string }>;
-}) {
+}: Props) {
   const { categorie } = await params;
 
-  return <CategorieTelling categorie={categorie} />;
+  return (
+    <CategorieTelling
+      categorie={categorie}
+    />
+  );
 }

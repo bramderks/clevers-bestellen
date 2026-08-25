@@ -7,25 +7,32 @@ function weekPeriode(
   jaar: number,
   week: number
 ) {
-  const jan4 = new Date(jaar, 0, 4);
+  const jan4 = new Date(
+    jaar,
+    0,
+    4
+  );
 
-  const maandagWeek1 = new Date(jan4);
+  const maandagWeek1 =
+    new Date(jan4);
 
   maandagWeek1.setDate(
     jan4.getDate() -
       ((jan4.getDay() + 6) % 7)
   );
 
-  const maandag = new Date(
-    maandagWeek1
-  );
+  const maandag =
+    new Date(
+      maandagWeek1
+    );
 
   maandag.setDate(
     maandagWeek1.getDate() +
       (week - 1) * 7
   );
 
-  const zondag = new Date(maandag);
+  const zondag =
+    new Date(maandag);
 
   zondag.setDate(
     maandag.getDate() + 6
@@ -68,7 +75,9 @@ export default async function HistorieWeektakenPagina() {
           week: "desc",
         },
         {
-          vestigingSnapshot: "asc",
+          vestiging: {
+            naam: "asc",
+          },
         },
       ],
     });
@@ -90,7 +99,8 @@ export default async function HistorieWeektakenPagina() {
 
         {weken.length === 0 && (
           <div className="rounded-2xl border bg-white p-10 text-center text-gray-500 shadow-sm">
-            Er zijn nog geen weektaken opgeslagen.
+            Er zijn nog geen weektaken
+            opgeslagen.
           </div>
         )}
 
@@ -101,7 +111,8 @@ export default async function HistorieWeektakenPagina() {
 
             const gereed =
               week.taken.filter(
-                (t) => t.voltooid
+                (taak) =>
+                  taak.voltooid
               ).length;
 
             const open =
@@ -117,7 +128,6 @@ export default async function HistorieWeektakenPagina() {
                   );
 
             const vestigingNaam =
-              week.vestigingSnapshot ??
               week.vestiging?.naam ??
               "-";
 
@@ -148,7 +158,9 @@ export default async function HistorieWeektakenPagina() {
                     </div>
 
                     <p className="mt-2 text-gray-500">
-                      Week {week.week} •{" "}
+                      Week{" "}
+                      {week.week}{" "}
+                      •{" "}
                       {weekPeriode(
                         week.jaar,
                         week.week

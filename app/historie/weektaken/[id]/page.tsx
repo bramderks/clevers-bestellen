@@ -27,7 +27,7 @@ export default async function HistorieWeekPagina({
             categorie: "asc",
           },
           {
-            taak: "asc",
+            titel: "asc",
           },
         ],
       },
@@ -41,7 +41,7 @@ export default async function HistorieWeekPagina({
   const totaal = week.taken.length;
 
   const gereed = week.taken.filter(
-    (t) => t.voltooid
+    (taak) => taak.voltooid
   ).length;
 
   const open = totaal - gereed;
@@ -52,9 +52,7 @@ export default async function HistorieWeekPagina({
       : Math.round((gereed / totaal) * 100);
 
   const vestigingNaam =
-    week.vestigingSnapshot ??
-    week.vestiging?.naam ??
-    "-";
+    week.vestiging?.naam ?? "-";
 
   return (
     <main className="min-h-screen bg-slate-100 p-6 md:p-8">
@@ -91,6 +89,7 @@ export default async function HistorieWeekPagina({
             <div className="text-3xl font-bold text-blue-700">
               {totaal}
             </div>
+
             <div className="mt-1 text-sm text-gray-500">
               📋 Totaal
             </div>
@@ -100,6 +99,7 @@ export default async function HistorieWeekPagina({
             <div className="text-3xl font-bold text-green-700">
               {gereed}
             </div>
+
             <div className="mt-1 text-sm text-gray-500">
               ✅ Gereed
             </div>
@@ -109,6 +109,7 @@ export default async function HistorieWeekPagina({
             <div className="text-3xl font-bold text-orange-600">
               {open}
             </div>
+
             <div className="mt-1 text-sm text-gray-500">
               ⏳ Open
             </div>
@@ -118,6 +119,7 @@ export default async function HistorieWeekPagina({
             <div className="text-3xl font-bold text-blue-700">
               {percentage}%
             </div>
+
             <div className="mt-1 text-sm text-gray-500">
               📈 Voortgang
             </div>
@@ -137,7 +139,7 @@ export default async function HistorieWeekPagina({
           <div className="hidden grid-cols-[80px_1fr_220px_220px] bg-blue-700 px-4 py-4 font-bold text-white md:grid">
             <div>Status</div>
             <div>Taak</div>
-            <div>Medewerker</div>
+            <div>Categorie</div>
             <div>Afgerond op</div>
           </div>
 
@@ -155,11 +157,11 @@ export default async function HistorieWeekPagina({
               </div>
 
               <div className="mt-2 font-medium md:mt-0">
-                {taak.taak}
+                {taak.titel}
               </div>
 
               <div className="mt-2 text-gray-700 md:mt-0">
-                {taak.naam ?? "-"}
+                {taak.categorie ?? "-"}
               </div>
 
               <div className="mt-2 text-sm text-gray-500 md:mt-0">

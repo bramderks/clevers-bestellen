@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 import { haalOfMaakWeek } from "@/lib/haalOfMaakWeek";
 import { initialiseerWeektaken } from "@/lib/initialiseerWeektaken";
 
-export async function GET(request: Request) {
+export async function GET(
+  request: Request
+) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } =
+      new URL(request.url);
 
     const vestiging =
       searchParams.get("vestiging") ??
@@ -27,12 +31,13 @@ export async function GET(request: Request) {
         where: {
           weekId: week.id,
         },
+
         orderBy: [
           {
             categorie: "asc",
           },
           {
-            taak: "asc",
+            titel: "asc",
           },
         ],
       });

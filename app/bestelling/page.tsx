@@ -19,7 +19,8 @@ export default function BestellingPagina() {
     useState<BestellingData | null>(null);
 
   useEffect(() => {
-    const bestelling = laadBestelling();
+    const bestelling =
+      laadBestelling();
 
     if (bestelling) {
       setData(bestelling);
@@ -44,27 +45,30 @@ export default function BestellingPagina() {
       )
       .sort(
         (a, b) =>
-          a.volgorde - b.volgorde
+          a.volgorde -
+          b.volgorde
       );
 
   const ijskeuken =
     bestelling.filter(
       (regel) =>
-        regel.bestelBij === "ijskeuken"
+        regel.bestelBij ===
+        "ijskeuken"
     );
 
   const drooggoed =
     bestelling.filter(
       (regel) =>
-        regel.bestelBij === "drooggoed"
+        regel.bestelBij ===
+        "drooggoed"
     );
 
   return (
     <main className="min-h-screen bg-gray-100 py-10 print:bg-white print:py-0">
       <div className="mx-auto max-w-4xl rounded-xl bg-white p-10 shadow-xl print:rounded-none print:shadow-none">
-
         <div className="mb-8 flex justify-between print:hidden">
           <button
+            type="button"
             onClick={() =>
               window.close()
             }
@@ -74,6 +78,7 @@ export default function BestellingPagina() {
           </button>
 
           <button
+            type="button"
             onClick={() =>
               window.print()
             }
@@ -99,7 +104,8 @@ export default function BestellingPagina() {
           </h1>
 
           <p className="mt-2 text-gray-600">
-            Clevers {data.vestiging}
+            Clevers{" "}
+            {data.vestiging}
           </p>
         </div>
 
@@ -129,33 +135,37 @@ export default function BestellingPagina() {
           </div>
         </div>
 
-        {ijskeuken.length > 0 && (
+        {ijskeuken.length >
+          0 && (
           <BestelTabel
             titel="🍦 IJskeuken"
             regels={ijskeuken}
-            totaal={
-              ijskeuken.reduce(
-                (totaal, regel) =>
-                  totaal +
-                  regel.bestellen,
-                0
-              )
-            }
+            totaal={ijskeuken.reduce(
+              (
+                totaal,
+                regel
+              ) =>
+                totaal +
+                regel.bestellen,
+              0
+            )}
           />
         )}
 
-        {drooggoed.length > 0 && (
+        {drooggoed.length >
+          0 && (
           <BestelTabel
             titel="📦 Drooggoed"
             regels={drooggoed}
-            totaal={
-              drooggoed.reduce(
-                (totaal, regel) =>
-                  totaal +
-                  regel.bestellen,
-                0
-              )
-            }
+            totaal={drooggoed.reduce(
+              (
+                totaal,
+                regel
+              ) =>
+                totaal +
+                regel.bestellen,
+              0
+            )}
           />
         )}
 
@@ -171,7 +181,6 @@ export default function BestellingPagina() {
             <div className="h-8" />
           </div>
         </div>
-
       </div>
     </main>
   );

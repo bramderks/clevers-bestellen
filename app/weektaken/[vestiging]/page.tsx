@@ -1,9 +1,32 @@
 import { headers } from "next/headers";
+
+import TopBar from "@/components/TopBar";
 import WeektakenClient from "@/components/weektaken/WeektakenClient";
 import WeekAfsluitenButton from "@/components/weektaken/WeekAfsluitenButton";
-import TopBar from "@/components/TopBar";
 
-async function haalTakenOp(vestiging: string) {
+type WeekTaak = {
+  id: string;
+  titel: string;
+  categorie: string | null;
+  omschrijving: string | null;
+  prioriteit: string | null;
+  voltooid: boolean;
+  voltooidOp: string | null;
+};
+
+type WeekData = {
+  week: {
+    id: string;
+    jaar: number;
+    week: number;
+    afgesloten: boolean;
+  };
+  taken: WeekTaak[];
+};
+
+async function haalTakenOp(
+  vestiging: string
+): Promise<WeekData> {
   const h = await headers();
 
   const protocol =
@@ -13,15 +36,25 @@ async function haalTakenOp(vestiging: string) {
 
   const host = h.get("host");
 
+  if (!host) {
+    throw new Error(
+      "Kon host niet bepalen."
+    );
+  }
+
   const res = await fetch(
-    `${protocol}://${host}/api/weektaken?vestiging=${vestiging}`,
+    `${protocol}://${host}/api/weektaken?vestiging=${encodeURIComponent(
+      vestiging
+    )}`,
     {
       cache: "no-store",
     }
   );
 
   if (!res.ok) {
-    throw new Error("Kon weektaken niet ophalen.");
+    throw new Error(
+      "Kon weektaken niet ophalen."
+    );
   }
 
   return res.json();
@@ -31,24 +64,30 @@ function weekPeriode(
   jaar: number,
   week: number
 ) {
-  const jan4 = new Date(jaar, 0, 4);
+  const jan4 = new Date(
+    jaar,
+    0,
+    4
+  );
 
-  const maandagWeek1 = new Date(jan4);
+  const maandagWeek1 =
+    new Date(jan4);
+
   maandagWeek1.setDate(
     jan4.getDate() -
       ((jan4.getDay() + 6) % 7)
   );
 
-  const maandag = new Date(
-    maandagWeek1
-  );
+  const maandag =
+    new Date(maandagWeek1);
 
   maandag.setDate(
     maandagWeek1.getDate() +
       (week - 1) * 7
   );
 
-  const zondag = new Date(maandag);
+  const zondag =
+    new Date(maandag);
 
   zondag.setDate(
     maandag.getDate() + 6
@@ -91,67 +130,72 @@ export default async function WeektakenPagina({
     await params;
 
   const data =
-    await haalTakenOp(vestiging);
+    await haalTakenOp(
+      vestiging
+    );
 
-  const weekId = data.week.id;
+  const weekId =
+    data.week.id;
 
   const weekAfgesloten =
     data.week.afgesloten;
 
-  const groepen: {
-    categorie: string;
-    taken: any[];
-  }[] = Object.entries(
-    data.taken.reduce(
-      (
-        acc: Record<string, any[]>,
-        taak: any
-      ) => {
-        if (
-          !acc[taak.categorie]
-        ) {
-          acc[taak.categorie] = [];
-        }
+  const groepen = Object.entries(
+    data.taken.reduce<
+      Record<string, WeekTaak[]>
+    >((acc, taak) => {
+      const categorie =
+        taak.categorie ??
+        "Algemeen";
 
-        acc[
-          taak.categorie
-        ].push(taak);
+      if (!acc[categorie]) {
+        acc[categorie] = [];
+      }
 
-        return acc;
-      },
-      {}
-    )
+      acc[categorie].push(
+        taak
+      );
+
+      return acc;
+    }, {})
   )
     .map(
       ([categorie, taken]) => ({
         categorie,
-        taken: taken as any[],
+        taken,
       })
     )
     .sort((a, b) => {
       const openA =
         a.taken.filter(
-          (t) => !t.voltooid
+          (taak) =>
+            !taak.voltooid
         ).length;
 
       const openB =
         b.taken.filter(
-          (t) => !t.voltooid
+          (taak) =>
+            !taak.voltooid
         ).length;
 
       if (
         openA === 0 &&
         openB > 0
-      )
+      ) {
         return 1;
+      }
 
       if (
         openB === 0 &&
         openA > 0
-      )
+      ) {
         return -1;
+      }
 
-      return 0;
+      return a.categorie.localeCompare(
+        b.categorie,
+        "nl"
+      );
     });
 
   const totaal =
@@ -159,20 +203,23 @@ export default async function WeektakenPagina({
 
   const gereed =
     data.taken.filter(
-      (t: any) => t.voltooid
+      (taak) =>
+        taak.voltooid
     ).length;
 
   const percentage =
     totaal === 0
       ? 0
       : Math.round(
-          (gereed / totaal) *
-            100
+          (gereed / totaal) * 100
         );
 
   return (
     <main className="mx-auto max-w-7xl p-6 md:p-8">
-      <TopBar title={`Weektaken ${vestiging}`} />
+      <TopBar
+        title={`Weektaken ${vestiging}`}
+      />
+
       <div className="mb-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <h1 className="text-3xl font-bold md:text-4xl">
@@ -209,8 +256,9 @@ export default async function WeektakenPagina({
         </div>
 
         <p className="mt-2 text-sm font-medium">
-          {gereed} van {totaal} taken
-          voltooid ({percentage}%)
+          {gereed} van {totaal}{" "}
+          taken voltooid (
+          {percentage}%)
         </p>
 
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -236,8 +284,7 @@ export default async function WeektakenPagina({
 
           <div className="rounded-2xl border bg-orange-50 p-5 shadow-sm">
             <div className="text-3xl font-bold text-orange-600">
-              {totaal -
-                gereed}
+              {totaal - gereed}
             </div>
 
             <div className="mt-1 text-sm text-gray-500">

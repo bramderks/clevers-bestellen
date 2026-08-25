@@ -5,24 +5,50 @@ import { prisma } from "@/lib/prisma";
 import { log } from "@/lib/logger";
 
 export async function GET() {
-  const producten =
-    await prisma.product.findMany({
-      orderBy: [
-        {
-          categorie: "asc",
+  try {
+    const producten =
+      await prisma.product.findMany({
+        include: {
+          categorie: true,
+          leverancier: true,
         },
-        {
-          volgorde: "asc",
-        },
-        {
-          naam: "asc",
-        },
-      ],
-    });
 
-  return NextResponse.json(
-    producten
-  );
+        orderBy: [
+          {
+            categorie: {
+              volgorde: "asc",
+            },
+          },
+          {
+            categorie: {
+              naam: "asc",
+            },
+          },
+          {
+            volgorde: "asc",
+          },
+          {
+            naam: "asc",
+          },
+        ],
+      });
+
+    return NextResponse.json(
+      producten
+    );
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json(
+      {
+        error:
+          "Producten konden niet worden opgehaald.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 }
 
 export async function POST(
@@ -32,61 +58,216 @@ export async function POST(
     const body =
       await request.json();
 
+    if (
+      typeof body.naam !== "string" ||
+      !body.naam.trim()
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Productnaam is verplicht.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (
+      typeof body.categorieId !==
+        "string" ||
+      !body.categorieId
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Categorie is verplicht.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const categorie =
+      await prisma.productCategorie.findUnique(
+        {
+          where: {
+            id: body.categorieId,
+          },
+        }
+      );
+
+    if (!categorie) {
+      return NextResponse.json(
+        {
+          error:
+            "Categorie niet gevonden.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    if (
+      body.leverancierId !==
+        undefined &&
+      body.leverancierId !== null &&
+      body.leverancierId !== ""
+    ) {
+      const leverancier =
+        await prisma.leverancier.findUnique(
+          {
+            where: {
+              id: body.leverancierId,
+            },
+          }
+        );
+
+      if (!leverancier) {
+        return NextResponse.json(
+          {
+            error:
+              "Leverancier niet gevonden.",
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+    }
+
     const product =
       await prisma.product.create({
         data: {
           naam:
             body.naam.trim(),
 
-          zoekNaam:
-            body.zoekNaam?.trim() ??
-            null,
+          omschrijving:
+            typeof body.omschrijving ===
+            "string"
+              ? body.omschrijving.trim() ||
+                null
+              : null,
 
-          categorie:
-            body.categorie,
+          code:
+            typeof body.code ===
+            "string"
+              ? body.code.trim() || null
+              : null,
 
-          bestelBij:
-            body.bestelBij?.trim() ??
-            null,
+          categorie: {
+            connect: {
+              id: body.categorieId,
+            },
+          },
 
           leverancier:
-            body.leverancier?.trim() ??
-            null,
+            body.leverancierId
+              ? {
+                  connect: {
+                    id: body.leverancierId,
+                  },
+                }
+              : undefined,
 
-          artikelNummer:
-            body.artikelNummer?.trim() ??
-            null,
+          type:
+            typeof body.type ===
+            "string"
+              ? body.type.trim()
+              : "",
 
-          barcode:
-            body.barcode?.trim() ??
-            null,
+          bestelEenheid:
+            typeof body.bestelEenheid ===
+            "string"
+              ? body.bestelEenheid.trim() ||
+                null
+              : null,
 
-          eenheid:
-            body.eenheid?.trim() ??
-            null,
+          bestelAantal:
+            body.bestelAantal !==
+            undefined
+              ? Number(
+                  body.bestelAantal
+                )
+              : 1,
 
-          opmerking:
-            body.opmerking?.trim() ??
-            null,
+          buffer:
+            body.buffer !== undefined
+              ? Number(body.buffer)
+              : 0,
 
-          standaardBuffer:
-            Number(
-              body.standaardBuffer ??
-                0
-            ),
+          minimumVoorraad:
+            body.minimumVoorraad !==
+            undefined
+              ? Number(
+                  body.minimumVoorraad
+                )
+              : body.minimum !==
+                  undefined
+                ? Number(body.minimum)
+                : 0,
 
-          volgorde:
-            Number(
-              body.volgorde ?? 0
-            ),
+          maximumVoorraad:
+            body.maximumVoorraad !==
+            undefined
+              ? body.maximumVoorraad ===
+                null
+                ? null
+                : Number(
+                    body.maximumVoorraad
+                  )
+              : body.maximum !==
+                  undefined
+                ? body.maximum ===
+                  null
+                  ? null
+                  : Number(
+                      body.maximum
+                    )
+                : null,
+
+          vitrineProduct:
+            body.vitrineProduct !==
+            undefined
+              ? Boolean(
+                  body.vitrineProduct
+                )
+              : false,
+
+          seizoensProduct:
+            body.seizoensProduct !==
+            undefined
+              ? Boolean(
+                  body.seizoensProduct
+                )
+              : false,
+
+          bestelbaar:
+            body.bestelbaar !==
+            undefined
+              ? Boolean(
+                  body.bestelbaar
+                )
+              : true,
 
           actief:
-            body.actief ??
-            true,
+            body.actief !== undefined
+              ? Boolean(body.actief)
+              : true,
 
-          alternatieveNamen:
-            body.alternatieveNamen ??
-            null,
+          volgorde:
+            body.volgorde !== undefined
+              ? Number(
+                  body.volgorde
+                )
+              : 0,
+        },
+
+        include: {
+          categorie: true,
+          leverancier: true,
         },
       });
 
