@@ -10,11 +10,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
-      nijmegen: 5,
-
+      roermond: 5,
+      nijmegen: 4,
     },
     volgorde: 1,
     actief: true,
@@ -28,11 +25,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
-      nijmegen: 4,
-
+      roermond: 4,
+      nijmegen: 3,
     },
     volgorde: 2,
     actief: true,
@@ -46,11 +40,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 4,
       nijmegen: 3,
-
     },
     volgorde: 3,
     actief: true,
@@ -64,11 +55,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 4,
       nijmegen: 3,
-
     },
     volgorde: 4,
     actief: true,
@@ -82,15 +70,16 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 4,
       nijmegen: 3,
-
     },
     volgorde: 5,
     actief: true,
-    alternatieveNamen: ["stracciatella", "straciatella", "stracci"],
+    alternatieveNamen: [
+      "stracciatella",
+      "straciatella",
+      "stracci",
+    ],
   },
   {
     id: "dark-cookies",
@@ -100,11 +89,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 2,
       nijmegen: 2,
-
     },
     volgorde: 6,
     actief: true,
@@ -118,11 +104,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
-      nijmegen: 2,
-
+      roermond: 2,
+      nijmegen: 1,
     },
     volgorde: 7,
     actief: true,
@@ -136,11 +119,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 4,
       nijmegen: 3,
-
     },
     volgorde: 8,
     actief: true,
@@ -160,11 +140,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 2,
       nijmegen: 1,
-
     },
     volgorde: 9,
     actief: true,
@@ -178,11 +155,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 2,
       nijmegen: 2,
-
     },
     volgorde: 10,
     actief: true,
@@ -196,11 +170,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
-      nijmegen: 2,
-
+      roermond: 2,
+      nijmegen: 1,
     },
     volgorde: 11,
     actief: true,
@@ -214,11 +185,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 2,
       nijmegen: 1,
-
     },
     volgorde: 12,
     actief: true,
@@ -232,11 +200,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 3,
       nijmegen: 2,
-
     },
     volgorde: 13,
     actief: true,
@@ -250,11 +215,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 3,
       nijmegen: 2,
-
     },
     volgorde: 14,
     actief: true,
@@ -268,11 +230,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 3,
       nijmegen: 2,
-
     },
     volgorde: 15,
     actief: true,
@@ -286,11 +245,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 3,
       nijmegen: 2,
-
     },
     volgorde: 16,
     actief: true,
@@ -304,11 +260,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
-      nijmegen: 1,
-
+      roermond: 2,
+      nijmegen: 2,
     },
     volgorde: 17,
     actief: true,
@@ -322,11 +275,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
-      nijmegen: 1,
-
+      roermond: 2,
+      nijmegen: 2,
     },
     volgorde: 18,
     actief: true,
@@ -340,11 +290,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
-      nijmegen: 1,
-
+      roermond: 2,
+      nijmegen: 2,
     },
     volgorde: 19,
     actief: true,
@@ -358,11 +305,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 2,
       nijmegen: 1,
-
     },
     volgorde: 20,
     actief: true,
@@ -376,15 +320,15 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 3,
       nijmegen: 2,
-
     },
     volgorde: 21,
     actief: true,
-    alternatieveNamen: ["yoghurt bosvruchten", "bosvruchten yoghurt"],
+    alternatieveNamen: [
+      "yoghurt bosvruchten",
+      "bosvruchten yoghurt",
+    ],
   },
 
   // Zachtlopers
@@ -396,11 +340,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 1,
       nijmegen: 1,
-
     },
     volgorde: 22,
     actief: true,
@@ -414,11 +355,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 1,
       nijmegen: 1,
-
     },
     volgorde: 23,
     actief: true,
@@ -432,33 +370,12 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 2,
       nijmegen: 1,
-
     },
     volgorde: 24,
     actief: true,
     alternatieveNamen: ["banaan"],
-  },
-  {
-    id: "bosbes",
-    naam: "Bosbes",
-    categorie: "ijs",
-    telCategorie: "zachtlopers",
-    bestelBij: "ijskeuken",
-    bestelGroep: "ijs",
-    buffers: {
-
-      roermond: -1,
-
-      nijmegen: 0,
-
-    },
-    volgorde: 25,
-    actief: true,
-    alternatieveNamen: ["bosbes", "blauwe bes"],
   },
   {
     id: "malaga",
@@ -468,11 +385,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 2,
       nijmegen: 2,
-
     },
     volgorde: 26,
     actief: true,
@@ -486,11 +400,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 1,
       nijmegen: 1,
-
     },
     volgorde: 27,
     actief: true,
@@ -504,11 +415,8 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 1,
       nijmegen: 0,
-
     },
     volgorde: 28,
     actief: true,
@@ -522,32 +430,28 @@ export const ijs: Product[] = [
     bestelBij: "ijskeuken",
     bestelGroep: "ijs",
     buffers: {
-
-      roermond: -1,
-
+      roermond: 1,
       nijmegen: 0,
-
     },
     volgorde: 29,
     actief: true,
     alternatieveNamen: ["yoghurt aardbei"],
   },
+
+  // Speciaalsmaken
   {
-  id: "speciaalsmaken",
-  naam: "Speciaalsmaken",
-  categorie: "ijs",
-  telCategorie: "speciaalsmaken",
-  bestelBij: "ijskeuken",
-  bestelGroep: "ijs",
-  buffers: {
-
-    roermond: -1,
-
-    nijmegen: 12,
-
+    id: "speciaalsmaken",
+    naam: "Speciaalsmaken",
+    categorie: "ijs",
+    telCategorie: "speciaalsmaken",
+    bestelBij: "ijskeuken",
+    bestelGroep: "ijs",
+    buffers: {
+      roermond: 12,
+      nijmegen: 12,
+    },
+    volgorde: 999,
+    actief: true,
+    alternatieveNamen: [],
   },
-  volgorde: 999,
-  actief: true,
-  alternatieveNamen: [],
-},
 ];

@@ -14,9 +14,8 @@ export default function TelRij({
   onChange,
 }: Props) {
   return (
-    <div className="grid grid-cols-[1fr_60px_152px] items-center gap-3 border-b py-3 md:grid-cols-[1fr_90px_190px]">
-
-      <div className="break-words text-sm font-medium md:text-base">
+    <div className="grid grid-cols-[minmax(0,1fr)_44px_176px] items-center gap-3 border-b border-slate-300 py-3 md:grid-cols-[minmax(0,1fr)_60px_176px]">
+      <div className="min-w-0 break-words text-sm font-medium text-slate-900 md:text-base">
         {naam}
       </div>
 
@@ -24,8 +23,7 @@ export default function TelRij({
         {buffer}
       </div>
 
-      <div className="flex items-center justify-center gap-1">
-
+      <div className="grid h-11 grid-cols-[44px_minmax(0,1fr)_44px] gap-1">
         <button
           type="button"
           onClick={() =>
@@ -37,7 +35,7 @@ export default function TelRij({
             )
           }
           aria-label={`${naam} verlagen`}
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-red-500 p-0 text-2xl font-bold leading-none text-white transition-colors hover:bg-red-600 active:bg-red-700"
+          className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-500 p-0 text-2xl font-bold leading-none text-white transition-colors hover:bg-red-600 active:bg-red-700"
         >
           −
         </button>
@@ -51,14 +49,12 @@ export default function TelRij({
             onChange(
               Math.max(
                 0,
-                Number(
-                  e.target.value
-                ) || 0
+                Number(e.target.value) || 0
               )
             )
           }
           aria-label={`${naam} aantal`}
-          className="h-11 w-20 rounded-xl border border-slate-300 text-center text-lg font-bold outline-none [appearance:textfield] focus:border-blue-500 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="h-11 min-w-0 w-full rounded-xl border border-slate-300 bg-white text-center text-lg font-bold outline-none [appearance:textfield] focus:border-blue-500 focus:ring-1 focus:ring-blue-500 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
 
         <button
@@ -69,13 +65,11 @@ export default function TelRij({
             )
           }
           aria-label={`${naam} verhogen`}
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-green-600 p-0 text-2xl font-bold leading-none text-white transition-colors hover:bg-green-700 active:bg-green-800"
+          className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-600 p-0 text-2xl font-bold leading-none text-white transition-colors hover:bg-green-700 active:bg-green-800"
         >
           +
         </button>
-
       </div>
-
     </div>
   );
 }

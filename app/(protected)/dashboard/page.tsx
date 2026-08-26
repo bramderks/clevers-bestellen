@@ -3,69 +3,63 @@ import Link from "next/link";
 import { APP } from "@/lib/app";
 
 export default function DashboardPagina() {
-  const kaarten = [
-    {
-      titel: "Bestellingen",
-      waarde: "—",
-      icoon: "📦",
-      omschrijving:
-        "Bestellingen worden tijdelijk verwerkt en als PDF verzonden.",
-    },
-    {
-      titel: "Open weken",
-      waarde: "—",
-      icoon: "📅",
-      omschrijving:
-        "Weekgegevens zijn momenteel niet beschikbaar zonder databaseverbinding.",
-    },
-  ];
-
   return (
     <main className="min-h-screen bg-slate-100">
       <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-3xl items-center justify-between px-5 py-5">
           <div>
-            <h1 className="text-3xl font-bold">
-              Dashboard
+            <h1 className="text-3xl font-bold text-slate-900">
+              Clevers Bestellen
             </h1>
 
-            <p className="text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500">
               {APP.naam}
             </p>
           </div>
 
           <Link
             href="/api/auth/logout"
-            className="rounded-lg border px-4 py-2 text-sm transition hover:bg-slate-100"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
           >
             Uitloggen
           </Link>
         </div>
       </header>
 
-      <section className="mx-auto grid max-w-7xl gap-6 p-6 md:grid-cols-2">
-        {kaarten.map((kaart) => (
-          <article
-            key={kaart.titel}
-            className="rounded-2xl bg-white p-6 shadow-sm"
-          >
-            <div className="text-4xl">
-              {kaart.icoon}
-            </div>
+      <section className="mx-auto flex max-w-3xl flex-col gap-5 p-5">
+        <Link
+          href="/tellen"
+          className="group rounded-2xl bg-white p-7 shadow-sm transition hover:shadow-md active:scale-[0.99]"
+        >
+          <div className="text-5xl">
+            🍦
+          </div>
 
-            <div className="mt-4 text-3xl font-bold">
-              {kaart.waarde}
-            </div>
+          <h2 className="mt-5 text-3xl font-bold text-slate-900">
+            Bestellen
+          </h2>
 
-            <div className="mt-1 text-slate-500">
-              {kaart.titel}
-            </div>
+          <p className="mt-2 text-lg text-slate-500">
+            Voorraad tellen en direct een bestelling genereren.
+          </p>
+        </Link>
 
-            <p className="mt-4 text-sm text-slate-500">
-              {kaart.omschrijving}
-            </p>
-          </article>
-        ))}
+        <Link
+          href="/weektaken"
+          className="group rounded-2xl bg-white p-7 shadow-sm transition hover:shadow-md active:scale-[0.99]"
+        >
+          <div className="text-5xl">
+            ✅
+          </div>
+
+          <h2 className="mt-5 text-3xl font-bold text-slate-900">
+            Weektaken
+          </h2>
+
+          <p className="mt-2 text-lg text-slate-500">
+            Schoonmaak-, controle- en onderhoudstaken.
+          </p>
+        </Link>
       </section>
     </main>
   );
