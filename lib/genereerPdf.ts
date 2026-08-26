@@ -19,14 +19,8 @@ interface PdfRegel {
   bestellen: number;
 }
 
-function huidigeDatum(
-  datum: string
-) {
-  return new Date(
-    datum
-  ).toLocaleDateString(
-    "nl-NL"
-  );
+function huidigeDatum(datum: string) {
+  return new Date(datum).toLocaleDateString("nl-NL");
 }
 
 function tekenHeader(
@@ -34,11 +28,7 @@ function tekenHeader(
   vestiging: Vestiging,
   datum: string
 ) {
-  doc.setFillColor(
-    35,
-    91,
-    170
-  );
+  doc.setFillColor(35, 91, 170);
 
   doc.rect(
     0,
@@ -48,11 +38,7 @@ function tekenHeader(
     "F"
   );
 
-  doc.setTextColor(
-    255,
-    255,
-    255
-  );
+  doc.setTextColor(255, 255, 255);
 
   doc.setFont(
     "helvetica",
@@ -75,11 +61,7 @@ function tekenHeader(
     25
   );
 
-  doc.setTextColor(
-    40,
-    40,
-    40
-  );
+  doc.setTextColor(40, 40, 40);
 
   doc.setFont(
     "helvetica",
@@ -95,9 +77,7 @@ function tekenHeader(
   );
 
   doc.text(
-    `Datum: ${huidigeDatum(
-      datum
-    )}`,
+    `Datum: ${huidigeDatum(datum)}`,
     14,
     52
   );
@@ -129,18 +109,17 @@ function tekenTabel(
   y: number,
   regels: PdfRegel[]
 ) {
-  const zichtbareRegels =
-    regels
-      .filter(
-        (regel) =>
-          regel.bestellen > 0
+  const zichtbareRegels = regels
+    .filter(
+      (regel) =>
+        regel.bestellen > 0
+    )
+    .sort((a, b) =>
+      a.naam.localeCompare(
+        b.naam,
+        "nl"
       )
-      .sort((a, b) =>
-        a.naam.localeCompare(
-          b.naam,
-          "nl"
-        )
-      );
+    );
 
   if (
     zichtbareRegels.length === 0
@@ -148,11 +127,10 @@ function tekenTabel(
     return y;
   }
 
-  y =
-    controleerPagina(
-      doc,
-      y
-    );
+  y = controleerPagina(
+    doc,
+    y
+  );
 
   doc.setFont(
     "helvetica",
@@ -219,14 +197,17 @@ function tekenTabel(
       0: {
         cellWidth: 90,
       },
+
       1: {
         cellWidth: 25,
         halign: "center",
       },
+
       2: {
         cellWidth: 25,
         halign: "center",
       },
+
       3: {
         cellWidth: 30,
         halign: "center",
@@ -276,12 +257,45 @@ export function genereerBestelPdf({
     datum
   );
 
+  /*
+   * ========================================
+   * 1. IJS
+   * ========================================
+   *
+   * Alleen normale ijssmaken.
+   * Slagroom en speciaalsmaken worden
+   * apart weergegeven.
+   */
   const ijs =
     bestelling.filter(
       (regel) =>
-        regel.bestelGroep === "ijs"
+        regel.bestelGroep === "ijs" &&
+        regel.id !== "slagroom" &&
+        regel.id !== "speciaalsmaken"
     );
 
+  /*
+   * ========================================
+   * 2. SLAGROOM & SPECIAALSMAKEN
+   * ========================================
+   */
+  const slagroom =
+    bestelling.filter(
+      (regel) =>
+        regel.id === "slagroom"
+    );
+
+  const speciaalsmaken =
+    bestelling.filter(
+      (regel) =>
+        regel.id === "speciaalsmaken"
+    );
+
+  /*
+   * ========================================
+   * 3. DROOGGOED
+   * ========================================
+   */
   const drooggoed =
     bestelling.filter(
       (regel) =>
@@ -289,40 +303,65 @@ export function genereerBestelPdf({
         "drooggoed"
     );
 
-
   let y = 70;
 
-  y =
-    tekenTabel(
-      doc,
-      "IJS",
-      y,
-      ijs
-    );
+  /*
+   * IJS
+   */
+  y = tekenTabel(
+    doc,
+    "IJS",
+    y,
+    ijs
+  );
 
-
-  y =
-    controleerPagina(
-      doc,
-      y
-    );
-
-
-  y =
-    tekenTabel(
-      doc,
-      "DROOGGOED",
-      y,
-      drooggoed
-    );
-
-
+  /*
+   * SLAGROOM & SPECIAALSMaken
+   */
   y =
     controleerPagina(
       doc,
       y
     );
 
+  const specialeRegels = [
+    ...slagroom,
+    ...speciaalsmaken,
+  ];
+
+  y = tekenTabel(
+    doc,
+    "SLAGROOM & SPECIAALSMaken",
+    y,
+    specialeRegels
+  );
+
+  /*
+   * DROOGGOED
+   */
+  y =
+    controleerPagina(
+      doc,
+      y
+    );
+
+  y = tekenTabel(
+    doc,
+    "DROOGGOED",
+    y,
+    drooggoed
+  );
+
+  /*
+   * ========================================
+   * SAMENVATTING
+   * ========================================
+   */
+  y =
+    controleerPagina(
+      doc,
+      y
+    );
 
   doc.setFont(
     "helvetica",
@@ -337,7 +376,6 @@ export function genereerBestelPdf({
     y
   );
 
-
   doc.setFont(
     "helvetica",
     "normal"
@@ -345,15 +383,19 @@ export function genereerBestelPdf({
 
   doc.setFontSize(11);
 
-
   const totaalIJs =
     ijs.reduce(
       (totaal, regel) =>
         totaal +
         regel.bestellen,
       0
+    ) +
+    speciaalsmaken.reduce(
+      (totaal, regel) =>
+        totaal +
+        regel.bestellen,
+      0
     );
-
 
   const totaalDrooggoed =
     drooggoed.reduce(
@@ -363,6 +405,13 @@ export function genereerBestelPdf({
       0
     );
 
+  const totaalSlagroom =
+    slagroom.reduce(
+      (totaal, regel) =>
+        totaal +
+        regel.bestellen,
+      0
+    );
 
   doc.text(
     `Totaal ijs: ${totaalIJs}`,
@@ -370,17 +419,25 @@ export function genereerBestelPdf({
     y + 10
   );
 
-
   doc.text(
-    `Totaal drooggoed: ${totaalDrooggoed}`,
+    `Totaal slagroom: ${totaalSlagroom}`,
     14,
     y + 18
   );
 
+  doc.text(
+    `Totaal drooggoed: ${totaalDrooggoed}`,
+    14,
+    y + 26
+  );
 
+  /*
+   * ========================================
+   * PAGINANUMMERING
+   * ========================================
+   */
   const aantalPaginas =
     doc.getNumberOfPages();
-
 
   for (
     let pagina = 1;
@@ -400,7 +457,11 @@ export function genereerBestelPdf({
     );
   }
 
-
+  /*
+   * ========================================
+   * BESTANDSNAAM
+   * ========================================
+   */
   const bestandsDatum =
     new Date(datum)
       .toISOString()
@@ -408,7 +469,6 @@ export function genereerBestelPdf({
         0,
         10
       );
-
 
   doc.save(
     `${bestandsDatum}_${vestiging}_Bestelcontrole.pdf`
