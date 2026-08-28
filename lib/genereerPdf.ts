@@ -20,7 +20,9 @@ interface PdfRegel {
 }
 
 function huidigeDatum(datum: string) {
-  return new Date(datum).toLocaleDateString("nl-NL");
+  return new Date(datum).toLocaleDateString(
+    "nl-NL"
+  );
 }
 
 function tekenHeader(
@@ -38,7 +40,11 @@ function tekenHeader(
     "F"
   );
 
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(
+    255,
+    255,
+    255
+  );
 
   doc.setFont(
     "helvetica",
@@ -61,7 +67,11 @@ function tekenHeader(
     25
   );
 
-  doc.setTextColor(40, 40, 40);
+  doc.setTextColor(
+    40,
+    40,
+    40
+  );
 
   doc.setFont(
     "helvetica",
@@ -103,13 +113,10 @@ function controleerPagina(
   return y;
 }
 
-function tekenTabel(
-  doc: jsPDF,
-  titel: string,
-  y: number,
-  regels: PdfRegel[]
-) {
-  const zichtbareRegels = regels
+function sorteerRegels(
+  regels: BestelAdvies[]
+): PdfRegel[] {
+  return regels
     .filter(
       (regel) =>
         regel.bestellen > 0
@@ -119,7 +126,23 @@ function tekenTabel(
         b.naam,
         "nl"
       )
-    );
+    )
+    .map((regel) => ({
+      naam: regel.naam,
+      geteld: regel.geteld,
+      buffer: regel.buffer,
+      bestellen: regel.bestellen,
+    }));
+}
+
+function tekenTabel(
+  doc: jsPDF,
+  titel: string,
+  y: number,
+  regels: BestelAdvies[]
+) {
+  const zichtbareRegels =
+    sorteerRegels(regels);
 
   if (
     zichtbareRegels.length === 0
@@ -172,15 +195,14 @@ function tekenTabel(
       ],
     ],
 
-    body:
-      zichtbareRegels.map(
-        (regel) => [
-          regel.naam,
-          regel.geteld,
-          regel.buffer,
-          regel.bestellen,
-        ]
-      ),
+    body: zichtbareRegels.map(
+      (regel) => [
+        regel.naam,
+        regel.geteld,
+        regel.buffer,
+        regel.bestellen,
+      ]
+    ),
 
     headStyles: {
       fillColor: [
@@ -197,17 +219,14 @@ function tekenTabel(
       0: {
         cellWidth: 90,
       },
-
       1: {
         cellWidth: 25,
         halign: "center",
       },
-
       2: {
         cellWidth: 25,
         halign: "center",
       },
-
       3: {
         cellWidth: 30,
         halign: "center",
@@ -248,8 +267,7 @@ export function genereerBestelPdf({
   datum,
   bestelling,
 }: PdfOpties) {
-  const doc =
-    new jsPDF();
+  const doc = new jsPDF();
 
   tekenHeader(
     doc,
@@ -258,13 +276,12 @@ export function genereerBestelPdf({
   );
 
   /*
-   * ========================================
+   * ============================================================
    * 1. IJS
-   * ========================================
+   * ============================================================
    *
-   * Alleen normale ijssmaken.
-   * Slagroom en speciaalsmaken worden
-   * apart weergegeven.
+   * Alle normale ijssmaken.
+   * Slagroom en speciaalsmaken worden bewust apart gehouden.
    */
   const ijs =
     bestelling.filter(
@@ -275,26 +292,21 @@ export function genereerBestelPdf({
     );
 
   /*
-   * ========================================
+   * ============================================================
    * 2. SLAGROOM & SPECIAALSMAKEN
-   * ========================================
+   * ============================================================
    */
-  const slagroom =
+  const slagroomEnSpeciaalsmaken =
     bestelling.filter(
       (regel) =>
-        regel.id === "slagroom"
-    );
-
-  const speciaalsmaken =
-    bestelling.filter(
-      (regel) =>
+        regel.id === "slagroom" ||
         regel.id === "speciaalsmaken"
     );
 
   /*
-   * ========================================
+   * ============================================================
    * 3. DROOGGOED
-   * ========================================
+   * ============================================================
    */
   const drooggoed =
     bestelling.filter(
@@ -318,32 +330,25 @@ export function genereerBestelPdf({
   /*
    * SLAGROOM & SPECIAALSMaken
    */
-  y =
-    controleerPagina(
-      doc,
-      y
-    );
-
-  const specialeRegels = [
-    ...slagroom,
-    ...speciaalsmaken,
-  ];
+  y = controleerPagina(
+    doc,
+    y
+  );
 
   y = tekenTabel(
     doc,
-    "SLAGROOM & SPECIAALSMaken",
+    "SLAGROOM & SPECIAALSMAKEN",
     y,
-    specialeRegels
+    slagroomEnSpeciaalsmaken
   );
 
   /*
    * DROOGGOED
    */
-  y =
-    controleerPagina(
-      doc,
-      y
-    );
+  y = controleerPagina(
+    doc,
+    y
+  );
 
   y = tekenTabel(
     doc,
@@ -353,15 +358,14 @@ export function genereerBestelPdf({
   );
 
   /*
-   * ========================================
+   * ============================================================
    * SAMENVATTING
-   * ========================================
+   * ============================================================
    */
-  y =
-    controleerPagina(
-      doc,
-      y
-    );
+  y = controleerPagina(
+    doc,
+    y
+  );
 
   doc.setFont(
     "helvetica",
@@ -389,24 +393,37 @@ export function genereerBestelPdf({
         totaal +
         regel.bestellen,
       0
-    ) +
-    speciaalsmaken.reduce(
-      (totaal, regel) =>
-        totaal +
-        regel.bestellen,
-      0
-    );
-
-  const totaalDrooggoed =
-    drooggoed.reduce(
-      (totaal, regel) =>
-        totaal +
-        regel.bestellen,
-      0
     );
 
   const totaalSlagroom =
-    slagroom.reduce(
+    bestelling
+      .filter(
+        (regel) =>
+          regel.id === "slagroom"
+      )
+      .reduce(
+        (totaal, regel) =>
+          totaal +
+          regel.bestellen,
+        0
+      );
+
+  const totaalSpeciaalsmaken =
+    bestelling
+      .filter(
+        (regel) =>
+          regel.id ===
+          "speciaalsmaken"
+      )
+      .reduce(
+        (totaal, regel) =>
+          totaal +
+          regel.bestellen,
+        0
+      );
+
+  const totaalDrooggoed =
+    drooggoed.reduce(
       (totaal, regel) =>
         totaal +
         regel.bestellen,
@@ -426,15 +443,21 @@ export function genereerBestelPdf({
   );
 
   doc.text(
-    `Totaal drooggoed: ${totaalDrooggoed}`,
+    `Totaal speciaalsmaken: ${totaalSpeciaalsmaken}`,
     14,
     y + 26
   );
 
+  doc.text(
+    `Totaal drooggoed: ${totaalDrooggoed}`,
+    14,
+    y + 34
+  );
+
   /*
-   * ========================================
+   * ============================================================
    * PAGINANUMMERING
-   * ========================================
+   * ============================================================
    */
   const aantalPaginas =
     doc.getNumberOfPages();
@@ -457,11 +480,6 @@ export function genereerBestelPdf({
     );
   }
 
-  /*
-   * ========================================
-   * BESTANDSNAAM
-   * ========================================
-   */
   const bestandsDatum =
     new Date(datum)
       .toISOString()
