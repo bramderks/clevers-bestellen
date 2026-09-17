@@ -23,10 +23,9 @@ function getResend() {
 }
 
 function getAppUrl() {
-  return (
-    process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://clevers-bestellen.vercel.app")
-  );
+  // Never use VERCEL_URL for links in production e-mails: that can point to a
+  // deployment-specific/preview hostname which is not the public app URL.
+  return process.env.NEXT_PUBLIC_APP_URL || "https://clevers-bestellen.vercel.app";
 }
 
 function maakBestellingLink(
