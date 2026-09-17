@@ -140,7 +140,9 @@ export async function maakBestelPdf(
   const page = pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
   const ctx: PdfContext = { pdf, page, font, bold, y: PAGE_HEIGHT - MARGE };
 
-  tekst(ctx, "🍦 Clevers Telapp - Controle", MARGE, ctx.y, { size: 18, bold: true });
+  // StandardFonts gebruikt WinAnsi en kan geen emoji encoderen.
+  // Daarom gebruikt de PDF tekstlabels zonder emoji; de inhoud en indeling blijven gelijk aan Controle.
+  tekst(ctx, "Clevers Telapp - Controle", MARGE, ctx.y, { size: 18, bold: true });
   ctx.y -= 22;
   tekst(ctx, `${vestiging}  |  ${datum}  |  ${medewerker}`, MARGE, ctx.y, {
     size: 10,
@@ -163,26 +165,26 @@ export async function maakBestelPdf(
 
   tekenBlok(
     ctx,
-    "🍦 Regulier ijs",
+    "Regulier ijs",
     rgb(0.114, 0.275, 0.624),
     ijs.map((r) => ({ naam: r.productNaam, aantal: r.besteld })),
     totaalIJs,
   );
   tekenBlok(
     ctx,
-    "⭐ Speciaalsmaken",
+    "Speciaalsmaken",
     rgb(0.961, 0.62, 0.043),
     [{ naam: "Speciaalsmaken", aantal: speciaalsmaken?.besteld ?? 0 }],
   );
   tekenBlok(
     ctx,
-    "🍦 Slagroom",
+    "Slagroom",
     rgb(0.02, 0.4, 0.7),
     [{ naam: "Slagroom", aantal: slagroom?.besteld ?? 0 }],
   );
   tekenBlok(
     ctx,
-    "📦 Drooggoed",
+    "Drooggoed",
     rgb(0.086, 0.49, 0.216),
     drooggoed.map((r) => ({ naam: r.productNaam, aantal: r.besteld })),
     totaalDrooggoed,
