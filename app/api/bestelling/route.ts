@@ -29,12 +29,9 @@ interface SynchronisatieResultaat {
 
 function vestigingNaam(vestiging: string): string {
   switch (vestiging) {
-    case "roermond":
-      return "Roermond";
-    case "nijmegen":
-      return "Nijmegen";
-    default:
-      return vestiging;
+    case "roermond": return "Roermond";
+    case "nijmegen": return "Nijmegen";
+    default: return vestiging;
   }
 }
 
@@ -60,30 +57,18 @@ function maakSynchronisatieId(body: RequestBody): string {
       bestelGroep: regel.bestelGroep,
     })),
   });
-
   return createHash("sha256").update(inhoud).digest("hex");
 }
 
-async function synchroniseerMetErp(
-  body: RequestBody,
-): Promise<SynchronisatieResultaat> {
+async function synchroniseerMetErp(body: RequestBody): Promise<SynchronisatieResultaat> {
   const erpUrl = process.env.CLEVERS_ERP_TELLING_SYNC_URL;
   const geheim = process.env.CLEVERS_TELLING_SYNC_SECRET;
-
-  if (!erpUrl || !geheim) {
-    return {
-      success: false,
-      fout: "ERP-koppeling is nog niet geconfigureerd.",
-    };
-  }
+  if (!erpUrl || !geheim) return { success: false, fout: "ERP-koppeling is nog niet geconfigureerd." };
 
   try {
     const response = await fetch(erpUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + geheim,
-      },
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + geheim },
       body: JSON.stringify({
         synchronisatieId: maakSynchronisatieId(body),
         datum: body.datum,
@@ -99,27 +84,14 @@ async function synchroniseerMetErp(
       }),
       cache: "no-store",
     });
-
     if (!response.ok) {
       const resultaat = await response.json().catch(() => null);
-
-      return {
-        success: false,
-        fout: resultaat?.fout ?? "ERP-koppeling gaf een foutmelding.",
-      };
+      return { success: false, fout: resultaat?.fout ?? "ERP-koppeling gaf een foutmelding." };
     }
-
     return { success: true };
   } catch (error) {
     console.error("ERP-telling synchronisatie mislukt:", error);
-
-    return {
-      success: false,
-      fout:
-        error instanceof Error
-          ? error.message
-          : "Onbekende synchronisatiefout.",
-    };
+    return { success: false, fout: error instanceof Error ? error.message : "Onbekende synchronisatiefout." };
   }
 }
 
@@ -127,55 +99,33 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as RequestBody;
     const fout = valideer(body);
-
-    if (fout) {
-      return NextResponse.json(
-        { success: false, error: fout },
-        { status: 400 },
-      );
-    }
+    if (fout) return NextResponse.json({ success: false, error: fout }, { status: 400 });
 
     const naamVestiging = vestigingNaam(body.vestiging);
     const datum = new Date(body.datum);
 
-    // De bestaande mailflow blijft de primaire,
-    // onafhankelijke afronding van de telling.
     await verstuurBestelMail(
       naamVestiging,
       body.medewerker.trim(),
       datum.toLocaleDateString("nl-NL"),
       body.regels,
+      body.opmerking?.trim() ?? "",
     );
 
-    // ERP-synchronisatie is aanvullend en mag de
-    // bestaande mailfunctionaliteit nooit blokkeren.
     const synchronisatie = await synchroniseerMetErp(body);
-
     if (!synchronisatie.success) {
-      console.error(
-        "Telling per mail verzonden, maar ERP-synchronisatie mislukt:",
-        synchronisatie.fout,
-      );
+      console.error("Telling per mail verzonden, maar ERP-synchronisatie mislukt:", synchronisatie.fout);
     }
 
     return NextResponse.json({
       success: true,
       message: "Telling per mail verzonden.",
-      erpSynchronisatie: synchronisatie.success
-        ? "gesynchroniseerd"
-        : "niet-gesynchroniseerd",
+      erpSynchronisatie: synchronisatie.success ? "gesynchroniseerd" : "niet-gesynchroniseerd",
     });
   } catch (error) {
     console.error("Telling verwerken mislukt:", error);
-
     return NextResponse.json(
-      {
-        success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Onbekende fout.",
-      },
+      { success: false, error: error instanceof Error ? error.message : "Onbekende fout." },
       { status: 500 },
     );
   }
