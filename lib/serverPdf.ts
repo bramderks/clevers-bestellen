@@ -17,114 +17,119 @@ export interface PdfRegel {
 
 const PAGE_WIDTH = 595;
 const PAGE_HEIGHT = 842;
-const MARGE = 40;
-const BREEDTE = PAGE_WIDTH - MARGE * 2;
-const REGEL_HOOGTE = 28;
-
-interface PdfContext {
-  pdf: PDFDocument;
-  page: PDFPage;
-  font: PDFFont;
-  bold: PDFFont;
-  y: number;
-}
-
-function nieuwePagina(ctx: PdfContext) {
-  ctx.page = ctx.pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
-  ctx.y = PAGE_HEIGHT - MARGE;
-}
-
-function zorgVoorRuimte(ctx: PdfContext, hoogte: number) {
-  if (ctx.y - hoogte < 50) nieuwePagina(ctx);
-}
+const MARGE = 24;
+const KOLOM_GAT = 14;
+const KOLOM_BREEDTE = (PAGE_WIDTH - MARGE * 2 - KOLOM_GAT) / 2;
+const REGEL_HOOGTE = 17;
+const HEADER_HOOGTE = 23;
+const LETTER_GROOTTE = 8.5;
 
 function tekst(
-  ctx: PdfContext,
+  page: PDFPage,
   waarde: string,
   x: number,
   y: number,
-  opties: { size?: number; bold?: boolean; color?: ReturnType<typeof rgb> } = {},
+  font: PDFFont,
+  opties: { size?: number; color?: ReturnType<typeof rgb> } = {},
 ) {
-  ctx.page.drawText(waarde, {
+  page.drawText(waarde, {
     x,
     y,
-    size: opties.size ?? 10,
-    font: opties.bold ? ctx.bold : ctx.font,
+    size: opties.size ?? LETTER_GROOTTE,
+    font,
     color: opties.color,
   });
 }
 
+function tekenRegels(
+  page: PDFPage,
+  regels: Array<{ naam: string; aantal: number }>,
+  x: number,
+  y: number,
+  breedte: number,
+  font: PDFFont,
+  bold: PDFFont,
+) {
+  let currentY = y;
+
+  for (const regel of regels) {
+    const onderkant = currentY - REGEL_HOOGTE;
+
+    page.drawRectangle({
+      x,
+      y: onderkant,
+      width: breedte,
+      height: REGEL_HOOGTE,
+      borderColor: rgb(0.88, 0.89, 0.91),
+      borderWidth: 0.4,
+    });
+
+    // Productnamen worden niet afgekapt: ze krijgen de beschikbare breedte.
+    const maxNaamBreedte = breedte - 58;
+    let naam = regel.naam;
+    while (font.widthOfTextAtSize(naam, LETTER_GROOTTE) > maxNaamBreedte && naam.length > 3) {
+      naam = `${naam.slice(0, -4).trim()}...`;
+    }
+
+    tekst(page, naam, x + 9, onderkant + 5.2, font);
+
+    const aantal = String(regel.aantal);
+    const aantalBreedte = bold.widthOfTextAtSize(aantal, LETTER_GROOTTE);
+    tekst(page, aantal, x + breedte - 9 - aantalBreedte, onderkant + 5.2, bold);
+
+    currentY = onderkant;
+  }
+
+  return currentY;
+}
+
 function tekenBlok(
-  ctx: PdfContext,
+  page: PDFPage,
   titel: string,
   kleur: ReturnType<typeof rgb>,
   regels: Array<{ naam: string; aantal: number }>,
+  x: number,
+  y: number,
+  breedte: number,
+  font: PDFFont,
+  bold: PDFFont,
   totaal?: number,
 ) {
-  const hoogte = 30 + regels.length * REGEL_HOOGTE + (totaal !== undefined ? 30 : 0);
-  zorgVoorRuimte(ctx, Math.min(hoogte, PAGE_HEIGHT - 100));
-
-  ctx.page.drawRectangle({
-    x: MARGE,
-    y: ctx.y - 30,
-    width: BREEDTE,
-    height: 30,
+  page.drawRectangle({
+    x,
+    y: y - HEADER_HOOGTE,
+    width: breedte,
+    height: HEADER_HOOGTE,
     color: kleur,
   });
-  tekst(ctx, titel, MARGE + 14, ctx.y - 20, {
-    size: 12,
-    bold: true,
+  tekst(page, titel, x + 9, y - 15.5, bold, {
+    size: 9.5,
     color: rgb(1, 1, 1),
   });
-  ctx.y -= 30;
 
-  for (const regel of regels) {
-    zorgVoorRuimte(ctx, REGEL_HOOGTE + 2);
-    const onderkant = ctx.y - REGEL_HOOGTE;
-
-    ctx.page.drawRectangle({
-      x: MARGE,
-      y: onderkant,
-      width: BREEDTE,
-      height: REGEL_HOOGTE,
-      borderColor: rgb(0.88, 0.89, 0.91),
-      borderWidth: 0.5,
-    });
-    tekst(ctx, regel.naam, MARGE + 14, onderkant + 9, { size: 10 });
-
-    const aantal = String(regel.aantal);
-    const aantalBreedte = ctx.bold.widthOfTextAtSize(aantal, 10);
-    tekst(ctx, aantal, MARGE + BREEDTE - 14 - aantalBreedte, onderkant + 9, {
-      size: 10,
-      bold: true,
-    });
-    ctx.y = onderkant;
-  }
+  let currentY = y - HEADER_HOOGTE;
+  currentY = tekenRegels(page, regels, x, currentY, breedte, font, bold);
 
   if (totaal !== undefined) {
-    zorgVoorRuimte(ctx, 30);
-    const onderkant = ctx.y - 30;
-    ctx.page.drawRectangle({
-      x: MARGE,
+    const onderkant = currentY - REGEL_HOOGTE;
+    page.drawRectangle({
+      x,
       y: onderkant,
-      width: BREEDTE,
-      height: 30,
+      width: breedte,
+      height: REGEL_HOOGTE,
       color: rgb(0.97, 0.98, 0.99),
       borderColor: rgb(0.88, 0.89, 0.91),
-      borderWidth: 0.5,
+      borderWidth: 0.4,
     });
-    tekst(ctx, "Totaal", MARGE + 14, onderkant + 10, { size: 10, bold: true });
 
+    tekst(page, "Totaal", x + 9, onderkant + 5.2, bold);
     const waarde = String(totaal);
-    const waardeBreedte = ctx.bold.widthOfTextAtSize(waarde, 10);
-    tekst(ctx, waarde, MARGE + BREEDTE - 14 - waardeBreedte, onderkant + 10, {
-      size: 10,
-      bold: true,
-    });
-    ctx.y = onderkant;
+    const waardeBreedte = bold.widthOfTextAtSize(waarde, LETTER_GROOTTE);
+    tekst(page, waarde, x + breedte - 9 - waardeBreedte, onderkant + 5.2, bold);
+    currentY = onderkant;
   }
 
-  ctx.y -= 18;
+  return currentY;
 }
 
 export async function maakBestelPdf(
@@ -138,84 +143,154 @@ export async function maakBestelPdf(
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
   const page = pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
-  const ctx: PdfContext = { pdf, page, font, bold, y: PAGE_HEIGHT - MARGE };
 
-  // StandardFonts gebruikt WinAnsi en kan geen emoji encoderen.
-  // Daarom gebruikt de PDF tekstlabels zonder emoji; de inhoud en indeling blijven gelijk aan Controle.
-  tekst(ctx, "Clevers Telapp - Controle", MARGE, ctx.y, { size: 18, bold: true });
-  ctx.y -= 22;
-  tekst(ctx, `${vestiging}  |  ${datum}  |  ${medewerker}`, MARGE, ctx.y, {
-    size: 10,
-    color: rgb(0.35, 0.37, 0.4),
+  // Eén compacte A4-bestelbon. Geen emoji: StandardFonts/WinAnsi ondersteunt die niet.
+  tekst(page, "Clevers Telapp - Bestelling", MARGE, PAGE_HEIGHT - MARGE, bold, {
+    size: 17,
   });
-  ctx.y -= 28;
+  tekst(
+    page,
+    `${vestiging}  |  ${datum}  |  ${medewerker}`,
+    MARGE,
+    PAGE_HEIGHT - MARGE - 19,
+    font,
+    { size: 9, color: rgb(0.35, 0.37, 0.4) },
+  );
 
   const ijs = regels
-    .filter((r) => r.bestelGroep === "ijs" && r.productId !== "speciaalsmaken" && r.productId !== "slagroom")
+    .filter(
+      (r) =>
+        r.bestelGroep === "ijs" &&
+        r.productId !== "speciaalsmaken" &&
+        r.productId !== "slagroom",
+    )
     .sort((a, b) => a.productNaam.localeCompare(b.productNaam, "nl"));
   const speciaalsmaken = regels.find((r) => r.productId === "speciaalsmaken");
   const slagroom = regels.find((r) => r.productId === "slagroom");
   const drooggoed = regels
-    .filter((r) => r.bestelGroep !== "ijs" && r.productId !== "speciaalsmaken" && r.productId !== "slagroom")
+    .filter(
+      (r) =>
+        r.bestelGroep !== "ijs" &&
+        r.productId !== "speciaalsmaken" &&
+        r.productId !== "slagroom",
+    )
     .sort((a, b) => a.productNaam.localeCompare(b.productNaam, "nl"));
 
-  // Exact dezelfde indeling en totalen als ControlePagina.
-  const totaalIJs = ijs.reduce((totaal, regel) => totaal + regel.besteld, 0) + (speciaalsmaken?.besteld ?? 0);
-  const totaalDrooggoed = drooggoed.reduce((totaal, regel) => totaal + regel.besteld, 0);
+  const totaalIJs =
+    ijs.reduce((totaal, regel) => totaal + regel.besteld, 0) +
+    (speciaalsmaken?.besteld ?? 0);
+  const totaalDrooggoed = drooggoed.reduce(
+    (totaal, regel) => totaal + regel.besteld,
+    0,
+  );
 
-  tekenBlok(
-    ctx,
+  const topY = PAGE_HEIGHT - MARGE - 50;
+  const linkerX = MARGE;
+  const rechterX = MARGE + KOLOM_BREEDTE + KOLOM_GAT;
+
+  const ijsEindY = tekenBlok(
+    page,
     "Regulier ijs",
     rgb(0.114, 0.275, 0.624),
     ijs.map((r) => ({ naam: r.productNaam, aantal: r.besteld })),
+    linkerX,
+    topY,
+    KOLOM_BREEDTE,
+    font,
+    bold,
     totaalIJs,
   );
-  tekenBlok(
-    ctx,
-    "Speciaalsmaken",
-    rgb(0.961, 0.62, 0.043),
-    [{ naam: "Speciaalsmaken", aantal: speciaalsmaken?.besteld ?? 0 }],
-  );
-  tekenBlok(
-    ctx,
-    "Slagroom",
-    rgb(0.02, 0.4, 0.7),
-    [{ naam: "Slagroom", aantal: slagroom?.besteld ?? 0 }],
-  );
-  tekenBlok(
-    ctx,
+
+  const drooggoedEindY = tekenBlok(
+    page,
     "Drooggoed",
     rgb(0.086, 0.49, 0.216),
     drooggoed.map((r) => ({ naam: r.productNaam, aantal: r.besteld })),
+    rechterX,
+    topY,
+    KOLOM_BREEDTE,
+    font,
+    bold,
     totaalDrooggoed,
   );
 
-  zorgVoorRuimte(ctx, 75);
-  ctx.page.drawRectangle({
-    x: MARGE,
-    y: ctx.y - 60,
-    width: BREEDTE,
-    height: 60,
+  // Kleine vaste blokken onderaan de rechterkolom.
+  const kleineBlokkenY = Math.min(drooggoedEindY, topY - 155) - 12;
+  const specialEindY = tekenBlok(
+    page,
+    "Speciaalsmaken",
+    rgb(0.961, 0.62, 0.043),
+    [{ naam: "Speciaalsmaken", aantal: speciaalsmaken?.besteld ?? 0 }],
+    rechterX,
+    kleineBlokkenY,
+    KOLOM_BREEDTE,
+    font,
+    bold,
+  );
+
+  tekenBlok(
+    page,
+    "Slagroom",
+    rgb(0.02, 0.4, 0.7),
+    [{ naam: "Slagroom", aantal: slagroom?.besteld ?? 0 }],
+    rechterX,
+    specialEindY - 10,
+    KOLOM_BREEDTE,
+    font,
+    bold,
+  );
+
+  // Opmerking onder de reguliere ijslijst; dit blijft op dezelfde A4.
+  const opmerkingTop = Math.min(ijsEindY, PAGE_HEIGHT - 620) - 12;
+  const opmerkingHoogte = 66;
+  const opmerkingOnderkant = opmerkingTop - opmerkingHoogte;
+
+  page.drawRectangle({
+    x: linkerX,
+    y: opmerkingOnderkant,
+    width: KOLOM_BREEDTE,
+    height: opmerkingHoogte,
     borderColor: rgb(0.88, 0.89, 0.91),
-    borderWidth: 0.7,
+    borderWidth: 0.5,
   });
-  tekst(ctx, "Opmerking", MARGE + 14, ctx.y - 20, { size: 10, bold: true });
-  const opmerkingTekst = opmerking.trim() || "-";
-  const regelsOpmerking = opmerkingTekst.match(/.{1,85}(?:\s|$)/g) ?? [opmerkingTekst];
-  regelsOpmerking.slice(0, 2).forEach((regel, index) => {
-    tekst(ctx, regel.trim(), MARGE + 14, ctx.y - 39 - index * 12, { size: 9 });
+  tekst(page, "Opmerking", linkerX + 9, opmerkingTop - 16, bold, {
+    size: 9,
   });
 
-  const paginaAantal = pdf.getPageCount();
-  pdf.getPages().forEach((pdfPage, index) => {
-    pdfPage.drawText(`Pagina ${index + 1} van ${paginaAantal}`, {
-      x: PAGE_WIDTH - 95,
-      y: 22,
-      size: 8,
-      font,
-      color: rgb(0.45, 0.47, 0.5),
+  const opmerkingTekst = opmerking.trim() || "-";
+  const woorden = opmerkingTekst.split(/\s+/);
+  const opmerkingRegels: string[] = [];
+  let huidige = "";
+  const maxBreedte = KOLOM_BREEDTE - 18;
+
+  for (const woord of woorden) {
+    const kandidaat = huidige ? `${huidige} ${woord}` : woord;
+    if (
+      font.widthOfTextAtSize(kandidaat, 8.5) <= maxBreedte ||
+      !huidige
+    ) {
+      huidige = kandidaat;
+    } else {
+      opmerkingRegels.push(huidige);
+      huidige = woord;
+    }
+  }
+  if (huidige) opmerkingRegels.push(huidige);
+
+  opmerkingRegels.slice(0, 3).forEach((regel, index) => {
+    tekst(page, regel, linkerX + 9, opmerkingTop - 32 - index * 11, font, {
+      size: 8.5,
     });
   });
+
+  tekst(
+    page,
+    "Deze PDF is de besteloverzicht-versie van de controle na de telling.",
+    MARGE,
+    16,
+    font,
+    { size: 7, color: rgb(0.5, 0.52, 0.55) },
+  );
 
   return pdf.save();
 }
