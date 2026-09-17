@@ -1,11 +1,14 @@
 import { openBrowser } from "./browser";
-import { login } from "./login";
+import { login, CleversVestiging } from "./login";
 import { vulBestelling, BestelRegel } from "./bestelling";
 
-export async function verstuurBestelling(regels: BestelRegel[]) {
+export async function verstuurBestelling(
+  vestiging: CleversVestiging,
+  regels: BestelRegel[]
+) {
   const { browser, page } = await openBrowser();
 
-  await login(page);
+  await login(page, vestiging);
 
   await vulBestelling(page, regels);
 
