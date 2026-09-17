@@ -1,20 +1,23 @@
 import { NextResponse } from "next/server";
 
 import { verstuurBestelling } from "@/lib/automation/verzenden";
+import type { CleversVestiging } from "@/lib/automation/login";
 
-export async function POST(
-  request: Request
-) {
+function getVestiging(value: unknown): CleversVestiging {
+  if (value === "Nijmegen" || value === "Roermond") return value;
+  throw new Error("Ongeldige vestiging voor automatisch bestellen.");
+}
+
+export async function POST(request: Request) {
   try {
-    const bestelling =
-      await request.json();
+    const bestelling = await request.json();
+    const vestiging = getVestiging(bestelling?.vestiging);
 
-    await verstuurBestelling(
-      bestelling
-    );
+    await verstuurBestelling(vestiging, bestelling?.regels ?? []);
 
     return NextResponse.json({
       success: true,
+      vestiging,
     });
   } catch (error) {
     console.error(error);
@@ -22,8 +25,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: false,
-        error:
-          "Automatisch bestellen mislukt.",
+        error: "Automatisch bestellen mislukt.",
       },
       {
         status: 500,
