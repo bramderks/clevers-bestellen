@@ -23,8 +23,6 @@ function getResend() {
 }
 
 function getAppUrl() {
-  // Never use VERCEL_URL for links in production e-mails: that can point to a
-  // deployment-specific/preview hostname which is not the public app URL.
   return process.env.NEXT_PUBLIC_APP_URL || "https://clevers-bestellen.vercel.app";
 }
 
@@ -50,8 +48,6 @@ function maakHtml(
   regels: MailRegel[],
   opmerking: string,
 ) {
-  const totaal = regels.reduce((t, r) => t + r.besteld, 0);
-  const bestelRegels = regels.filter((r) => r.besteld > 0).length;
   const bestellingLink = maakBestellingLink(
     vestiging,
     medewerker,
@@ -59,28 +55,55 @@ function maakHtml(
     regels,
     opmerking,
   );
-  const rijen = regels
-    .map(
-      (r) => `
-        <tr>
-          <td>${r.productNaam}</td>
-          <td align="center">${r.geteld}</td>
-          <td align="center">${r.buffer}</td>
-          <td align="center"><strong>${r.besteld}</strong></td>
-        </tr>`,
-    )
-    .join("");
 
   return `
-<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"/><style>
-body{margin:0;padding:24px;background:#f4f4f4;font-family:Arial,sans-serif;color:#333}.container{max-width:700px;margin:auto;background:#fff;border:1px solid #e5e5e5;border-radius:10px;overflow:hidden}.header{background:#009640;color:#fff;padding:24px}.content{padding:24px}table{width:100%;border-collapse:collapse;margin-top:20px}th{background:#009640;color:#fff;padding:10px}td{padding:8px;border-bottom:1px solid #e5e5e5}.samenvatting{margin-top:24px;background:#f7f7f7;padding:16px;border-radius:8px}.actie{margin:28px 0;text-align:center}.knop{display:inline-block;background:#009640;color:#fff!important;text-decoration:none;padding:14px 24px;border-radius:8px;font-weight:bold}.footer{background:#fafafa;padding:18px;text-align:center;font-size:13px;color:#777}
-</style></head><body><div class="container"><div class="header"><h1>🍦 Clevers Telapp</h1><p>Nieuwe telling ontvangen</p></div><div class="content">
-<table><tr><td><strong>Vestiging</strong></td><td>${vestiging}</td></tr><tr><td><strong>Datum</strong></td><td>${datum}</td></tr><tr><td><strong>Medewerker</strong></td><td>${medewerker}</td></tr></table>
-<h2>Telling</h2><table><thead><tr><th>Product</th><th>Geteld</th><th>Buffer</th><th>Bestellen</th></tr></thead><tbody>${rijen}</tbody></table>
-<div class="samenvatting"><p><strong>Totaal te bestellen:</strong> ${totaal}</p><p><strong>Aantal bestelregels:</strong> ${bestelRegels}</p></div>
-<div class="actie"><a class="knop" href="${bestellingLink}">Open bestelling met aantallen</a></div>
-<p style="font-size:13px;color:#666;text-align:center">De link opent de bestelling met alle getelde aantallen al ingevuld. Vanuit daar kan de Clevers-bestelpagina worden geopend.</p>
-</div><div class="footer">Deze e-mail is automatisch verzonden vanuit de Clevers Telapp.</div></div></body></html>`;
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+body{margin:0;padding:32px 16px;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;color:#263238}
+.container{max-width:640px;margin:0 auto;background:#fff;border:1px solid #e2e6e9;border-radius:12px;overflow:hidden}
+.header{padding:28px 32px;border-bottom:1px solid #e8ecef}
+.logo{font-size:25px;font-weight:700;color:#159447;margin:0 0 6px}
+.header p{margin:0;color:#68737d;font-size:15px}
+.content{padding:30px 32px}
+h1{font-size:24px;margin:0 0 18px;color:#263238}
+p{font-size:16px;line-height:1.6;margin:0 0 16px}
+.info{margin:24px 0;padding:18px 20px;background:#f7f8f9;border-radius:8px}
+.info-row{padding:5px 0;font-size:15px}.label{font-weight:700;display:inline-block;min-width:100px}
+.action{text-align:center;margin:30px 0 24px}
+.button{display:inline-block;background:#159447;color:#fff!important;text-decoration:none;padding:14px 24px;border-radius:8px;font-weight:700;font-size:16px}
+.small{font-size:14px;color:#68737d}
+.footer{padding:18px 32px;background:#fafbfb;border-top:1px solid #e8ecef;color:#7b858d;font-size:12px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <p class="logo">Clevers Bestellen</p>
+    <p>Nieuwe bestelling ontvangen</p>
+  </div>
+  <div class="content">
+    <h1>Bestelling voor ${vestiging}</h1>
+    <p>De telling voor <strong>${vestiging}</strong> is afgerond en de bestelling is gereed.</p>
+    <div class="info">
+      <div class="info-row"><span class="label">Vestiging:</span> ${vestiging}</div>
+      <div class="info-row"><span class="label">Datum:</span> ${datum}</div>
+      <div class="info-row"><span class="label">Medewerker:</span> ${medewerker}</div>
+    </div>
+    <p>In de bijlage vind je de bestelling voor <strong>${vestiging}</strong>.</p>
+    <p>Om de bestelling direct verder te verwerken, klik je op onderstaande knop. De bestelling wordt dan geopend met de getelde aantallen al ingevuld.</p>
+    <div class="action">
+      <a class="button" href="${bestellingLink}">Open bestelling en ga verder →</a>
+    </div>
+    <p class="small">Controleer de bestelling en open daarna de Clevers-bestelpagina om deze verder te verwerken.</p>
+  </div>
+  <div class="footer">Deze e-mail is automatisch verzonden vanuit Clevers Bestellen.<br />De volledige bestelling vind je als PDF in de bijlage.</div>
+</div>
+</body>
+</html>`;
 }
 
 export async function verstuurBestelMail(
@@ -97,7 +120,7 @@ export async function verstuurBestelMail(
     from: "Bestelapp <onboarding@resend.dev>",
     replyTo: "bram.derks@outlook.com",
     to: ["bram.derks@outlook.com"],
-    subject: `🍦 Nieuwe telling - ${vestiging}`,
+    subject: `Nieuwe bestelling - ${vestiging}`,
     html: maakHtml(vestiging, medewerker, datum, regels, opmerking),
     attachments: [
       {
