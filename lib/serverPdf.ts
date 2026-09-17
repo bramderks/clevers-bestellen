@@ -61,10 +61,9 @@ function tekenBlok(
   regels: Array<{ naam: string; aantal: number }>,
   totaal?: number,
 ) {
-  const hoogte = 34 + regels.length * REGEL_HOOGTE + (totaal !== undefined ? 30 : 0);
+  const hoogte = 30 + regels.length * REGEL_HOOGTE + (totaal !== undefined ? 30 : 0);
   zorgVoorRuimte(ctx, Math.min(hoogte, PAGE_HEIGHT - 100));
 
-  // De kop komt overeen met de gekleurde kop van de controlepagina.
   ctx.page.drawRectangle({
     x: MARGE,
     y: ctx.y - 30,
@@ -80,7 +79,7 @@ function tekenBlok(
   ctx.y -= 30;
 
   for (const regel of regels) {
-    zorgVoorRuimte(ctx, REGEL_HOOGTE + 10);
+    zorgVoorRuimte(ctx, REGEL_HOOGTE + 2);
     const onderkant = ctx.y - REGEL_HOOGTE;
 
     ctx.page.drawRectangle({
@@ -92,6 +91,7 @@ function tekenBlok(
       borderWidth: 0.5,
     });
     tekst(ctx, regel.naam, MARGE + 14, onderkant + 9, { size: 10 });
+
     const aantal = String(regel.aantal);
     const aantalBreedte = ctx.bold.widthOfTextAtSize(aantal, 10);
     tekst(ctx, aantal, MARGE + BREEDTE - 14 - aantalBreedte, onderkant + 9, {
@@ -114,6 +114,7 @@ function tekenBlok(
       borderWidth: 0.5,
     });
     tekst(ctx, "Totaal", MARGE + 14, onderkant + 10, { size: 10, bold: true });
+
     const waarde = String(totaal);
     const waardeBreedte = ctx.bold.widthOfTextAtSize(waarde, 10);
     tekst(ctx, waarde, MARGE + BREEDTE - 14 - waardeBreedte, onderkant + 10, {
@@ -139,7 +140,7 @@ export async function maakBestelPdf(
   const page = pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
   const ctx: PdfContext = { pdf, page, font, bold, y: PAGE_HEIGHT - MARGE };
 
-  tekst(ctx, "Clevers Telapp - Controle", MARGE, ctx.y, { size: 18, bold: true });
+  tekst(ctx, "🍦 Clevers Telapp - Controle", MARGE, ctx.y, { size: 18, bold: true });
   ctx.y -= 22;
   tekst(ctx, `${vestiging}  |  ${datum}  |  ${medewerker}`, MARGE, ctx.y, {
     size: 10,
@@ -156,34 +157,33 @@ export async function maakBestelPdf(
     .filter((r) => r.bestelGroep !== "ijs" && r.productId !== "speciaalsmaken" && r.productId !== "slagroom")
     .sort((a, b) => a.productNaam.localeCompare(b.productNaam, "nl"));
 
-  const totaalIJs =
-    ijs.reduce((totaal, regel) => totaal + regel.besteld, 0) +
-    (speciaalsmaken?.besteld ?? 0);
+  // Exact dezelfde indeling en totalen als ControlePagina.
+  const totaalIJs = ijs.reduce((totaal, regel) => totaal + regel.besteld, 0) + (speciaalsmaken?.besteld ?? 0);
   const totaalDrooggoed = drooggoed.reduce((totaal, regel) => totaal + regel.besteld, 0);
 
   tekenBlok(
     ctx,
-    "Regulier ijs",
-    rgb(0.11, 0.31, 0.85),
+    "🍦 Regulier ijs",
+    rgb(0.114, 0.275, 0.624),
     ijs.map((r) => ({ naam: r.productNaam, aantal: r.besteld })),
     totaalIJs,
   );
   tekenBlok(
     ctx,
-    "Speciaalsmaken",
-    rgb(0.96, 0.62, 0.04),
+    "⭐ Speciaalsmaken",
+    rgb(0.961, 0.62, 0.043),
     [{ naam: "Speciaalsmaken", aantal: speciaalsmaken?.besteld ?? 0 }],
   );
   tekenBlok(
     ctx,
-    "Slagroom",
-    rgb(0.02, 0.52, 0.78),
+    "🍦 Slagroom",
+    rgb(0.02, 0.4, 0.7),
     [{ naam: "Slagroom", aantal: slagroom?.besteld ?? 0 }],
   );
   tekenBlok(
     ctx,
-    "Drooggoed",
-    rgb(0.02, 0.48, 0.33),
+    "📦 Drooggoed",
+    rgb(0.086, 0.49, 0.216),
     drooggoed.map((r) => ({ naam: r.productNaam, aantal: r.besteld })),
     totaalDrooggoed,
   );
