@@ -34,6 +34,7 @@ model Vestiging {
   productBuffers ProductBuffer[]
 
   documenten Document[]
+  factuurControles FactuurControle[]
 
   instellingen VestigingInstelling[]
   leverancierBestellingen LeverancierBestelling[]
@@ -72,6 +73,7 @@ model Gebruiker {
   rollen GebruikerRol[]
 
   auditLogs AuditLog[]
+  factuurControles FactuurControle[]
 
   notificaties Notificatie[]
 
@@ -662,6 +664,43 @@ model Document {
 
   @@index([vestigingId])
   @@index([categorie])
+}
+
+
+/// ======================================================
+/// FACTUURCONTROLE
+/// ======================================================
+
+model FactuurControle {
+  id String @id @default(cuid())
+
+  vestigingId String?
+  vestiging Vestiging? @relation(fields: [vestigingId], references: [id], onDelete: SetNull)
+
+  gebruikerId String?
+  gebruiker Gebruiker? @relation(fields: [gebruikerId], references: [id], onDelete: SetNull)
+
+  bestandsNaam String
+  leverancierNaam String?
+  factuurnummer String?
+  factuurDatum DateTime?
+
+  status String @default("Controleren")
+  aantalRood Int @default(0)
+  aantalOranje Int @default(0)
+  aantalGroen Int @default(0)
+
+  resultaat Json
+  duurMs Int?
+
+  aangemaaktOp DateTime @default(now())
+  gewijzigdOp DateTime @updatedAt
+
+  @@index([vestigingId])
+  @@index([gebruikerId])
+  @@index([status])
+  @@index([factuurDatum])
+  @@index([aangemaaktOp])
 }
 
 /// ======================================================
