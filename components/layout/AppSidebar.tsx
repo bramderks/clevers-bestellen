@@ -24,6 +24,11 @@ const MENU = [
     icoon: "✅",
     titel: "Weektaken",
   },
+  {
+    href: "/factuurcontrole",
+    icoon: "🧾",
+    titel: "Factuurcontrole",
+  },
 ];
 
 export default function AppSidebar() {
