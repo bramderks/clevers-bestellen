@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 type Regel = {
+  sleutel: string;
   omschrijving: string;
   productCode?: string | null;
   eenheidFactuur?: string | null;
