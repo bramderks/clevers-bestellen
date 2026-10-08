@@ -1,7 +1,4 @@
-import type {
-  BestelAdvies,
-  Vestiging,
-} from "@/types";
+import type { BestelAdvies, Vestiging } from "@/types";
 
 interface OpslaanParams {
   vestiging: Vestiging;
@@ -10,18 +7,11 @@ interface OpslaanParams {
   advies: BestelAdvies[];
 }
 
-function vestigingNaam(
-  vestiging: Vestiging
-): string {
+function vestigingNaam(vestiging: Vestiging): string {
   switch (vestiging) {
-    case "roermond":
-      return "Roermond";
-
-    case "nijmegen":
-      return "Nijmegen";
-
-    default:
-      return vestiging;
+    case "roermond": return "Roermond";
+    case "nijmegen": return "Nijmegen";
+    default: return vestiging;
   }
 }
 
@@ -32,70 +22,37 @@ export async function opslaanBestelling({
   advies,
 }: OpslaanParams) {
   if (!medewerker.trim()) {
-    throw new Error(
-      "Vul de naam van de medewerker in."
-    );
+    throw new Error("Vul de naam van de medewerker in.");
   }
 
-  const datum =
-    new Date().toISOString();
+  const datum = new Date().toISOString();
 
-  const regels = advies.map(
-    (regel) => ({
-      productId: regel.id,
+  const regels = advies.map((regel) => ({
+    productId: regel.id,
+    productNaam: regel.naam,
+    productAlternatieveNamen: regel.alternatieveNamen ?? [],
+    geteld: regel.geteld,
+    buffer: regel.buffer,
+    besteld: regel.bestellen,
+    bestelGroep: regel.bestelGroep,
+  }));
 
-      productNaam:
-        regel.naam,
+  const response = await fetch("/api/bestelling", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      datum,
+      vestiging: vestigingNaam(vestiging),
+      medewerker: medewerker.trim(),
+      opmerking: opmerking.trim(),
+      regels,
+    }),
+  });
 
-      geteld:
-        regel.geteld,
-
-      buffer:
-        regel.buffer,
-
-      besteld:
-        regel.bestellen,
-
-      bestelGroep:
-        regel.bestelGroep,
-    })
-  );
-
-  const response = await fetch(
-    "/api/bestelling",
-    {
-      method: "POST",
-
-      headers: {
-        "Content-Type":
-          "application/json",
-      },
-
-      body: JSON.stringify({
-        datum,
-
-        vestiging:
-          vestigingNaam(vestiging),
-
-        medewerker:
-          medewerker.trim(),
-
-        opmerking:
-          opmerking.trim(),
-
-        regels,
-      }),
-    }
-  );
-
-  const result =
-    await response.json();
+  const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      result.error ??
-        "Versturen mislukt."
-    );
+    throw new Error(result.error ?? "Versturen mislukt.");
   }
 
   return result;
