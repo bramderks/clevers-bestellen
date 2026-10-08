@@ -26,10 +26,10 @@ export default function DashboardPagina() {
         </div>
       </header>
 
-      <section className="mx-auto flex max-w-3xl flex-col gap-5 p-5">
+      <section className="mx-auto grid max-w-6xl gap-5 p-5 md:grid-cols-3">
         <Link
           href="/tellen"
-          className="group rounded-2xl bg-white p-7 shadow-sm transition hover:shadow-md active:scale-[0.99]"
+          className="group rounded-2xl bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99]"
         >
           <div className="text-5xl">
             🍦
