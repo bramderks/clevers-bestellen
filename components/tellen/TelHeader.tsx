@@ -3,9 +3,6 @@ import type { Vestiging } from "@/types";
 interface Props {
   vestiging: Vestiging;
   medewerker: string;
-  onMedewerkerChange: (
-    waarde: string
-  ) => void;
   stap: number;
   totaalStappen: number;
   controleStap: boolean;
@@ -14,7 +11,6 @@ interface Props {
 export default function TelHeader({
   vestiging,
   medewerker,
-  onMedewerkerChange,
   stap,
   totaalStappen,
   controleStap,
