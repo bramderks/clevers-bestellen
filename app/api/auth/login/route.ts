@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { maakErpSessie } from "@/lib/erp-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     const result = NextResponse.json({ success: true, gebruiker: data.gebruiker });
     result.cookies.set({
       name: "clevers_session",
-      value: data.gebruiker.id,
+      value: maakErpSessie(data.gebruiker.id, secret),
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
