@@ -107,6 +107,9 @@ export default function TelForm({ vestiging }: Props) {
 
   return (
     <div className="space-y-6">
+      {gebruikerLaden ? (
+        <div className="rounded-xl border bg-white p-8 text-center text-slate-600">Gebruikersgegevens ophalen uit Clevers ERP...</div>
+      ) : <>
       <TelHeader
         vestiging={vestiging}
         medewerker={medewerker}
@@ -150,6 +153,7 @@ export default function TelForm({ vestiging }: Props) {
         onVolgende={volgende}
         onOpslaan={opslaan}
       />
+      </>}
     </div>
   );
 }
