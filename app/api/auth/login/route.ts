@@ -1,96 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { gebruikerOpEmail, isActief } from "@/lib/auth";
-import { log } from "@/lib/logger";
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  const baseUrl = process.env.CLEVERS_ERP_BASE_URL?.replace(/\/+$/, "");
+  const secret = process.env.CLEVERS_BESTELLEN_INTEGRATION_SECRET;
+  if (!baseUrl || !secret) {
+    return NextResponse.json({ error: "De koppeling met Clevers ERP is nog niet volledig ingesteld." }, { status: 503 });
+  }
+
   try {
-    const { email } = await request.json();
+    const body = await request.json();
+    const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+    const wachtwoord = typeof body?.wachtwoord === "string" ? body.wachtwoord : "";
+    if (!email || !wachtwoord) return NextResponse.json({ error: "Vul e-mailadres en wachtwoord in." }, { status: 400 });
 
-    if (!email) {
-      return NextResponse.json(
-        {
-          error: "E-mailadres ontbreekt.",
-        },
-        {
-          status: 400,
-        },
-      );
+    const response = await fetch(baseUrl + "/api/integraties/bestellen/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-clevers-integration-secret": secret },
+      body: JSON.stringify({ email, wachtwoord }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(12000),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data?.gebruiker?.id) {
+      return NextResponse.json({ error: data?.message ?? "Inloggen mislukt." }, { status: response.status || 502 });
     }
 
-    const gebruiker = await gebruikerOpEmail(email);
-
-    const ipAdres =
-      request.headers
-        .get("x-forwarded-for")
-        ?.split(",")[0]
-        ?.trim() ??
-      request.headers.get("x-real-ip") ??
-      undefined;
-
-    const userAgent =
-      request.headers.get("user-agent") ??
-      undefined;
-
-    if (!gebruiker || !isActief(gebruiker)) {
-await log({
-  actie: "LOGIN_MISLUKT",
-  entiteit: "Gebruiker",
-  details: {
-    melding:
-      "Onbekende of inactieve gebruiker.",
-  },
-  ipAdres,
-  userAgent,
-});
-
-      return NextResponse.json(
-        {
-          error: "Ongeldige inloggegevens.",
-        },
-        {
-          status: 401,
-        },
-      );
-    }
-
-    await log({
-      gebruikerId: gebruiker.id,
-      actie: "LOGIN_GELUKT",
-      entiteit: "Gebruiker",
-      entiteitId: gebruiker.id,
-      ipAdres,
-      userAgent,
-    });
-
-    const response = NextResponse.json({
-      success: true,
-      gebruiker: {
-        id: gebruiker.id,
-        naam: gebruiker.naam,
-        email: gebruiker.email,
-      },
-    });
-
-    response.cookies.set({
+    const result = NextResponse.json({ success: true, gebruiker: data.gebruiker });
+    result.cookies.set({
       name: "clevers_session",
-      value: gebruiker.id,
+      value: data.gebruiker.id,
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 60 * 60 * 8,
+      maxAge: 60 * 60 * 12,
     });
-
-    return response;
-  } catch {
-    return NextResponse.json(
-      {
-        error: "Interne serverfout.",
-      },
-      {
-        status: 500,
-      },
-    );
+    result.headers.set("Cache-Control", "no-store");
+    return result;
+  } catch (error) {
+    console.error("ERP login koppeling mislukt", error);
+    return NextResponse.json({ error: "Clevers ERP is momenteel niet bereikbaar. Probeer het opnieuw." }, { status: 502 });
   }
 }
