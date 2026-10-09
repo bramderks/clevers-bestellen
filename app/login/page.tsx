@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function LoginPagina() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [wachtwoord, setWachtwoord] = useState("");
   const [fout, setFout] = useState("");
@@ -27,7 +26,7 @@ export default function LoginPagina() {
         setFout(data.error ?? "Inloggen is niet gelukt.");
         return;
       }
-      const bestemming = searchParams.get("next");
+      const bestemming = new URLSearchParams(window.location.search).get("next");
       router.replace(bestemming && bestemming.startsWith("/") && !bestemming.startsWith("//") ? bestemming : "/");
       router.refresh();
     } catch {
