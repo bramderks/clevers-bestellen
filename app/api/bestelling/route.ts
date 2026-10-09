@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { verstuurBestelMail } from "@/lib/mail";
+import { haalErpGebruiker } from "@/lib/erp-auth";
 
 interface BestelRegel {
   productId: string;
@@ -124,7 +125,12 @@ async function synchroniseerMetErp(body: RequestBody): Promise<SynchronisatieRes
 
 export async function POST(req: NextRequest) {
   try {
-    const body = (await req.json()) as RequestBody;
+    const gebruiker = await haalErpGebruiker(req);
+    if (!gebruiker) {
+      return NextResponse.json({ success: false, error: "Log in met je Clevers ERP-account om een telling op te slaan." }, { status: 401 });
+    }
+    const ontvangen = (await req.json()) as RequestBody;
+    const body: RequestBody = { ...ontvangen, medewerker: gebruiker.naam };
     const fout = valideer(body);
 
     if (fout) {
