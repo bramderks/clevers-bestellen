@@ -47,6 +47,21 @@ export default function Home() {
             Schoonmaak-, controle- en onderhoudstaken.
           </p>
         </Link>
+        
+        <Link
+          href="/factuurcontrole"
+          className="rounded-2xl bg-white p-8 shadow-sm transition hover:shadow-md active:scale-[0.99]"
+        >
+          <div className="text-5xl">🧾</div>
+
+          <h2 className="mt-5 text-3xl font-bold text-slate-900">
+            Factuurcontrole
+          </h2>
+
+          <p className="mt-2 text-lg text-slate-500">
+            Controleer de wekelijkse factuur tegen alle pakbonnen.
+          </p>
+        </Link>
       </section>
     </main>
   );
