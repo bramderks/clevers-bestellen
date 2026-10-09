@@ -67,13 +67,10 @@ export default function TelHeader({
         <input
           type="text"
           value={medewerker}
-          onChange={(e) =>
-            onMedewerkerChange(
-              e.target.value
-            )
-          }
-          placeholder="Bijvoorbeeld Bram"
-          className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-600"
+          readOnly
+          aria-readonly="true"
+          placeholder="Naam uit Clevers ERP"
+          className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-700 outline-none"
         />
 
       </div>
