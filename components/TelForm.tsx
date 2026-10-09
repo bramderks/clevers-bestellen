@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { Vestiging } from "@/types";
@@ -26,6 +26,25 @@ export default function TelForm({ vestiging }: Props) {
   const [medewerker, setMedewerker] = useState("");
   const [opmerking, setOpmerking] = useState("");
   const [opslaanBezig, setOpslaanBezig] = useState(false);
+  const [gebruikerLaden, setGebruikerLaden] = useState(true);
+
+  useEffect(() => {
+    let actief = true;
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) {
+          router.replace("/login?next=%2Ftellen");
+          return;
+        }
+        const data = await response.json();
+        if (actief && data.gebruiker?.naam) setMedewerker(data.gebruiker.naam);
+        if (actief) setGebruikerLaden(false);
+      })
+      .catch(() => {
+        if (actief) router.replace("/login?next=%2Ftellen");
+      });
+    return () => { actief = false; };
+  }, [router]);
 
   function wijzig(id: string, waarde: number) {
     setTelling((vorige) => ({ ...vorige, [id]: waarde }));
