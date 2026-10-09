@@ -3,6 +3,7 @@ import OpenAI from "openai";
 
 import { prisma } from "@/lib/prisma";
 import { vergelijkRegels, type FactuurControleResultaat } from "@/lib/factuurcontrole";
+import { haalErpGebruiker } from "@/lib/erp-auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -39,21 +40,11 @@ function nummer(value: unknown): number | null {
 }
 
 export async function POST(request: NextRequest) {
-  const sessionId = request.cookies.get("clevers_session")?.value;
-  if (!sessionId) {
-    return NextResponse.json({ success: false, message: "Niet ingelogd." }, { status: 401 });
+  const gebruiker = await haalErpGebruiker(request);
+  if (!gebruiker) {
+    return NextResponse.json({ success: false, message: "Log in met je Clevers ERP-account." }, { status: 401 });
   }
-
-  const gebruiker = await prisma.gebruiker.findUnique({
-    where: { id: sessionId },
-    include: { rollen: { include: { rol: true } } },
-  });
-
-  if (!gebruiker?.actief) {
-    return NextResponse.json({ success: false, message: "Geen actieve gebruiker." }, { status: 401 });
-  }
-
-  if (!gebruiker.rollen.some((item) => item.rol.naam === "Eigenaar")) {
+  if (!gebruiker.eigenaar) {
     return NextResponse.json({ success: false, message: "Alleen de eigenaar kan facturen controleren." }, { status: 403 });
   }
 
@@ -175,7 +166,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.factuurControle.create({
       data: {
-        gebruikerId: gebruiker.id,
+        gebruikerId: (await prisma.gebruiker.findUnique({ where: { email: gebruiker.email }, select: { id: true } }))?.id ?? null,
         bestandsNaam: file.name,
         leverancierNaam: resultaat.leverancier,
         factuurnummer: resultaat.factuurnummer,
