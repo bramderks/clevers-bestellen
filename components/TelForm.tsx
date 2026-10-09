@@ -113,7 +113,6 @@ export default function TelForm({ vestiging }: Props) {
       <TelHeader
         vestiging={vestiging}
         medewerker={medewerker}
-        onMedewerkerChange={setMedewerker}
         stap={stap}
         totaalStappen={stappen.length}
         controleStap={controleStap}
