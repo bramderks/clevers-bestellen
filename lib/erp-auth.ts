@@ -28,7 +28,7 @@ export type ErpGebruiker = {
 };
 
 export async function haalErpGebruikerMetSessie(session: string | undefined): Promise<ErpGebruiker | null> {
-  const baseUrl = process.env.CLEVERS_ERP_BASE_URL?.replace(/\\/+$/, "");
+  const baseUrl = process.env.CLEVERS_ERP_BASE_URL?.replace(/\/+$/, "");
   const secret = process.env.CLEVERS_BESTELLEN_INTEGRATION_SECRET;
   if (!session || !baseUrl || !secret) return null;
 
