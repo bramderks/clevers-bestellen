@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import InactiviteitUitloggen from "@/components/auth/InactiviteitUitloggen";
 import AppHeader from "./AppHeader";
 import AppSidebar from "./AppSidebar";
 
@@ -16,11 +17,10 @@ export default function AppLayout({
 }: Readonly<Props>) {
   return (
     <div className="flex min-h-screen bg-slate-100">
-
+      <InactiviteitUitloggen />
       <AppSidebar />
 
       <div className="flex min-h-screen flex-1 flex-col">
-
         <AppHeader
           naam={naam}
           vestiging={vestiging}
@@ -29,9 +29,7 @@ export default function AppLayout({
         <main className="flex-1 p-8">
           {children}
         </main>
-
       </div>
-
     </div>
   );
 }
