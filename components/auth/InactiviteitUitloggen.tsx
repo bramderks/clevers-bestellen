@@ -22,6 +22,8 @@ export default function InactiviteitUitloggen() {
           credentials: "same-origin",
           cache: "no-store",
         });
+      } catch {
+        // Ook bij een tijdelijke netwerkfout naar het inlogscherm navigeren.
       } finally {
         router.replace("/login?reden=inactiviteit");
         router.refresh();
