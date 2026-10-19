@@ -1,33 +1,20 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { prisma } from "@/lib/prisma";
-
+import { haalErpGebruikerMetSessie } from "@/lib/erp-auth";
 import AppLayout from "@/components/layout/AppLayout";
 
 interface Props {
   children: React.ReactNode;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function ProtectedLayout({
   children,
 }: Readonly<Props>) {
   const cookieStore = await cookies();
-
-  const session = cookieStore.get("clevers_session");
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const gebruiker = await prisma.gebruiker.findUnique({
-    where: {
-      id: session.value,
-    },
-    include: {
-      vestiging: true,
-    },
-  });
+  const gebruiker = await haalErpGebruikerMetSessie(cookieStore.get("clevers_session")?.value);
 
   if (!gebruiker || !gebruiker.actief) {
     redirect("/login");
@@ -36,7 +23,7 @@ export default async function ProtectedLayout({
   return (
     <AppLayout
       naam={gebruiker.naam}
-      vestiging={gebruiker.vestiging?.naam}
+      vestiging={gebruiker.vestigingen?.[0]?.naam}
     >
       {children}
     </AppLayout>
