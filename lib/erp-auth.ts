@@ -27,11 +27,11 @@ export type ErpGebruiker = {
   vestigingen: Array<{ id: string; naam: string; organisatieId: string }>;
 };
 
-export async function haalErpGebruiker(request: NextRequest): Promise<ErpGebruiker | null> {
-  const session = request.cookies.get("clevers_session")?.value;
-  const baseUrl = process.env.CLEVERS_ERP_BASE_URL?.replace(/\/+$/, "");
+export async function haalErpGebruikerMetSessie(session: string | undefined): Promise<ErpGebruiker | null> {
+  const baseUrl = process.env.CLEVERS_ERP_BASE_URL?.replace(/\\/+$/, "");
   const secret = process.env.CLEVERS_BESTELLEN_INTEGRATION_SECRET;
   if (!session || !baseUrl || !secret) return null;
+
   const userId = controleerErpSessie(session, secret);
   if (!userId) return null;
 
@@ -47,4 +47,8 @@ export async function haalErpGebruiker(request: NextRequest): Promise<ErpGebruik
   } catch {
     return null;
   }
+}
+
+export async function haalErpGebruiker(request: NextRequest): Promise<ErpGebruiker | null> {
+  return haalErpGebruikerMetSessie(request.cookies.get("clevers_session")?.value);
 }
